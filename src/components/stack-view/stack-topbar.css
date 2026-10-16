@@ -1,0 +1,719 @@
+/* components/stack-view/stack-topbar.css
+ * Top bar of the stack screen and its icon buttons.
+ */
+.dm-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 14px;
+  gap: clamp(3px, 1.5vw, 8px);
+  flex-wrap: nowrap;
+}
+.dm-topbar > *:last-child {
+  margin-left: auto;
+}
+.dm-topbar .dm-iconbtn {
+  flex: 0 1 44px;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  min-width: 26px;
+  border-radius: 10px;
+  padding: 0;
+}
+.dm-topbar .dm-iconbtn.dm-topbar-fixed-btn {
+  flex: 0 0 44px;
+  min-width: 44px;
+}
+.dm-topbar .dm-iconbtn svg {
+  width: 45%;
+  height: 45%;
+}
+.dm-topbar .dm-iconbtn .dm-aicon svg {
+  width: 100%;
+  height: 100%;
+}
+.dm-topbar .dm-forms-audio-toggle {
+  flex: 0 1 44px;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  min-width: 26px;
+  border-radius: 10px;
+}
+.dm-topbar-extra {
+  min-width: 0;
+}
+.dm-topbar-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Premium upgrade CTA: fixed-width pill so it doesn't resize when sibling
+   icons come and go (e.g. toggling the stack topbar's "more options" menu).
+   Sized a bit bigger than the ordinary 44px icon buttons around it. */
+.dm-topbar-premium-btn {
+  position: relative;
+  flex: 0 0 auto;
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: clamp(12px, 4vw, 16px);
+  letter-spacing: 0.2px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--gold) 100%);
+  background-size: 220% 220%;
+  background-position: 0% 50%;
+  box-shadow:
+    0 8px 24px -6px rgba(var(--cyan-rgb), 0.55),
+    0 3px 12px -3px rgba(var(--gold-rgb), 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    background-position 0.45s ease,
+    padding 0.2s ease,
+    gap 0.2s ease;
+  container: dm-premium-cta / inline-size;
+}
+.dm-topbar-premium-label-short {
+  display: none;
+}
+/* When there isn't room for the full word, swap to "Pro" instead of truncating with an ellipsis. */
+@container dm-premium-cta (max-width: 128px) {
+  .dm-topbar-premium-btn {
+    padding: 0 10px;
+    gap: 6px;
+  }
+  .dm-topbar-premium-label-full {
+    display: none;
+  }
+  .dm-topbar-premium-label-short {
+    display: inline;
+  }
+}
+@container dm-premium-cta (max-width: 62px) {
+  .dm-topbar-premium-btn {
+    padding: 0;
+    gap: 0;
+  }
+  .dm-topbar-premium-label-short {
+    display: none;
+  }
+}
+/* Fallback for engines without container query support: just let the font shrink with the viewport. */
+@supports not (container-type: inline-size) {
+  .dm-topbar-premium-label-full {
+    font-size: clamp(11px, 3vw, 16px);
+  }
+}
+.dm-topbar-premium-btn svg {
+  flex-shrink: 0;
+  transform-origin: center;
+  animation: dm-premium-star-twinkle 2.1s ease-in-out infinite;
+}
+@keyframes dm-premium-star-twinkle {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45));
+  }
+  50% {
+    transform: scale(1.22) rotate(10deg);
+    filter: drop-shadow(0 0 9px rgba(255, 255, 255, 0.95));
+  }
+}
+.dm-topbar-premium-label-full,
+.dm-topbar-premium-label-short {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.dm-topbar-premium-btn:active {
+  transform: scale(0.95);
+}
+/* On the home screen this button sits among fixed-size icon buttons (not a flex-growing
+   row like the stack topbar), so give it its own natural content-based width and match
+   the standard button height used there instead of collapsing to near-zero. */
+.dm-home-premium-btn {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  min-width: 0;
+  gap: 0;
+  border-radius: 13px;
+}
+.dm-home-premium-btn .dm-topbar-premium-label-full,
+.dm-home-premium-btn .dm-topbar-premium-label-short {
+  display: none !important;
+}
+.dm-home-premium-btn svg {
+  width: 20px;
+  height: 20px;
+}
+@media (max-width: 460px) {
+  .dm-home-premium-btn {
+    flex-basis: 72px;
+    width: 72px;
+    height: 48px;
+    border-radius: 15px;
+  }
+  .dm-home-premium-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+.dm-topbar-premium-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: dm-premium-shine 3.4s ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-topbar-premium-btn:hover {
+    background-position: 100% 50%;
+    box-shadow:
+      0 8px 26px -6px rgba(var(--cyan-rgb), 0.6),
+      0 3px 12px -2px rgba(var(--gold-rgb), 0.5),
+      0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  }
+}
+@keyframes dm-premium-shine {
+  0% {
+    left: -60%;
+  }
+  45% {
+    left: 130%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+/* Morph container: whichever row is currently active stays in normal flow (so the
+   container's width always matches it exactly, no leftover blank space); the other
+   row is pulled out with position:absolute and overlaid for the crossfade. */
+.dm-topbar-morph {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 640px;
+}
+.dm-topbar-morph > .dm-topbar-default,
+.dm-topbar-morph > .dm-topbar-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dm-topbar-extra {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: scale(0.92) translateY(5px);
+  filter: blur(3px);
+  pointer-events: none;
+  transition:
+    opacity 0.16s cubic-bezier(0.4, 0, 1, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 1, 1),
+    filter 0.16s ease;
+}
+.dm-topbar-extra.dm-topbar-extra-open {
+  position: static;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+  pointer-events: auto;
+  transition:
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+    transform 0.42s cubic-bezier(0.22, 1.28, 0.36, 1) 0.05s,
+    filter 0.24s ease 0.05s;
+}
+.dm-topbar-extra > * {
+  flex-shrink: 1;
+  min-width: 0;
+  opacity: 0;
+  transform: scale(0.6) translateY(6px);
+}
+.dm-topbar-extra-open > * {
+  animation: dm-topbar-item-pop-in 0.46s cubic-bezier(0.22, 1.32, 0.36, 1) both;
+}
+.dm-topbar-extra-open > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.dm-topbar-extra-open > *:nth-child(2) {
+  animation-delay: 0.11s;
+}
+.dm-topbar-extra-open > *:nth-child(3) {
+  animation-delay: 0.17s;
+}
+.dm-topbar-extra-open > *:nth-child(4) {
+  animation-delay: 0.23s;
+}
+
+.dm-topbar-default {
+  position: static;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+  pointer-events: auto;
+  transition:
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+    transform 0.42s cubic-bezier(0.22, 1.28, 0.36, 1) 0.05s,
+    filter 0.24s ease 0.05s;
+}
+.dm-topbar-default.dm-topbar-default-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: scale(0.92) translateY(-5px);
+  filter: blur(3px);
+  pointer-events: none;
+  transition:
+    opacity 0.16s cubic-bezier(0.4, 0, 1, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 1, 1),
+    filter 0.16s ease;
+}
+.dm-topbar-default > * {
+  flex-shrink: 1;
+  min-width: 0;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.dm-topbar-default:not(.dm-topbar-default-hidden) > * {
+  animation: dm-topbar-item-pop-in 0.46s cubic-bezier(0.22, 1.32, 0.36, 1) both;
+}
+.dm-topbar-default:not(.dm-topbar-default-hidden) > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.dm-topbar-default:not(.dm-topbar-default-hidden) > *:nth-child(2) {
+  animation-delay: 0.11s;
+}
+.dm-topbar-default:not(.dm-topbar-default-hidden) > *:nth-child(3) {
+  animation-delay: 0.17s;
+}
+.dm-topbar-default:not(.dm-topbar-default-hidden) > *:nth-child(4) {
+  animation-delay: 0.23s;
+}
+
+@keyframes dm-topbar-item-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(7px);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.09) translateY(-1.5px);
+  }
+  80% {
+    transform: scale(0.97) translateY(0.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Give the menu toggle button a soft press/glow so the trigger itself feels tactile. */
+.dm-topbar .dm-iconbtn.dm-topbar-fixed-btn {
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.dm-topbar .dm-iconbtn.dm-topbar-fixed-btn:active {
+  transform: scale(0.88);
+}
+.dm-emoji {
+  margin-right: 4px;
+}
+
+.dm-iconbtn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-iconbtn:hover {
+    background: var(--surface-strong);
+    border-color: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+}
+.dm-iconbtn:active {
+  transform: scale(0.92);
+  box-shadow: var(--shadow-xs);
+}
+.dm-iconbtn-active {
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.4);
+}
+
+.dm-stack-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.dm-stack-title-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+.dm-iconbtn.dm-stack-title-ministack-btn {
+  flex-shrink: 0;
+  position: relative;
+  overflow: visible;
+}
+.dm-stack-title-ministack-btn.dm-iconbtn-active {
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(var(--gold-rgb), 0.18),
+    transparent 75%
+  );
+  box-shadow:
+    0 0 16px -4px rgba(var(--gold-rgb), 0.4),
+    var(--shadow-xs);
+  animation: dm-anim-herobreathe 3s ease-in-out infinite;
+}
+.dm-ministack-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--gold), #ffd873);
+  color: #241a02;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--bg);
+  animation: dm-ministack-badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes dm-ministack-badge-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Stack view toolbar: one unified glass dock instead of six floating tiles ===== */
+.dm-topbar:has(.dm-topbar-morph) {
+  --dk: 42px;
+  padding: 7px;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow:
+    var(--shadow-xs),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn,
+.dm-topbar:has(.dm-topbar-morph) .dm-forms-audio-toggle {
+  flex: 0 0 var(--dk);
+  width: var(--dk);
+  min-width: var(--dk);
+  max-width: var(--dk);
+  height: var(--dk);
+  aspect-ratio: auto;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-dim, var(--text));
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn.dm-topbar-fixed-btn {
+  flex: 0 0 var(--dk);
+  min-width: var(--dk);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph {
+  flex-shrink: 0;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.1;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn .dm-aicon svg {
+  width: 100%;
+  height: 100%;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-default,
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-extra {
+  gap: 6px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-topbar:has(.dm-topbar-morph) .dm-iconbtn:hover {
+    background: var(--surface-strong);
+    color: var(--text);
+    transform: translateY(-1px);
+    box-shadow: none;
+    border-color: transparent;
+  }
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn:active {
+  transform: scale(0.9);
+}
+
+/* Back = plain ghost; menu toggle lights up when open */
+.dm-topbar:has(.dm-topbar-morph) .dm-iconbtn.dm-topbar-fixed-btn:first-child {
+  color: var(--text);
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-iconbtn.dm-iconbtn-active.dm-topbar-fixed-btn {
+  background: rgba(var(--gold-rgb), 0.16);
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.35);
+}
+
+/* Divider between navigation and actions */
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph {
+  margin-left: 12px;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: 50%;
+  width: 1px;
+  height: 22px;
+  transform: translateY(-50%);
+  background: var(--border);
+  pointer-events: none;
+}
+
+/* Tinted action icons: AI = cyan, mini stack = gold, games = pink */
+.dm-topbar:has(.dm-topbar-morph) .dm-stackview-ai-btn {
+  color: var(--cyan);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-stackview-ai-btn:hover {
+  background: rgba(var(--cyan-rgb), 0.14);
+  color: var(--cyan);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-stack-title-ministack-btn {
+  color: var(--gold);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-stack-title-ministack-btn:hover {
+  background: rgba(var(--gold-rgb), 0.14);
+  color: var(--gold);
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-stack-title-ministack-btn.dm-iconbtn-active {
+  background: rgba(var(--gold-rgb), 0.16);
+  border-color: rgba(var(--gold-rgb), 0.35);
+  box-shadow: 0 0 14px -4px rgba(var(--gold-rgb), 0.55);
+  animation: none;
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-topbar-default .dm-iconbtn:nth-child(3) {
+  color: var(--pink, #ff6b9d);
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-topbar-default
+  .dm-iconbtn:nth-child(3):hover {
+  background: rgba(255, 107, 157, 0.14);
+}
+.dm-topbar:has(.dm-topbar-morph) .dm-ministack-badge {
+  top: -3px;
+  right: -3px;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+/* "+" add word = the one primary action, filled and pushed right */
+.dm-topbar:has(.dm-topbar-morph) > .dm-iconbtn:last-child {
+  flex: 0 0 var(--dk);
+  min-width: var(--dk);
+  max-width: var(--dk);
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  color: #0b0c10;
+  border-color: transparent;
+  box-shadow:
+    0 6px 16px -6px rgba(var(--cyan-rgb), 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.35) inset;
+}
+.dm-topbar:has(.dm-topbar-morph) > .dm-iconbtn:last-child svg {
+  stroke-width: 2.6;
+  width: 21px;
+  height: 21px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-topbar:has(.dm-topbar-morph) > .dm-iconbtn:last-child:hover {
+    background: linear-gradient(135deg, var(--cyan), var(--gold));
+    color: #0b0c10;
+    filter: brightness(1.08);
+    box-shadow: 0 9px 20px -6px rgba(var(--cyan-rgb), 0.8);
+  }
+}
+
+/* Premium CTA inside the dock */
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-topbar-premium-btn:not(.dm-home-premium-btn) {
+  height: var(--dk);
+  border-radius: 14px;
+  margin-left: 6px;
+  flex: 0 1 auto;
+  min-width: var(--dk);
+}
+@media (max-width: 430px) {
+  .dm-topbar:has(.dm-topbar-morph) {
+    --dk: 36px;
+    padding: 6px;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph {
+    margin-left: 10px;
+  }
+}
+@media (max-width: 345px) {
+  .dm-topbar:has(.dm-topbar-morph) {
+    --dk: 32px;
+    gap: 4px;
+  }
+}
+
+/* ===== Mini stack button: dedicated icon, clear empty / filled states ===== */
+.dm-iconbtn.dm-stack-title-ministack-btn {
+  position: relative;
+  overflow: visible;
+}
+.dm-ministack-plus {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #ffd873);
+  color: #241a02;
+  font:
+    900 12px/1 "Inter",
+    -apple-system,
+    sans-serif;
+  padding-bottom: 1px;
+  box-shadow: 0 0 0 2px var(--bg);
+  pointer-events: none;
+}
+.dm-ministack-badge {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-stack-title-ministack-btn:not(.dm-iconbtn-active) {
+  border: 1px dashed rgba(var(--gold-rgb), 0.5);
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-stack-title-ministack-btn
+  .dm-ministack-badge,
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-stack-title-ministack-btn
+  .dm-ministack-plus {
+  top: -5px;
+  right: -5px;
+}
+.dm-topbar:has(.dm-topbar-morph)
+  .dm-stack-title-ministack-btn.dm-iconbtn-active {
+  color: var(--gold);
+}
+.dm-stack-title-ministack-btn.dm-iconbtn-active svg {
+  filter: drop-shadow(0 0 4px rgba(var(--gold-rgb), 0.45));
+}
+.dm-stack-title-emoji {
+  flex-shrink: 0;
+}
+.dm-stack-title-emoji-mini {
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(var(--cyan-rgb), 0.35),
+    0 0 14px -2px rgba(var(--cyan-rgb), 0.4);
+}
+.dm-stack-title-name {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-stack-title-count {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.12);
+  border: 1px solid rgba(var(--cyan-rgb), 0.3);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.dm-empty-ministack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.dm-empty-ministack svg {
+  opacity: 0.35;
+}

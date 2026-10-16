@@ -1,0 +1,245 @@
+/* components/stack-select/stack-select.css
+ * Select / dropdown / stack-select.
+ */
+.dm-select-wrap {
+  position: relative;
+}
+.dm-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  cursor: pointer;
+}
+.dm-select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  pointer-events: none;
+  color: var(--text-dim);
+  transition: transform 0.18s ease;
+}
+.dm-select-chevron-open {
+  transform: translateY(-50%) rotate(180deg);
+}
+.dm-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  font-family: inherit;
+}
+.dm-dropdown-trigger:focus-visible {
+  border-color: rgba(var(--cyan-rgb), 0.45);
+  box-shadow:
+    var(--shadow-inset),
+    0 0 0 3px rgba(var(--cyan-rgb), 0.12);
+}
+.dm-dropdown-trigger-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.dm-dropdown-trigger-label svg {
+  flex-shrink: 0;
+  color: var(--cyan);
+}
+.dm-dropdown-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  background: var(--modal-bg, linear-gradient(180deg, #14161e, #0f1117));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.4);
+  z-index: 30;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: dm-dropdown-in 0.16s ease;
+}
+.dm-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.dm-dropdown-item:hover,
+.dm-dropdown-item:focus-visible {
+  background: rgba(var(--cyan-rgb), 0.08);
+}
+.dm-dropdown-item-active {
+  background: rgba(var(--cyan-rgb), 0.14);
+  color: var(--cyan);
+}
+.dm-dropdown-item-active svg {
+  color: var(--cyan);
+}
+.dm-dropdown-item-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes dm-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dm-stackselect {
+  position: relative;
+  margin-bottom: 18px;
+}
+.dm-stackselect-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--text);
+  backdrop-filter: blur(10px);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-stackselect-trigger:hover {
+    border-color: rgba(var(--cyan-rgb), 0.35);
+    box-shadow: var(--shadow-md);
+  }
+}
+.dm-stackselect-trigger-open {
+  border-color: var(--cyan);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 3px rgba(var(--cyan-rgb), 0.12);
+}
+.dm-stackselect-emoji {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--surface-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dm-stackselect-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dm-stackselect-name {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dm-stackselect-count {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.dm-stackselect-chevron {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.dm-stackselect-trigger-open .dm-stackselect-chevron {
+  transform: rotate(180deg);
+  color: var(--cyan);
+}
+.dm-stackselect-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--modal-bg, #12141b);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: dm-fadein 0.16s ease;
+}
+.dm-stackselect-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 11px;
+  padding: 9px 8px;
+  color: var(--text);
+  transition: background 0.12s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-stackselect-item:hover {
+    background: var(--surface-strong);
+  }
+}
+.dm-stackselect-item-active {
+  background: rgba(var(--cyan-rgb), 0.1);
+}
+.dm-stackselect-item-name {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dm-stackselect-item-count {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.dm-stackselect-check {
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+.dm-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}

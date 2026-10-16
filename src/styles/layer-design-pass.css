@@ -1,0 +1,164 @@
+/* styles/layer-design-pass.css
+ * LAYER: banners, type scale, settings, spacing, phone games.
+ */
+/* ===================== Design pass: banners, type scale, settings, spacing, phone games ===================== */
+
+/* 1. Home banners: neutral surface, colour only in the icon tile and a thin accent edge */
+.dm-home-view > .dm-due-banner {
+  --banner-accent: var(--gold);
+}
+.dm-home-view > .dm-hard-banner {
+  --banner-accent: var(--red);
+}
+.dm-home-view > .dm-due-banner,
+.dm-home-view > .dm-hard-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 2px 0 0 var(--banner-accent),
+    var(--shadow-sm);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-home-view > .dm-due-banner:hover,
+  .dm-home-view > .dm-hard-banner:hover {
+    border-color: color-mix(in srgb, var(--banner-accent) 45%, var(--border));
+    box-shadow:
+      inset 2px 0 0 var(--banner-accent),
+      var(--shadow-md);
+  }
+}
+
+/* 2. Type scale: clearer section labels, no unreadable captions */
+.dm-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.dm-eyebrow {
+  font-size: 12.5px;
+}
+.dm-game-lock-badge,
+.dm-level-badge,
+.dm-direction-badge {
+  font-size: 11px;
+}
+.dm-premium-plan-badge,
+.dm-gem-pack-bonus {
+  font-size: 12.5px;
+}
+.dm-navbtn-label {
+  font-size: 12.5px;
+}
+.dm-stackselect-count,
+.dm-card-index,
+.dm-settings-card-desc,
+.dm-premium-plan-sub,
+.dm-settings-section-label {
+  font-size: 13px;
+}
+.dm-game-desc {
+  font-size: 12px;
+}
+
+/* 3. Settings: grouped, one neutral card style, a single accent colour */
+.dm-settings-group-label {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 24px 2px 10px;
+}
+.dm-settings-group-label:first-of-type {
+  margin-top: 8px;
+}
+.dm-settings-group-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: dm-settings-label-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.dm-settings-group-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+  transform-origin: left;
+  animation: dm-settings-line-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: inherit;
+}
+@keyframes dm-settings-label-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-settings-line-in {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-settings-group-label,
+  .dm-settings-group-label::after {
+    animation: none;
+  }
+}
+.dm-settings-grid > .dm-settings-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.dm-settings-grid > .dm-settings-card .dm-settings-card-icon {
+  color: var(--cyan);
+}
+.dm-settings-grid > .dm-settings-card-premium {
+  border-color: rgba(var(--gold-rgb), 0.4);
+  background: linear-gradient(
+    160deg,
+    rgba(var(--gold-rgb), 0.12),
+    var(--surface) 65%
+  );
+}
+.dm-settings-grid > .dm-settings-card-premium .dm-settings-card-icon {
+  color: var(--gold);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-settings-grid > .dm-settings-card:hover:not(:disabled) {
+    border-color: rgba(var(--cyan-rgb), 0.45);
+  }
+  .dm-settings-grid > .dm-settings-card-premium:hover:not(:disabled) {
+    border-color: rgba(var(--gold-rgb), 0.65);
+  }
+}
+
+/* 5. Home vertical rhythm: 16px between rows, 12px between the two banners, 24px before a section */
+.dm-home-view > .dm-header {
+  margin-bottom: 16px;
+}
+.dm-home-view > .dm-stats-row {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.dm-home-view > .dm-due-banner {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.dm-home-view > .dm-hard-banner {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.dm-home-view .dm-section-title {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}

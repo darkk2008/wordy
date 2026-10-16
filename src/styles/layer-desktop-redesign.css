@@ -1,0 +1,263 @@
+/* styles/layer-desktop-redesign.css
+ * LAYER: desktop sidebar, hero header, dashboard split.
+ */
+/* ==================================================================
+   DESKTOP REDESIGN — sidebar polish, hero header, dashboard split.
+   Scoped to >=900px / >=1080px so mobile is completely untouched.
+   ================================================================== */
+@media (min-width: 900px) {
+  /* ---- Sidebar nav: real app-rail treatment ---- */
+  .dm-bottomnav {
+    flex: 0 0 var(--nav-w, 264px);
+    width: var(--nav-w, 264px);
+    max-width: var(--nav-w, 264px);
+    transition:
+      width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+      max-width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+      flex-basis 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+    padding: 26px 14px calc(24px + env(safe-area-inset-bottom));
+    gap: 3px;
+    background: linear-gradient(
+      185deg,
+      var(--surface, rgba(255, 255, 255, 0.03)) 0%,
+      var(--nav-bg, rgba(10, 12, 17, 0.92)) 60%
+    );
+  }
+  .dm-nav-brand {
+    margin: 6px 12px 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dm-navbtn {
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 13px;
+    border-radius: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    transition:
+      background-color 0.16s ease,
+      color 0.16s ease,
+      transform 0.16s ease;
+  }
+  .dm-navbtn svg {
+    flex-shrink: 0;
+  }
+  .dm-navbtn-active {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--cyan-rgb), 0.16),
+      rgba(var(--cyan-rgb), 0.05)
+    );
+    color: var(--cyan) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.22);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dm-navbtn:hover {
+      transform: translateX(2px);
+    }
+  }
+
+  /* ---- Hero header ---- */
+  .dm-header {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+      150deg,
+      rgba(var(--cyan-rgb), 0.09),
+      rgba(255, 255, 255, 0.015) 55%
+    );
+    border-radius: 26px;
+    padding: 30px 32px;
+  }
+  .dm-header::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    right: -10%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(
+      circle,
+      rgba(var(--gold-rgb), 0.14),
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+  .dm-header-brand {
+    position: relative;
+    z-index: 1;
+  }
+  .dm-header-actions {
+    position: relative;
+    z-index: 1;
+  }
+  .dm-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.09em;
+  }
+  .dm-h1 {
+    font-size: clamp(24px, 2.2vw, 32px);
+  }
+
+  /* ---- Stats toolbar row ---- */
+  .dm-stats-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: var(--shadow-xs);
+  }
+  .dm-stat-chip {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* ---- Stack cards: extra presence on a big canvas ---- */
+  .dm-stack-grid {
+    grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
+  }
+  .dm-stack-card {
+    border-radius: 22px;
+  }
+  .dm-stack-emoji {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(var(--cyan-rgb), 0.08);
+    margin-bottom: 2px;
+  }
+
+  /* ---- Game cards: same premium treatment as stack cards, tuned for a
+       mouse — a clean lift + glow instead of the touch-oriented 3D tilt,
+       so the shadow always matches the elevation instead of lagging
+       behind a rotated card. ---- */
+  .dm-game-grid {
+    grid-template-columns: repeat(auto-fit, minmax(202px, 1fr));
+    gap: 18px;
+  }
+  .dm-game-card {
+    border-radius: 20px;
+    padding: 22px 20px 20px;
+    min-height: 148px;
+    gap: 12px;
+  }
+  .dm-game-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(var(--gold-rgb), 0.1);
+    margin-bottom: 2px;
+  }
+  .dm-game-name {
+    font-size: 15px;
+  }
+  .dm-game-desc {
+    font-size: 13px;
+    line-height: 1.42;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dm-game-card:hover:not(:disabled) {
+      border-color: rgba(var(--gold-rgb), 0.45);
+      box-shadow:
+        0 22px 46px -18px rgba(0, 0, 0, 0.5),
+        0 8px 24px -8px rgba(var(--gold-rgb), 0.22),
+        0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      transform: translateY(-6px) scale(1.016);
+    }
+  }
+}
+
+@media (min-width: 1080px) {
+  /* ---- Home dashboard: main column + sticky "up next" rail ---- */
+  .dm-home-view {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: 32px;
+    align-items: start;
+  }
+  .dm-home-view > .dm-header {
+    grid-column: 1 / -1;
+  }
+  .dm-home-view > .dm-stats-row,
+  .dm-home-view > .dm-search-row,
+  .dm-home-view > .dm-section-title,
+  .dm-home-view > .dm-family-filter-row,
+  .dm-home-view > .dm-family-stats,
+  .dm-home-view > .dm-empty,
+  .dm-home-view > .dm-stack-grid {
+    grid-column: 1;
+  }
+  .dm-home-view:not(:has(> .dm-due-banner)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dm-home-view > .dm-due-banner {
+    grid-column: 2;
+    grid-row: 2 / span 12;
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    max-width: none;
+    margin: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 26px 24px;
+    border-radius: 24px;
+    background: linear-gradient(
+      165deg,
+      rgba(var(--gold-rgb), 0.18),
+      rgba(var(--gold-rgb), 0.04) 70%
+    );
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-title {
+    font-size: 19px;
+    line-height: 1.3;
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-sub {
+    font-size: 13px;
+    margin-top: 3px;
+  }
+  .dm-home-view > .dm-due-banner svg:last-child {
+    align-self: flex-end;
+    color: var(--gold);
+    background: rgba(var(--gold-rgb), 0.14);
+    border-radius: 999px;
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dm-home-view > .dm-due-banner:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px -16px rgba(var(--gold-rgb), 0.35);
+    }
+  }
+}
+
+/* RTL support: direction/alignment for most layouts already follow the
+   html[dir] attribute automatically via the browser's bidi algorithm.
+   The one thing that needs an explicit rule is directional iconography,
+   since an SVG path doesn't know which way "back" or "next" should point. */
+html[dir="rtl"] svg[data-flip-rtl] {
+  transform: scaleX(-1);
+}
+
+/* Desktop-only home hero copy: hidden on mobile, where the compact
+   logo header is exactly right already. */
+.dm-home-hero-copy {
+  display: none;
+}

@@ -1,0 +1,280 @@
+/* components/word-card/word-card-premium-badges.css
+ * Word card buttons and premium badges (v2..v4).
+ */
+/* ===== Word card buttons: same look as the swipe-reveal buttons ===== */
+.dm-card .dm-card-actions {
+  gap: 5px;
+  align-items: center;
+}
+.dm-card .dm-card-actions .dm-iconbtn,
+.dm-card .dm-card-actions .dm-iconbtn:first-child {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  margin: 0;
+  border-radius: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+.dm-card .dm-card-actions .dm-iconbtn:first-child {
+  color: var(--cyan);
+}
+.dm-card .dm-card-actions .dm-iconbtn svg {
+  width: 18px;
+  height: 18px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-card .dm-card-actions .dm-iconbtn:hover,
+  .dm-card .dm-card-actions .dm-iconbtn:first-child:hover {
+    background: var(--surface-strong);
+    border-color: rgba(var(--cyan-rgb), 0.35);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .dm-card .dm-card-actions .dm-iconbtn:first-child:hover {
+    color: var(--cyan);
+  }
+}
+.dm-card .dm-card-actions .dm-iconbtn:active,
+.dm-card .dm-card-actions .dm-iconbtn:first-child:active {
+  transform: scale(0.92);
+  box-shadow: var(--shadow-xs);
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-iconbtn-active {
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.4);
+  background: var(--surface-strong);
+}
+@media (max-width: 380px) {
+  .dm-card .dm-card-actions {
+    gap: 4px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn,
+  .dm-card .dm-card-actions .dm-iconbtn:first-child {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    border-radius: 12px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+/* ===== Word card buttons: slightly bigger + cleaner premium badge ===== */
+.dm-card .dm-card-actions {
+  gap: 6px;
+}
+.dm-card .dm-card-actions .dm-iconbtn,
+.dm-card .dm-card-actions .dm-iconbtn:first-child {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 14px;
+  position: relative;
+}
+.dm-card .dm-card-actions .dm-iconbtn svg {
+  width: 20px;
+  height: 20px;
+}
+@media (max-width: 480px) {
+  .dm-card .dm-card-actions {
+    gap: 5px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn,
+  .dm-card .dm-card-actions .dm-iconbtn:first-child {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    border-radius: 13px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn svg {
+    width: 19px;
+    height: 19px;
+  }
+}
+@media (max-width: 380px) {
+  .dm-card .dm-card-actions {
+    gap: 4px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn,
+  .dm-card .dm-card-actions .dm-iconbtn:first-child {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 12px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Premium badge: a small gold seal pinned to the button's corner */
+.dm-card .dm-forms-btn-icon-wrap {
+  position: static;
+  display: inline-flex;
+}
+.dm-card .dm-premium-badge-dot {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1300;
+  background: linear-gradient(135deg, #ffd36b, var(--gold) 55%, #ff8a3d);
+  box-shadow:
+    0 0 0 2px var(--bg, #0a0c11),
+    0 4px 10px -2px rgba(var(--gold-rgb), 0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+.dm-card .dm-premium-badge-dot svg {
+  width: 10px;
+  height: 10px;
+  display: block;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ===== Premium marker v2: gold-tinted button + tiny PRO tag ===== */
+.dm-card .dm-card-actions .dm-iconbtn:has(.dm-premium-badge-dot) {
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.38);
+  background: linear-gradient(
+    160deg,
+    rgba(var(--gold-rgb), 0.14),
+    var(--surface)
+  );
+}
+.dm-card .dm-premium-badge-dot {
+  top: -5px;
+  right: -5px;
+  width: auto;
+  height: 14px;
+  padding: 0 4px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #ffd36b, var(--gold));
+  box-shadow: 0 0 0 2px var(--bg, #0a0c11);
+}
+.dm-card .dm-premium-badge-dot svg {
+  display: none;
+}
+.dm-card .dm-premium-badge-dot::before {
+  content: "PRO";
+  font-family: "Sora", sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  color: #1a1300;
+}
+
+/* ===== Premium marker v3: just a little badge ===== */
+.dm-card .dm-card-actions .dm-iconbtn:has(.dm-premium-badge-dot) {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface);
+}
+.dm-card .dm-card-actions .dm-iconbtn:first-child:has(.dm-premium-badge-dot) {
+  color: var(--cyan);
+}
+.dm-card .dm-premium-badge-dot {
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 1.5px var(--bg, #0a0c11);
+}
+.dm-card .dm-premium-badge-dot::before {
+  content: none;
+}
+.dm-card .dm-premium-badge-dot svg {
+  display: block;
+  width: 7px;
+  height: 7px;
+  fill: currentColor;
+  stroke: none;
+  color: #1a1300;
+}
+
+/* ===== Premium marker v4: gold crown chip + soft gold-edged button ===== */
+.dm-card .dm-card-actions .dm-iconbtn:has(.dm-premium-badge-dot) {
+  color: var(--text);
+  border-color: rgba(var(--gold-rgb), 0.32);
+  background: linear-gradient(
+    155deg,
+    rgba(var(--gold-rgb), 0.1),
+    var(--surface) 62%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+.dm-card .dm-card-actions .dm-iconbtn:first-child:has(.dm-premium-badge-dot) {
+  color: var(--cyan);
+}
+.dm-card .dm-card-actions .dm-iconbtn:has(.dm-premium-badge-dot):hover {
+  border-color: rgba(var(--gold-rgb), 0.6);
+  box-shadow:
+    0 6px 16px -8px rgba(var(--gold-rgb), 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+/* the base button clips its children (ripple) - let the badge poke out of the corner */
+.dm-card .dm-card-actions .dm-iconbtn:has(.dm-premium-badge-dot) {
+  overflow: visible;
+}
+.dm-card .dm-premium-badge-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a1a00;
+  background: linear-gradient(145deg, #ffd36b, var(--gold));
+  box-shadow:
+    0 0 0 2px var(--bg, #0a0c11),
+    0 2px 6px -1px rgba(var(--gold-rgb), 0.5);
+  pointer-events: none;
+  z-index: 2;
+}
+.dm-card .dm-premium-badge-dot::before {
+  content: none;
+}
+.dm-card .dm-card-actions .dm-iconbtn .dm-premium-badge-dot svg {
+  display: block;
+  width: 10px;
+  height: 10px;
+  flex: none;
+  color: #2a1a00;
+}
+@media (max-width: 380px) {
+  .dm-card .dm-premium-badge-dot {
+    top: -4px;
+    right: -4px;
+    width: 15px;
+    height: 15px;
+  }
+  .dm-card .dm-card-actions .dm-iconbtn .dm-premium-badge-dot svg {
+    width: 9px;
+    height: 9px;
+  }
+}

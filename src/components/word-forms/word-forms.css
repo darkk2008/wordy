@@ -1,0 +1,380 @@
+/* components/word-forms/word-forms.css
+ * Word modal inputs, forms tables, eye/speak buttons.
+ */
+/* Word-review modals (word info, all-forms table, lookup popup) get a
+   livelier, springier entrance than the plain sheet slide-up, since these
+   are opened constantly while browsing/reviewing a stack. A gentle
+   overshoot ("pop") reads as more polished without feeling gimmicky. */
+.dm-modal-review {
+  animation: dm-review-pop-in 0.44s cubic-bezier(0.22, 1.12, 0.3, 1) both;
+  transform-origin: 50% 100%;
+}
+.dm-modal-review.dm-modal-closing {
+  animation: dm-review-pop-out 0.22s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+@keyframes dm-review-pop-in {
+  0% {
+    transform: translateY(38px) scale(0.93);
+    opacity: 0;
+  }
+  62% {
+    transform: translateY(-5px) scale(1.012);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes dm-review-pop-out {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(26px) scale(0.96);
+    opacity: 0;
+  }
+}
+.dm-modal-review-backdrop {
+  animation: dm-review-backdrop-in 0.24s ease both;
+}
+.dm-modal-review-backdrop.dm-modal-backdrop-closing {
+  animation: dm-fadeout 0.2s ease forwards;
+}
+@keyframes dm-review-backdrop-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+/* Content inside settles in just after the sheet, for a touch more polish. */
+.dm-modal-review > .dm-modal-head {
+  opacity: 0;
+  animation: dm-review-content-in 0.36s ease 0.08s both;
+}
+.dm-modal-review > .dm-modal-head ~ * {
+  opacity: 0;
+  animation: dm-review-content-in 0.36s ease 0.14s both;
+}
+@keyframes dm-review-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Mini table: an all-forms popup used inside other modals (e.g. the mini
+   stack reviewer). Raised above regular .dm-modal (z-index 1001) so it
+   never gets stuck behind the modal it was opened from. Otherwise left
+   unstyled so it sits and animates as a bottom sheet, same as the default
+   all-forms table. */
+.dm-mini-forms-backdrop {
+  z-index: 1010;
+}
+.dm-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.dm-modal-head h3 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-modal-head h3 {
+  font-family: "Sora", sans-serif;
+  margin: 0;
+  font-size: 17px;
+}
+.dm-label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 12px 0 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.dm-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 12px 13px;
+  font-size: 16px;
+  outline: none;
+  font-family: inherit;
+  box-shadow: var(--shadow-inset);
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.dm-autofill-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: rgba(var(--cyan-rgb), 0.06);
+  border: 1.5px dashed rgba(var(--cyan-rgb), 0.45);
+  color: var(--cyan);
+  border-radius: 13px;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-autofill-btn:hover:not(:disabled) {
+    background: rgba(var(--cyan-rgb), 0.12);
+    border-color: rgba(var(--cyan-rgb), 0.7);
+  }
+}
+.dm-autofill-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.dm-autofill-spin {
+  animation: dm-spin 0.9s linear infinite;
+}
+@keyframes dm-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.dm-autofill-error {
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 6px;
+}
+.dm-voice-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  max-width: min(92vw, 420px);
+  background: rgba(20, 24, 33, 0.97);
+  color: #f2f4f8;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font:
+    500 13px/1.45 Inter,
+    system-ui,
+    sans-serif;
+  z-index: 99999;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+.dm-roman-inline {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+  letter-spacing: 0.2px;
+}
+.dm-roman-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-style: normal;
+  color: var(--gold, #e0a526);
+  cursor: default;
+}
+.dm-flip-roman {
+  font-size: 15px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 4px;
+}
+.dm-autofill-hint {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 6px;
+}
+.dm-forms-modal-section {
+  margin-top: 18px;
+}
+.dm-forms-modal-section:first-of-type {
+  margin-top: 4px;
+}
+.dm-forms-modal-title {
+  font-size: 13px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.dm-forms-modal-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.dm-forms-modal-row {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.dm-forms-modal-row:last-child {
+  border-bottom: none;
+}
+.dm-forms-modal-pronoun {
+  color: var(--text-dim);
+  font-size: 16px;
+  font-weight: 400;
+  flex: 0 0 42%;
+}
+.dm-forms-modal-value {
+  color: var(--text);
+  opacity: 0.82;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 400;
+  flex: 1;
+  display: inline-block;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+  transform: scale(1);
+}
+.dm-forms-modal-value-blur {
+  display: inline-block;
+  padding: 10px 12px;
+  margin: -10px -12px;
+  transition: filter 0.35s ease;
+  filter: blur(0);
+}
+.dm-forms-modal-note {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+.dm-forms-modal-empty {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 30px 10px;
+  font-size: 14px;
+}
+.dm-forms-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.dm-forms-modal-value-hidden {
+  opacity: 0.55;
+  transform: scale(0.97);
+  user-select: none;
+}
+.dm-forms-modal-value-blur-hidden {
+  filter: blur(7px);
+}
+.dm-eye-toggle {
+  display: inline-flex;
+  animation: dm-eye-pop 0.3s ease;
+}
+@keyframes dm-eye-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.dm-eye-toggle.dm-eye-shake {
+  animation: dm-eye-shake-anim 0.5s ease;
+}
+@keyframes dm-eye-shake-anim {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(-22deg);
+  }
+  30% {
+    transform: rotate(20deg);
+  }
+  45% {
+    transform: rotate(-16deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+}
+.dm-forms-btn-icon-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.dm-premium-badge-dot {
+  position: absolute;
+  top: -4px;
+  right: -5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1a1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.dm-premium-badge-dot svg {
+  display: block;
+  fill: currentColor;
+}
+.dm-forms-premium-hint {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+}
+.dm-forms-premium-hint svg {
+  flex: 0 0 auto;
+}
+.dm-input:focus {
+  border-color: rgba(var(--cyan-rgb), 0.45);
+  box-shadow:
+    var(--shadow-inset),
+    0 0 0 3px rgba(var(--cyan-rgb), 0.12);
+}

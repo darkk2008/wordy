@@ -1,0 +1,72 @@
+/* components/account/account.css
+ * Account screen: sync status card.
+ */
+.dm-sync-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.dm-sync-card-error {
+  border-color: color-mix(in srgb, var(--red) 55%, var(--border));
+}
+.dm-sync-card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.dm-sync-card-text {
+  min-width: 0;
+}
+.dm-sync-card-title {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+.dm-sync-card-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+.dm-sync-dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 22%, transparent);
+}
+.dm-sync-dot-bad {
+  background: var(--red);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 22%, transparent);
+}
+.dm-sync-dot-busy {
+  background: var(--gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 22%, transparent);
+  animation: dm-sync-pulse 1s ease-in-out infinite;
+}
+@keyframes dm-sync-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (max-width: 380px) {
+  .dm-sync-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dm-sync-card .dm-icon-action-btn {
+    justify-content: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-sync-dot-busy {
+    animation: none;
+  }
+}

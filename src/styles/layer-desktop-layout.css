@@ -1,0 +1,439 @@
+/* styles/layer-desktop-layout.css
+ * LAYER: desktop app-shell for >=900px (overrides earlier files).
+ */
+/* ==================================================================
+   DESKTOP LAYOUT — real app-shell for wide viewports.
+   Mobile styles above are completely untouched; everything here only
+   activates at >=900px, so phones/small tablets render exactly as before.
+   ================================================================== */
+/* Touch devices (phones/tablets) get extra bottom padding so the last
+   row of content clears the fixed bottom nav — mobile browsers' dynamic
+   toolbars and safe-area insets eat into the space the base padding
+   already accounts for. Mouse/trackpad devices (laptops, desktops) are
+   unaffected, since they don't have that browser-chrome quirk. Overridden
+   again at 900px+, where the bottom nav becomes a sticky sidebar anyway. */
+@media (hover: none) and (pointer: coarse) {
+  .dm-content {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 900px) {
+  html,
+  body {
+    background: var(--bg, #0a0c11);
+  }
+
+  /* The mobile ambient glow blobs (.dm-bg-glow-1/2) are position:fixed with
+     offsets tuned for a ~430px-wide phone frame. On a wide desktop viewport
+     they no longer sit just off the edge of the screen — they land behind
+     whatever content happens to be in that corner (e.g. a gold blob bleeding
+     through the bottom-right game cards), which reads as a stray, uneven
+     shadow rather than a deliberate effect. Desktop already gets its own
+     ambient lighting from .dm-app's background-image and .dm-header::after,
+     so just drop these here instead of trying to reposition them per-page. */
+  .dm-bg-glow {
+    display: none;
+  }
+
+  /* The phone-width column becomes a full-bleed desktop shell.
+     Flex (not fixed positioning) drives the layout so it can't get
+     clipped/detached by any wrapping container — robust everywhere. */
+  .dm-app {
+    display: flex;
+    align-items: flex-start;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    border-left: none;
+    border-right: none;
+    /* The sidebar is position:fixed (see .dm-bottomnav below), so it no
+       longer occupies flex space itself — this padding reserves the same
+       width by hand so .dm-content's flex box starts to the right of it.
+       Doing the reservation here (instead of as a margin on .dm-content)
+       means .dm-content's own margin can be a plain auto-centering margin
+       within the space that's actually left over, instead of a fixed
+       offset that leaves the leftover width stranded on one side.
+       border-box is required here: with the default content-box, this
+       padding would be added on top of width:100% and overflow the
+       viewport instead of being carved out of it. */
+    box-sizing: border-box;
+    padding-left: var(--nav-w, 264px);
+    transition: padding-left 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Mobile uses overflow-x:clip to hide horizontal spill without
+       touching overflow-y. On desktop we don't need the horizontal clip
+       at all, so restore normal overflow so the sidebar sticks relative
+       to the real viewport. */
+    overflow: visible;
+    background-image:
+      radial-gradient(
+        ellipse 1100px 620px at 12% -10%,
+        rgba(var(--cyan-rgb), 0.07),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 900px 640px at 100% 10%,
+        rgba(var(--gold-rgb), 0.05),
+        transparent 55%
+      );
+  }
+
+  /* Sidebar navigation instead of a bottom dock. The order property puts
+     it first visually even though it comes after .dm-content in the DOM.
+     It stays visible even inside games/stack views (unlike on mobile,
+     where it's hidden there to save space) so the app always has a
+     stable, app-like frame on wide screens. */
+  .dm-bottomnav-hidden {
+    display: flex;
+  }
+  .dm-bottomnav {
+    position: fixed;
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    transform: none;
+    order: -1;
+    flex: 0 0 248px;
+    width: 248px;
+    max-width: 248px;
+    height: 100vh;
+    align-self: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 28px 16px calc(20px + env(safe-area-inset-bottom));
+    border-top: none;
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: 4px 0 28px rgba(0, 0, 0, 0.22);
+  }
+  .dm-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 10px 22px;
+  }
+  .dm-nav-brand-logo {
+    flex-shrink: 0;
+  }
+  .dm-nav-brand-text {
+    font-family: "Sora", sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    background: linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--gold),
+      var(--green),
+      var(--cyan)
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: dm-brand-shimmer 6s linear infinite;
+    filter: drop-shadow(0 2px 10px rgba(var(--cyan-rgb), 0.12));
+  }
+  .dm-navbtn {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-size: 14.5px;
+  }
+  .dm-navbtn span {
+    font-size: 14.5px;
+  }
+  .dm-navbtn-active {
+    transform: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dm-navbtn:hover {
+      background: var(--surface-strong);
+      color: var(--text);
+    }
+  }
+
+  /* Content area: takes all remaining space next to the sidebar. The
+     sidebar is position:fixed (see .dm-bottomnav above) so it no longer
+     occupies flex space itself — this margin reserves the same width
+     by hand so the layout looks identical. */
+  .dm-content {
+    flex: 1 1 0%;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 44px 48px 64px;
+    max-width: 1200px;
+  }
+
+  /* Header gets more presence on a big canvas */
+  .dm-header {
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.015)
+    );
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 26px 28px;
+    margin-bottom: 26px;
+    box-shadow: var(--shadow-sm);
+  }
+  .dm-header-logo {
+    width: 88px !important;
+    height: 88px !important;
+  }
+  .dm-h1 {
+    font-size: clamp(22px, 2vw, 30px);
+  }
+  .dm-eyebrow {
+    font-size: 13px;
+  }
+  .dm-streak,
+  .dm-stat-chip,
+  .dm-stat-newstack,
+  .dm-theme-toggle {
+    min-height: 40px;
+  }
+  .dm-stats-row {
+    max-width: none;
+  }
+
+  /* Grids use the extra width instead of stopping at two columns. auto-fit
+     (not auto-fill) so that a handful of cards stretch to fill the row
+     instead of hugging the left edge with dead empty columns beside them. */
+  .dm-stack-grid,
+  .dm-game-grid,
+  .dm-settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .dm-stack-card {
+    padding: 22px 20px;
+    min-height: 128px;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dm-stack-emoji {
+    font-size: 30px;
+  }
+  .dm-stack-name {
+    font-size: 16px;
+  }
+  .dm-stack-count {
+    font-size: 13px;
+  }
+  .dm-stat-grid {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+    max-width: 980px;
+  }
+
+  /* Word lists (stack detail, favorites) stay one word per row — full-width
+     cards are far easier to scan than a cramped multi-column grid — but
+     the column itself is capped so lines of text don't run edge-to-edge. */
+  .dm-list {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dm-due-banner {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Full-width mobile controls (segmented tabs, dropdowns, settings rows,
+     toggles) shouldn't stretch edge-to-edge on a wide canvas — cap them
+     to a comfortable width so they still read as a single control. */
+  .dm-segmented {
+    max-width: 460px;
+  }
+  .dm-display-toggle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dm-settings-grid {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  /* These used to be capped to 640px and left-aligned, which looked fine
+     back when .dm-content itself was stuck to the left edge (so a narrow
+     block here still lined up with everything above it). Now that
+     .dm-content is centered, capping only these specific elements would
+     make them drift out of alignment with the labels/hero/grids around
+     them that already correctly use the full content width (as
+     .dm-guard-row, .dm-stat-grid and the Languages/Data & Backup rows
+     already do) — so instead of re-centering a narrow column here (which
+     just moves the misalignment rather than fixing it), let them use the
+     same full width as everything else on these pages. */
+  .dm-forms-mix-row,
+  .dm-forms-toggle-row {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dm-stackselect,
+  .dm-stackselect-trigger,
+  .dm-tr-stackpick-trigger {
+    max-width: 420px;
+  }
+
+  /* Gameplay screens render without the sidebar (full dm-content width),
+     so on a wide canvas they were stretching edge-to-edge. Cap them to a
+     comfortable reading/interaction width and center them like a real
+     desktop app screen, instead of full-bleed mobile layout. */
+  .dm-game-play {
+    max-width: 580px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.015)
+    );
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    padding: 28px 30px 30px;
+    box-shadow: var(--shadow-md);
+  }
+  .dm-flipcard {
+    height: 260px;
+  }
+  .dm-sentence-textarea {
+    min-height: 140px;
+  }
+
+  /* Modals behave like real dialogs, centered on the canvas, not bottom sheets.
+     The backdrop stops at the sidebar's edge (instead of inset:0) so the left
+     navigation stays fully visible and undimmed while a modal is open, and the
+     rule that hides the sidebar under any modal (needed on mobile, where the
+     bottom nav would otherwise collide with a full-screen sheet) is undone
+     here so the desktop sidebar never disappears. */
+  .dm-app:has(.dm-modal-backdrop) .dm-bottomnav {
+    display: flex;
+  }
+  .dm-modal-backdrop {
+    left: var(--nav-w, 264px);
+    transition: left 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--modal-backdrop, rgba(5, 6, 9, 0.55));
+    backdrop-filter: blur(6px);
+  }
+  .dm-modal {
+    max-width: 560px;
+    max-height: calc(var(--vv-height, 100vh) * 0.82);
+    border-radius: 22px;
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow:
+      0 30px 90px -12px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    padding: 26px 26px 30px;
+  }
+  .dm-modal::before {
+    display: none;
+  }
+
+  /* Appearing / disappearing animation: on a bottom sheet a slide-up read as
+     natural, but a centered dialog reads better with a soft scale + fade. */
+  .dm-modal-backdrop {
+    animation: dm-desktop-backdrop-in 0.22s ease both;
+  }
+  .dm-modal-backdrop-closing {
+    animation: dm-desktop-backdrop-out 0.18s ease forwards;
+  }
+  .dm-modal {
+    animation: dm-desktop-modal-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .dm-modal-closing {
+    animation: dm-desktop-modal-out 0.16s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  }
+  @keyframes dm-desktop-backdrop-in {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(6px);
+    }
+  }
+  @keyframes dm-desktop-backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes dm-desktop-modal-in {
+    from {
+      transform: translateY(10px) scale(0.96);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes dm-desktop-modal-out {
+    from {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(6px) scale(0.97);
+      opacity: 0;
+    }
+  }
+
+  /* Word-review modals: centered dialogs read better with a scale-pop than
+     a slide, so swap the sheet animation for one anchored to the middle. */
+  .dm-modal-review {
+    animation: dm-review-pop-in-desktop 0.4s cubic-bezier(0.22, 1.12, 0.3, 1)
+      both;
+    transform-origin: 50% 50%;
+  }
+  .dm-modal-review.dm-modal-closing {
+    animation: dm-desktop-modal-out 0.16s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  }
+  @keyframes dm-review-pop-in-desktop {
+    0% {
+      transform: translateY(14px) scale(0.9);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(-3px) scale(1.02);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+@media (min-width: 1300px) {
+  .dm-content {
+    max-width: 1320px;
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+  .dm-stack-grid,
+  .dm-game-grid,
+  .dm-settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}

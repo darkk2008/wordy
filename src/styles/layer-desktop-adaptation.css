@@ -1,0 +1,240 @@
+/* styles/layer-desktop-adaptation.css
+ * LAYER: desktop fixes for controls built for phones.
+ */
+/* ==================================================================
+   DESKTOP ADAPTATION PASS
+   Everything below lives inside a min-width query, so the mobile
+   layout (the one the app is designed for) is completely untouched.
+   It fixes the controls that were built with flex:1 for a 400px
+   screen and therefore stretched into huge empty slabs on a laptop.
+   ================================================================== */
+@media (min-width: 900px) {
+  /* ---- Home hero: the band had only a logo in it, so it read as empty.
+       Give it the same eyebrow + title treatment every other view has. */
+  .dm-home-hero-copy {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: -4px;
+  }
+  .dm-home-hero-title {
+    margin: 0;
+    font-family: "Sora", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: clamp(26px, 2.2vw, 34px);
+    background: linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--gold),
+      var(--green),
+      var(--cyan)
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: dm-brand-shimmer 6s linear infinite;
+  }
+  .dm-home-hero-sub {
+    margin-top: 2px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .dm-home-view > .dm-header {
+    gap: 14px;
+    padding: 20px 24px;
+    flex-wrap: nowrap;
+  }
+  .dm-home-view > .dm-header .dm-header-brand {
+    flex: 0 0 auto;
+  }
+
+  /* Header actions: bigger targets so the action cluster balances the
+     brand block instead of leaving a canyon of empty space between them. */
+  .dm-home-view > .dm-header .dm-header-actions {
+    gap: 10px;
+  }
+  .dm-home-view > .dm-header .dm-iconbtn,
+  .dm-home-view > .dm-header .dm-home-premium-btn {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 16px;
+  }
+  .dm-home-view > .dm-header .dm-iconbtn svg,
+  .dm-home-view > .dm-header .dm-home-premium-btn svg {
+    width: 23px;
+    height: 23px;
+  }
+  .dm-home-view > .dm-header .dm-streak {
+    height: 52px;
+    padding: 0 18px;
+    border-radius: 16px;
+    font-size: 16px;
+    gap: 8px;
+  }
+  .dm-home-view > .dm-header .dm-streak svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  /* ---- Toolbar row: chips size to their content instead of each
+       taking a quarter of the canvas; "New stack" anchors to the right. */
+  .dm-stats-row {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  .dm-stats-row > * {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    max-width: 200px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 13.5px;
+  }
+  .dm-gems-inline,
+  .dm-store-entry-btn,
+  .dm-stat-chip,
+  .dm-stat-newstack,
+  .dm-theme-toggle {
+    justify-content: center;
+  }
+  .dm-gems-inline svg,
+  .dm-store-entry-btn svg,
+  .dm-stat-newstack svg,
+  .dm-theme-toggle svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* ---- Due banner keeps the toolbar's width instead of being capped. */
+  .dm-due-banner {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* ---- Top bars: on desktop the Premium CTA used margin-left:auto, which
+       floated it away from the icon group toward the middle/right of the
+       (centered, max-width) bar. Drop the auto margin so it sits directly
+       left, right after the icon group; the "+" button still gets pushed
+       to the far right via its own last-child auto margin. */
+  .dm-topbar {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dm-topbar-premium-btn:not(.dm-home-premium-btn) {
+    flex: 0 0 auto;
+    width: 134px;
+    min-width: 134px;
+    max-width: 134px;
+    height: 44px;
+    font-size: 13.5px;
+    border-radius: 13px;
+    gap: 6px;
+    padding: 0 12px;
+  }
+  .dm-topbar-premium-btn:not(.dm-home-premium-btn) svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ---- Secondary blocks were centred under full-width headers, which
+       left every screen looking slightly misaligned. Align them left. */
+  .dm-settings-grid {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  /* Games setup: the stack picker and the "word forms only" switch are one
+     pair of settings, so they share a width and read as a single column
+     instead of one cramped box above one over-wide one. */
+  .dm-stackselect,
+  .dm-stackselect-trigger {
+    max-width: 560px;
+  }
+  .dm-stackselect-trigger {
+    padding: 14px 16px;
+    gap: 14px;
+  }
+  .dm-stackselect-emoji {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+  }
+  .dm-stackselect-emoji .dm-aicon {
+    transform: scale(1.3);
+  }
+  .dm-forms-mix-row,
+  .dm-forms-toggle-row {
+    max-width: 560px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .dm-forms-mix-row {
+    border-radius: 14px;
+  }
+  .dm-forms-mix-label {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .dm-stat-grid {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 1080px) {
+  /* ---- The "words due for review" card used to be pulled out into a
+       sticky right-hand rail: different height, different width and a
+       squeezed stack grid beside it. It now sits in the normal flow,
+       directly under the toolbar, at exactly the same width. */
+  .dm-home-view {
+    display: block;
+  }
+  .dm-home-view > .dm-due-banner {
+    position: static;
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 22px;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 20px;
+    border-radius: 16px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--gold-rgb), 0.16),
+      rgba(var(--gold-rgb), 0.05)
+    );
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-title {
+    font-size: 16px;
+  }
+  .dm-home-view > .dm-due-banner .dm-due-banner-sub {
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .dm-home-view > .dm-due-banner svg:last-child {
+    align-self: center;
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    padding: 6px;
+  }
+}

@@ -1,0 +1,44 @@
+/* All stylesheets, in cascade order.
+ *
+ * ORDER MATTERS. This is the order the original single file used, and later files deliberately
+ * override earlier ones (the "layer-*" files especially). Do not reorder without checking the screens.
+ */
+@import "theme-tokens.css";
+@import "base-layout.css";
+@import "../components/home/home-header.css";
+@import "../components/stack-card/stack-card.css";
+@import "../components/stack-view/stack-topbar.css";
+@import "../components/word-card/word-card.css";
+@import "../components/modal/modal.css";
+@import "../components/admin-panel/admin-panel.css";
+@import "../components/word-forms/word-forms.css";
+@import "../components/stack-select/stack-select.css";
+@import "../components/ai-modal/ai-modal.css";
+@import "../components/translation-overlay/translation-overlay.css";
+@import "../components/common/common-widgets.css";
+@import "../components/icons/icons.css";
+@import "../components/settings/settings.css";
+@import "../components/onboarding/onboarding.css";
+@import "../components/restrictions-settings/restrictions-settings.css";
+@import "../components/premium-settings/premium-settings.css";
+@import "../components/notification-settings/notification-settings.css";
+@import "../components/about-settings/faq.css";
+@import "../components/games/games.css";
+@import "../components/bottom-nav/bottom-nav.css";
+@import "../components/games/games-advanced.css";
+@import "../components/grammar/grammar.css";
+@import "layer-visual-polish.css";
+@import "layer-desktop-layout.css";
+@import "layer-desktop-redesign.css";
+@import "layer-desktop-adaptation.css";
+@import "../components/games/games-setup-panel.css";
+@import "../components/word-card/word-card-actions.css";
+@import "../components/home/home-toolbar.css";
+@import "../components/word-card/word-card-premium-badges.css";
+@import "layer-pickers-and-round3.css";
+@import "layer-banners-and-games-polish.css";
+@import "layer-design-pass.css";
+@import "layer-mobile-adaptation.css";
+@import "../components/account/account.css";
+@import "layer-small-screens.css";
+@import "../components/qr-sync-settings/qr-sync-settings.css";

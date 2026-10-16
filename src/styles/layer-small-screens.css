@@ -1,0 +1,15 @@
+/* styles/layer-small-screens.css
+ * Fixes for very narrow phones (320-360px wide). Loaded last on purpose.
+ */
+@media (max-width: 380px) {
+  /* Onboarding welcome chips: wrap instead of being cut off at both edges */
+  .dm-onboard-highlights {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  .dm-onboard-highlight {
+    padding: 7px 10px;
+    font-size: 12.5px;
+  }
+}

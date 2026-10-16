@@ -1,0 +1,136 @@
+/* components/qr-sync-settings/qr-sync-settings.css
+ * Settings > Sync via QR, plus the multi-part QR controls.
+ */
+.dm-qrsync-scan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+.dm-qrsync-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dm-qrsync-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dm-qrsync-row:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+.dm-qrsync-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-strong);
+  color: var(--cyan);
+}
+.dm-qrsync-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dm-qrsync-name {
+  font-weight: 700;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-qrsync-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* Multi-part QR: part controls and scan progress */
+.dm-qr-parts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.dm-qr-parts-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dm-qr-step,
+.dm-qr-play {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  min-height: 40px;
+  cursor: pointer;
+}
+.dm-qr-step {
+  width: 44px;
+  display: grid;
+  place-items: center;
+}
+.dm-qr-play {
+  padding: 0 18px;
+}
+.dm-qr-parts-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dm-qr-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+}
+.dm-qr-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.dm-qr-dots span.on {
+  background: var(--cyan);
+}
+.dm-qr-progress {
+  margin: 0 0 12px;
+}
+.dm-qr-progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.dm-qr-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transition: width 0.2s ease;
+}
+.dm-qr-progress-label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+}

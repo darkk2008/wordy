@@ -1,0 +1,564 @@
+/* components/icons/icons.css
+ * Icon sizing and icon animations.
+ */
+.dm-aicon svg {
+  width: 100%;
+  height: 100%;
+}
+.dm-ic-sprout-leaf {
+  transform-origin: 24px 36px;
+  animation: dm-anim-sway 3s ease-in-out infinite;
+}
+.dm-ic-bolt-flash {
+  transform-origin: 24px 24px;
+  animation: dm-anim-flash 1.3s ease-in-out infinite;
+}
+.dm-ic-plane-fly {
+  animation: dm-anim-fly 2.6s ease-in-out infinite;
+}
+.dm-ic-plane-trail {
+  animation: dm-anim-trail 1.4s ease-in-out infinite;
+}
+.dm-ic-book-page {
+  transform-origin: 24px 12px;
+  animation: dm-anim-pageflip 2.4s ease-in-out infinite;
+}
+.dm-ic-school-flag {
+  transform-origin: 24px 2px;
+  animation: dm-anim-flagwave 1.6s ease-in-out infinite;
+}
+.dm-ic-brief-handle {
+  transform-origin: 24px 16px;
+  animation: dm-anim-wiggle 2.4s ease-in-out infinite;
+}
+.dm-ic-food-steam {
+  transform-origin: center bottom;
+  animation: dm-anim-steamrise 2.2s ease-in-out infinite;
+}
+.dm-ic-food-steam.s2 {
+  animation-delay: 0.5s;
+}
+.dm-ic-food-steam.s3 {
+  animation-delay: 1s;
+}
+.dm-ic-target-ring {
+  transform-origin: 24px 24px;
+  animation: dm-anim-pulsering 1.8s ease-out infinite;
+}
+.dm-ic-target-arrow {
+  transform-origin: 24px 24px;
+  animation: dm-anim-arrowshoot 2.2s ease-in-out infinite;
+}
+.dm-ic-home-heart {
+  transform-origin: 24px 22px;
+  animation: dm-anim-heartbeat 1.8s ease-in-out infinite;
+}
+.dm-ic-tree-nodes {
+  transform-origin: 24px 13.5px;
+  animation: dm-anim-nodepulse 2.6s ease-in-out infinite;
+}
+.dm-ic-nest-eggs {
+  animation: dm-anim-eggbob 2.4s ease-in-out infinite;
+}
+.dm-ic-folder-dots .d1 {
+  animation: dm-anim-dotbounce 1.4s ease-in-out infinite;
+}
+.dm-ic-folder-dots .d2 {
+  animation: dm-anim-dotbounce 1.4s ease-in-out infinite 0.15s;
+}
+.dm-ic-folder-dots .d3 {
+  animation: dm-anim-dotbounce 1.4s ease-in-out infinite 0.3s;
+}
+.dm-ic-orbit-spin {
+  transform-origin: 24px 24px;
+  animation: dm-anim-orbitspin 3.6s linear infinite;
+}
+.dm-ic-spark-core {
+  transform-origin: 24px 24px;
+  animation: dm-anim-sparkpulse 1.6s ease-in-out infinite;
+}
+.dm-ic-spark-dot {
+  transform-origin: center;
+  animation: dm-anim-fam-spark 2.2s ease-in-out infinite;
+}
+.dm-ic-spark-dot.d2 {
+  animation-delay: 0.5s;
+}
+.dm-ic-spark-dot.d3 {
+  animation-delay: 1s;
+}
+.dm-ic-gem-shine {
+  animation: dm-anim-gemshine 2.4s ease-in-out infinite;
+}
+.dm-ic-magnet-bit {
+  transform-origin: center;
+  animation: dm-anim-magnetpull 1.8s ease-in infinite;
+}
+.dm-ic-magnet-bit.b2 {
+  animation-delay: 0.3s;
+}
+.dm-ic-magnet-bit.b3 {
+  animation-delay: 0.6s;
+}
+.dm-ic-comet-head {
+  transform-origin: 40px 8px;
+  animation: dm-anim-gemtwinkle 1.4s ease-in-out infinite;
+}
+.dm-ic-comet-tail {
+  animation: dm-anim-comettrail 1.6s ease-in-out infinite;
+}
+.dm-ic-beacon-ray {
+  transform-origin: 24px 12px;
+  animation: dm-anim-beaconray 1.8s ease-in-out infinite;
+}
+.dm-ic-beacon-ray.r2 {
+  animation-delay: 0.2s;
+}
+.dm-ic-beacon-ray.r3 {
+  animation-delay: 0.4s;
+}
+.dm-ic-puzzle-a {
+  animation: dm-anim-puzzle-a 2.2s ease-in-out infinite;
+}
+.dm-ic-puzzle-b {
+  animation: dm-anim-puzzle-b 2.2s ease-in-out infinite;
+}
+.dm-ic-crown-gems {
+  transform-origin: 24px 21px;
+  animation: dm-anim-gemtwinkle 1.6s ease-in-out infinite;
+}
+.dm-ic-fam-figs {
+  transform-origin: 12px 40px;
+  animation: dm-anim-fam-sway 2.4s ease-in-out infinite;
+}
+.dm-ic-fam-figs2 {
+  transform-origin: 34px 40px;
+  animation: dm-anim-fam-sway 2.4s ease-in-out infinite 0.3s reverse;
+}
+.dm-ic-fam-heart {
+  transform-origin: 24px 11px;
+  animation: dm-anim-fam-heartfloat 2s ease-in-out infinite;
+}
+.dm-ic-fam-smoke {
+  transform-origin: center bottom;
+  animation: dm-anim-fam-smoke 2.4s ease-in-out infinite;
+}
+.dm-ic-fam-smoke.s2 {
+  animation-delay: 0.6s;
+}
+.dm-ic-fam-trunk {
+  transform-origin: 24px 44px;
+  animation: dm-anim-fam-treesway 3.4s ease-in-out infinite;
+}
+.dm-ic-fam-node {
+  animation: dm-anim-nodepulse 2.6s ease-in-out infinite;
+}
+.dm-ic-fam-node.n2 {
+  animation-delay: 0.3s;
+}
+.dm-ic-fam-node.n3 {
+  animation-delay: 0.6s;
+}
+.dm-ic-fam-roots {
+  animation: dm-anim-fam-rootfade 3.4s ease-in-out infinite;
+}
+.dm-ic-fam-wing {
+  transform-origin: 24px 7px;
+  animation: dm-anim-fam-wingflap 1.2s ease-in-out infinite;
+}
+.dm-ic-fam-nestbody {
+  transform-origin: 24px 40px;
+  animation: dm-anim-fam-treesway 3s ease-in-out infinite;
+}
+.dm-ic-fam-egg {
+  animation: dm-anim-eggbob 2.4s ease-in-out infinite;
+}
+.dm-ic-fam-egg.e2 {
+  animation-delay: 0.3s;
+}
+.dm-ic-fam-egg.e3 {
+  animation-delay: 0.6s;
+}
+.dm-ic-fam-lid {
+  transform-origin: 24px 16.5px;
+  animation: dm-anim-fam-lid 2.8s ease-in-out infinite;
+}
+.dm-ic-fam-core {
+  transform-origin: 24px 24px;
+  animation: dm-anim-fam-corepulse 2s ease-in-out infinite;
+}
+.dm-ic-fam-orbit1 {
+  transform-origin: 24px 24px;
+  animation: dm-anim-orbitspin 3s linear infinite;
+}
+.dm-ic-fam-orbit2 {
+  transform-origin: 24px 24px;
+  animation: dm-anim-orbitspin 5s linear infinite reverse;
+}
+.dm-ic-fam-spark {
+  transform-origin: 24px 21.5px;
+  animation: dm-anim-fam-spark 2.2s ease-in-out infinite;
+}
+.dm-ic-fam-crownbody {
+  transform-origin: 24px 34px;
+  animation: dm-anim-fam-crownbounce 2.6s ease-in-out infinite;
+}
+.dm-ic-fam-gem {
+  animation: dm-anim-gemtwinkle 1.6s ease-in-out infinite;
+}
+.dm-ic-fam-gem.g2 {
+  animation-delay: 0.3s;
+}
+.dm-ic-fam-gem.g3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes dm-anim-sway {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes dm-anim-flash {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(var(--gold-rgb), 0));
+  }
+  50% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 5px rgba(var(--gold-rgb), 0.7));
+  }
+}
+@keyframes dm-anim-fly {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(3px, -2px);
+  }
+}
+@keyframes dm-anim-trail {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+@keyframes dm-anim-pageflip {
+  0%,
+  100% {
+    transform: scaleX(1) skewY(0deg);
+  }
+  50% {
+    transform: scaleX(0.5) skewY(4deg);
+  }
+}
+@keyframes dm-anim-flagwave {
+  0%,
+  100% {
+    transform: skewY(0deg) rotate(0deg);
+  }
+  50% {
+    transform: skewY(10deg) rotate(4deg);
+  }
+}
+@keyframes dm-anim-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+@keyframes dm-anim-steamrise {
+  0% {
+    transform: translateY(2px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+@keyframes dm-anim-pulsering {
+  0% {
+    transform: scale(0.75);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+@keyframes dm-anim-arrowshoot {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2px, -2px);
+  }
+}
+@keyframes dm-anim-heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.18);
+  }
+  40% {
+    transform: scale(0.95);
+  }
+  55% {
+    transform: scale(1.1);
+  }
+}
+@keyframes dm-anim-nodepulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+@keyframes dm-anim-eggbob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes dm-anim-dotbounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-3.5px);
+    opacity: 1;
+  }
+}
+@keyframes dm-anim-orbitspin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes dm-anim-puzzle-a {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-2px);
+  }
+}
+@keyframes dm-anim-puzzle-b {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+}
+@keyframes dm-anim-gemtwinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.7);
+  }
+}
+@keyframes dm-anim-fam-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes dm-anim-fam-heartfloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-3px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+@keyframes dm-anim-fam-smoke {
+  0% {
+    transform: translateY(2px) scale(0.8);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-9px) scale(1.3);
+    opacity: 0;
+  }
+}
+@keyframes dm-anim-fam-treesway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+@keyframes dm-anim-fam-rootfade {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes dm-anim-fam-wingflap {
+  0%,
+  100% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  50% {
+    transform: scaleY(0.6) rotate(-4deg);
+  }
+}
+@keyframes dm-anim-fam-lid {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.4);
+    opacity: 0.3;
+  }
+}
+@keyframes dm-anim-fam-corepulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+@keyframes dm-anim-fam-spark {
+  0%,
+  40%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  60% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes dm-anim-fam-crownbounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+@keyframes dm-anim-sparkpulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.88) rotate(6deg);
+    opacity: 0.85;
+  }
+}
+@keyframes dm-anim-gemshine {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  45% {
+    opacity: 0;
+  }
+  55% {
+    opacity: 0.9;
+    transform: translate(9px, 9px);
+  }
+  70% {
+    opacity: 0;
+    transform: translate(11px, 11px);
+  }
+}
+@keyframes dm-anim-magnetpull {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translate(9px, -14px) scale(0.5);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(10px, -16px) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes dm-anim-comettrail {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes dm-anim-beaconray {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}

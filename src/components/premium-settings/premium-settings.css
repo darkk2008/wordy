@@ -1,0 +1,537 @@
+/* components/premium-settings/premium-settings.css
+ * Premium screen.
+ */
+.dm-premium-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 22px 10px 6px;
+}
+.dm-premium-hero-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--gold) 100%);
+  color: #fff;
+  box-shadow:
+    0 10px 28px -8px rgba(var(--cyan-rgb), 0.5),
+    0 3px 12px -3px rgba(var(--gold-rgb), 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset;
+  margin-bottom: 4px;
+  animation: dm-premium-hero-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.dm-premium-hero-icon-active {
+  background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%);
+  box-shadow:
+    0 10px 28px -8px rgba(var(--cyan-rgb), 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+@keyframes dm-premium-hero-pop {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+.dm-premium-hero-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  margin: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dm-premium-hero-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  max-width: 280px;
+  margin: 0;
+  line-height: 1.5;
+}
+.dm-premium-celebrate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 6, 9, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+/* The overlay now carries the active .dm-app.dm-<theme> classes directly on
+   itself (see celebratePremiumUnlock), so this can be a plain compound
+   selector on the overlay instead of relying on a .dm-app ancestor that
+   never actually existed (the overlay is appended to <body>, not inside
+   .dm-app) -- that mismatch is why the tint never applied before. */
+.dm-premium-celebrate-overlay.dm-light {
+  background: rgba(30, 34, 50, 0.45);
+}
+.dm-premium-celebrate-overlay.dm-premium-celebrate-show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dm-premium-confetti-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.dm-premium-celebrate-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 20px;
+  background: var(--modal-bg, linear-gradient(180deg, #14161e, #0f1117));
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  box-shadow:
+    0 24px 70px -12px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  transform: scale(0.86) translateY(14px);
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.32s ease;
+}
+.dm-premium-celebrate-overlay.dm-premium-celebrate-show
+  .dm-premium-celebrate-card {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+.dm-premium-celebrate-card.dm-premium-celebrate-step-out {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.dm-premium-celebrate-card.dm-premium-celebrate-step-in {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: none;
+}
+.dm-premium-celebrate-topbar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px -10px -2px 0;
+}
+.dm-premium-celebrate-skip {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 7px 9px;
+  border-radius: 8px;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.dm-premium-celebrate-skip:hover {
+  color: var(--text);
+  background: rgba(127, 127, 127, 0.1);
+}
+.dm-premium-celebrate-skip:active {
+  transform: scale(0.96);
+}
+.dm-premium-celebrate-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--gold) 100%);
+  color: #fff;
+  box-shadow:
+    0 10px 30px -8px rgba(var(--cyan-rgb), 0.55),
+    0 3px 14px -3px rgba(var(--gold-rgb), 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.28) inset;
+  margin-bottom: 2px;
+  animation: dm-premium-celebrate-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)
+    0.05s both;
+}
+.dm-premium-celebrate-icon-feature {
+  background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%);
+}
+@keyframes dm-premium-celebrate-pop {
+  0% {
+    transform: scale(0.3) rotate(-16deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+.dm-premium-celebrate-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 5px 11px;
+  border-radius: 999px;
+  margin-top: 2px;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  box-shadow: 0 6px 16px -6px rgba(var(--cyan-rgb), 0.55);
+}
+.dm-premium-celebrate-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  margin: 4px 0 0;
+  color: var(--text);
+}
+.dm-premium-celebrate-sub {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 270px;
+}
+.dm-premium-celebrate-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.dm-premium-celebrate-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition:
+    width 0.25s ease,
+    background 0.25s ease;
+}
+.dm-premium-celebrate-dot-active {
+  width: 18px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+}
+.dm-premium-celebrate-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: 14px;
+  border: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  box-shadow: 0 10px 24px -8px rgba(var(--cyan-rgb), 0.5);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.dm-premium-celebrate-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 6px 16px -8px rgba(var(--cyan-rgb), 0.45);
+}
+.dm-premium-features {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.dm-premium-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+.dm-premium-feature-check {
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  color: #fff;
+  box-shadow: 0 2px 6px -1px rgba(var(--cyan-rgb), 0.5);
+}
+.dm-premium-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.dm-premium-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  animation: dm-settings-card-in 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.dm-premium-plan-active {
+  border-color: var(--cyan);
+  box-shadow:
+    0 0 0 2px rgba(var(--cyan-rgb), 0.45) inset,
+    var(--shadow-sm);
+}
+.dm-premium-plan-badge {
+  position: absolute;
+  top: -9px;
+  right: 14px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 2.5px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  box-shadow: 0 3px 10px -2px rgba(var(--cyan-rgb), 0.5);
+}
+.dm-premium-plan-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dm-premium-plan-name {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+.dm-premium-plan-check {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  color: #fff;
+}
+.dm-premium-plan-price {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+}
+.dm-premium-plan-period {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.dm-premium-plan-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.dm-premium-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+  border: none;
+  border-radius: 15px;
+  padding: 15px;
+  cursor: pointer;
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 14.5px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--gold) 100%);
+  background-size: 220% 220%;
+  background-position: 0% 50%;
+  box-shadow:
+    0 8px 24px -6px rgba(var(--cyan-rgb), 0.5),
+    0 3px 12px -3px rgba(var(--gold-rgb), 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background-position 0.45s ease;
+}
+.dm-premium-cta:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-premium-cta:hover {
+    background-position: 100% 50%;
+    box-shadow:
+      0 10px 28px -6px rgba(var(--cyan-rgb), 0.6),
+      0 3px 14px -2px rgba(var(--gold-rgb), 0.5),
+      0 1px 0 rgba(255, 255, 255, 0.2) inset;
+  }
+}
+.dm-premium-alt-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: var(--surface);
+  transition: all 0.15s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-premium-alt-pay-btn:hover {
+    color: var(--cyan);
+    border-color: rgba(var(--cyan-rgb), 0.4);
+  }
+}
+.dm-premium-alt-pay-btn:active {
+  transform: scale(0.97);
+}
+.dm-premium-manage-card {
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: dm-settings-card-in 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.dm-premium-manage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dm-premium-manage-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.dm-premium-manage-value {
+  font-family: "Sora", sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+}
+.dm-premium-manage-divider {
+  height: 1px;
+  background: var(--border);
+}
+.dm-premium-redeem-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 16px;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 13px;
+  padding: 11px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-dim);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.dm-premium-redeem-toggle:hover {
+  border-color: var(--cyan);
+  color: var(--text);
+}
+.dm-premium-promo-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.dm-premium-promo-input-wrap {
+  position: relative;
+  flex: 1;
+}
+.dm-premium-promo-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.dm-premium-promo-input {
+  padding-left: 36px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.dm-premium-promo-btn {
+  flex: 0 0 auto;
+  padding: 0 18px;
+}
+.dm-premium-notice {
+  min-height: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.dm-premium-notice-show {
+  opacity: 1;
+}
+.dm-store-notice-top {
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+.dm-premium-footnote {
+  text-align: center;
+  margin-top: 2px;
+}

@@ -1,0 +1,177 @@
+/* components/modal/modal.css
+ * Modal backdrop, sheet, animations.
+ */
+.dm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  top: var(--vv-offset-top, 0px);
+  height: calc(var(--vv-height, 100dvh) - var(--wf-kb-height, 0px));
+  background: var(--modal-backdrop, rgba(5, 6, 9, 0.7));
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  transition:
+    height 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+    top 0.2s ease;
+}
+/* Hiding the bottom nav while a modal is open used to rely purely on
+   the :has(.dm-modal-backdrop) selector. That selector forces the
+   browser to re-scan for a matching descendant on every DOM mutation
+   anywhere inside .dm-app, and a modal like the All-forms table mounts
+   a burst of child nodes right as it opens — so on slower devices the
+   nav could stay visible for a beat before the (expensive) :has()
+   recalculation caught up and hid it. The dm-modal-open class on body
+   below is set imperatively instead (see the MutationObserver near the
+   bottom of this file) the instant a backdrop lands in the DOM, so the
+   hide is immediate rather than waiting on style recalculation. */
+body.dm-modal-open .dm-bottomnav {
+  display: none;
+}
+.dm-app:has(.dm-multipick-bar) .dm-bottomnav {
+  display: none;
+}
+body:has(.dm-modal-backdrop),
+body:has(.dm-stackselect-menu),
+body:has(.dm-tr-stackpick-menu) {
+  overflow: hidden;
+}
+html,
+body,
+.dm-modal,
+.dm-stackselect-menu,
+.dm-tr-stackpick-menu,
+.dm-ai-messages,
+.dm-forms-modal-table,
+.dm-stats-row,
+.dm-admin-body,
+.dm-admin-code-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.dm-modal::-webkit-scrollbar,
+.dm-stackselect-menu::-webkit-scrollbar,
+.dm-tr-stackpick-menu::-webkit-scrollbar,
+.dm-ai-messages::-webkit-scrollbar,
+.dm-forms-modal-table::-webkit-scrollbar,
+.dm-stats-row::-webkit-scrollbar,
+.dm-admin-body::-webkit-scrollbar,
+.dm-admin-code-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.dm-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--modal-bg, linear-gradient(180deg, #14161e, #0f1117));
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 18px 26px;
+  max-height: calc(var(--vv-height, 100vh) * 0.88);
+  overflow-y: auto;
+  animation: dm-slideup 0.16s ease;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
+}
+@keyframes dm-slideup {
+  from {
+    transform: translateY(16px);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.dm-modal-backdrop {
+  animation: dm-backdrop-in 0.14s ease both;
+}
+@keyframes dm-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.dm-modal-backdrop-closing {
+  animation: dm-fadeout 0.24s ease forwards;
+}
+@keyframes dm-fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.dm-modal-closing {
+  animation: dm-slidedown 0.24s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+@keyframes dm-slidedown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* Admin panel */
+@keyframes dm-admin-head-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 6px 16px -6px rgba(139, 92, 246, 0.55),
+      0 0 0 0 rgba(217, 70, 239, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 6px 20px -4px rgba(139, 92, 246, 0.7),
+      0 0 0 6px rgba(217, 70, 239, 0.08);
+  }
+}
+@keyframes dm-admin-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-admin-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-admin-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(52, 199, 89, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0);
+  }
+}
+@keyframes dm-admin-shimmer {
+  0% {
+    background-position: -120% 0;
+  }
+  100% {
+    background-position: 220% 0;
+  }
+}

@@ -1,0 +1,486 @@
+/* components/admin-panel/admin-panel.css
+ * Admin panel.
+ */
+.dm-admin-modal {
+  max-width: 520px;
+}
+.dm-admin-modal-v2 {
+  max-width: 560px;
+  padding-left: 16px;
+  padding-right: 16px;
+  background:
+    radial-gradient(
+      120% 140% at 0% 0%,
+      rgba(139, 92, 246, 0.1),
+      transparent 55%
+    ),
+    var(--modal-bg, linear-gradient(180deg, #14161e, #0f1117));
+}
+.dm-admin-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.dm-admin-head-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dm-admin-head-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+  color: #fff;
+  animation: dm-admin-head-glow 2.6s ease-in-out infinite;
+}
+.dm-admin-head-title h3 {
+  margin: 0;
+  font-size: 16px;
+  background: linear-gradient(135deg, #fff, #d9c8ff 65%, #f0abfc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dm-admin-head-sub {
+  margin: 1px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.dm-admin-tabs {
+  margin-top: 14px;
+}
+.dm-admin-tab {
+  font-size: 13px;
+  padding: 9px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.dm-admin-tab-icon {
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.dm-admin-tab.dm-seg-active .dm-admin-tab-icon {
+  opacity: 1;
+  color: #d946ef;
+  transform: scale(1.08);
+}
+.dm-admin-tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-admin-body {
+  margin-top: 4px;
+  max-height: calc(var(--vv-height, 100vh) * 0.58);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.dm-admin-tab-panel {
+  animation: dm-admin-fade-up 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.dm-admin-notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 12px 13px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+.dm-admin-notice-icon {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.dm-admin-notice-body strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.dm-admin-notice-body p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.dm-admin-section-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 2px;
+}
+.dm-admin-section-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(139, 92, 246, 0.16);
+  color: #a78bfa;
+}
+.dm-admin-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+.dm-admin-stat-grid-compact {
+  margin-top: 8px;
+}
+.dm-admin-stat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 11px 12px;
+  box-shadow: var(--shadow-xs);
+  animation: dm-admin-pop-in 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(4) {
+  animation-delay: 0.14s;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(5) {
+  animation-delay: 0.18s;
+}
+.dm-admin-stat-grid .dm-admin-stat-card:nth-child(6) {
+  animation-delay: 0.22s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(139, 92, 246, 0.35);
+  }
+}
+.dm-admin-stat-card-online {
+  border-color: rgba(52, 199, 89, 0.4);
+  background: rgba(52, 199, 89, 0.08);
+}
+.dm-admin-stat-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(139, 92, 246, 0.14);
+  color: #8b5cf6;
+}
+.dm-admin-stat-card-online .dm-admin-stat-icon {
+  background: rgba(52, 199, 89, 0.18);
+  color: #34c759;
+}
+.dm-admin-stat-body {
+  min-width: 0;
+}
+.dm-admin-stat-value {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 1.15;
+}
+.dm-admin-stat-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+.dm-admin-stat-sub {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  opacity: 0.75;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.dm-admin-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  margin-left: 6px;
+  animation: dm-admin-pulse-ring 1.7s ease-out infinite;
+}
+.dm-admin-scope-note {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  opacity: 0.8;
+  margin: 10px 2px 0;
+  line-height: 1.5;
+}
+.dm-admin-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.dm-admin-section-first {
+  margin-top: 14px;
+  padding-top: 0;
+  border-top: none;
+}
+.dm-admin-promo-create {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.dm-admin-discount-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.dm-admin-discount-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  grid-column: span 1;
+}
+.dm-admin-discount-field:last-child {
+  grid-column: span 2;
+}
+.dm-admin-discount-field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.dm-admin-discount-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.dm-admin-code-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.dm-admin-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  animation: dm-admin-fade-up 0.3s ease both;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-admin-code-row:not(.dm-admin-code-row-used):hover {
+    border-color: rgba(var(--cyan-rgb), 0.35);
+  }
+}
+.dm-admin-code-row-used {
+  opacity: 0.5;
+}
+.dm-admin-code-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.dm-admin-code-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+}
+.dm-admin-code-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+  cursor: text;
+}
+.dm-admin-code-input:focus {
+  outline: none;
+}
+.dm-admin-code-type {
+  font-size: 12.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--cyan-rgb), 0.16);
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+.dm-admin-code-meta {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  flex: 1 1 100%;
+}
+.dm-admin-code-copy-error {
+  color: #ff5a5f;
+  font-weight: 600;
+}
+.dm-admin-code-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.dm-admin-code-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.dm-admin-code-btn-error {
+  border-color: rgba(255, 90, 95, 0.5);
+  color: #ff5a5f;
+}
+.dm-admin-premium-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+.dm-admin-grant-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.dm-admin-grant-actions .dm-btn-secondary,
+.dm-admin-grant-actions .dm-btn-danger {
+  width: 100%;
+}
+.dm-admin-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+.dm-admin-footnote {
+  margin-top: 18px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+@media (max-width: 460px) {
+  .dm-admin-modal-v2 {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+  .dm-admin-head-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+  .dm-admin-head-title h3 {
+    font-size: 15px;
+  }
+  .dm-admin-head-sub {
+    font-size: 12.5px;
+  }
+  .dm-admin-tab {
+    font-size: 13px;
+    padding: 8px 4px;
+    gap: 4px;
+  }
+  .dm-admin-stat-value {
+    font-size: 15.5px;
+  }
+  .dm-admin-code-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .dm-admin-tab-label {
+    display: none;
+  }
+  .dm-admin-tab {
+    padding: 10px 4px;
+  }
+  .dm-admin-tab-icon {
+    opacity: 0.9;
+  }
+  .dm-admin-stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .dm-admin-discount-fields {
+    grid-template-columns: 1fr;
+  }
+  .dm-admin-discount-field:last-child {
+    grid-column: span 1;
+  }
+  .dm-admin-code-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dm-admin-code-meta {
+    order: 3;
+  }
+  .dm-admin-premium-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dm-admin-premium-actions .dm-btn-secondary,
+  .dm-admin-premium-actions .dm-btn-danger {
+    width: 100%;
+  }
+}
+.dm-premium-active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dm-premium-plan-price-strike {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-weight: 500;
+  margin-right: 4px;
+}

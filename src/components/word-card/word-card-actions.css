@@ -1,0 +1,139 @@
+/* components/word-card/word-card-actions.css
+ * Word card actions and display switch.
+ */
+/* ===== Word cards: Pronounce is the main action, the rest are quiet ===== */
+.dm-card .dm-card-actions {
+  gap: 2px;
+  align-items: center;
+}
+.dm-card .dm-card-actions .dm-iconbtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-dim);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-card .dm-card-actions .dm-iconbtn:hover {
+    background: var(--surface-strong);
+    color: var(--text);
+    border-color: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+}
+.dm-card .dm-card-actions .dm-iconbtn:active {
+  transform: scale(0.88);
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-iconbtn-active {
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.12);
+  border-color: transparent;
+}
+.dm-card .dm-card-actions .dm-iconbtn:first-child {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 4px;
+  background: rgba(var(--cyan-rgb), 0.14);
+  color: var(--cyan);
+  box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.28);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-card .dm-card-actions .dm-iconbtn:first-child:hover {
+    background: rgba(var(--cyan-rgb), 0.24);
+    color: var(--cyan);
+  }
+}
+
+/* ===== Display switch (GER / ENG / BOTH / FORMS): compact, with a sliding pill ===== */
+.dm-segmented.dm-display-toggle {
+  position: relative;
+  padding: 3px;
+  gap: 0;
+  border-radius: 14px;
+  --i: 0;
+}
+.dm-segmented.dm-display-toggle::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 4);
+  border-radius: 11px;
+  background: var(--surface-strong);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px var(--border) inset;
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 0.34s cubic-bezier(0.3, 1.25, 0.5, 1);
+}
+.dm-segmented.dm-display-toggle:has(.dm-seg:nth-child(2).dm-seg-active) {
+  --i: 1;
+}
+.dm-segmented.dm-display-toggle:has(.dm-seg:nth-child(3).dm-seg-active) {
+  --i: 2;
+}
+.dm-segmented.dm-display-toggle:has(.dm-seg:nth-child(4).dm-seg-active) {
+  --i: 3;
+}
+.dm-segmented.dm-display-toggle .dm-seg {
+  position: relative;
+  z-index: 1;
+  padding: 6px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 11px;
+  transition: color 0.2s ease;
+}
+.dm-segmented.dm-display-toggle .dm-seg.dm-seg-active {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--text);
+}
+.dm-segmented.dm-display-toggle .dm-seg.dm-seg-active::before {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-segmented.dm-display-toggle::before {
+    transition: none;
+  }
+}
+
+.dm-account-btn {
+  position: relative;
+}
+.dm-account-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #33d17a;
+  box-shadow: 0 0 0 2px var(--dm-bg, #0a0c11);
+}
+.dm-account-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+}
+.dm-auth-modal {
+  max-width: 400px;
+}
+.dm-auth-tabs {
+  margin-bottom: 14px;
+}

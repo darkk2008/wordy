@@ -1,0 +1,554 @@
+/* styles/base-layout.css
+ * App shell, loading skeleton, logo, view transitions, base keyframes.
+ */
+.dm-bg-glow {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+  animation: dm-glow-breathe 7s ease-in-out infinite;
+}
+/* Only force body's top back to 0 when the modal/keyboard scroll-lock
+   (see the IIFE near the end of this file) isn't holding it at a
+   negative offset on purpose — otherwise this fights that lock and
+   makes the page visually snap to the top whenever a modal/table opens. */
+body:not(.dm-scroll-locked) {
+  top: 0px !important;
+}
+/* iOS keeps fixed bottom bars pinned to the layout viewport, so with the keyboard
+   open they end up floating right above it. Hide them until it closes.
+   (JS toggles .dm-kb-open on <html>; the >=900px layout uses a sidebar, so skip it.) */
+@media (max-width: 899px) {
+  .dm-kb-open .dm-bottomnav,
+  .dm-kb-open .dm-multipick-bar {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+.goog-te-gadget-icon {
+  display: none !important;
+}
+#google_translate_element {
+  display: none !important;
+}
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+  visibility: hidden !important;
+}
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+.goog-te-spinner-pos {
+  display: none !important;
+}
+.goog-te-ftab,
+.goog-te-ftab-float {
+  display: none !important;
+}
+.skiptranslate iframe.goog-te-banner-frame {
+  display: none !important;
+}
+.dm-bg-glow-1 {
+  width: 280px;
+  height: 280px;
+  background: var(--cyan);
+  top: -80px;
+  left: -60px;
+}
+.dm-bg-glow-2 {
+  width: 260px;
+  height: 260px;
+  background: var(--gold);
+  bottom: 40px;
+  right: -80px;
+  opacity: 0.15;
+  animation-delay: -3.5s;
+}
+@keyframes dm-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.12);
+  }
+}
+.dm-content {
+  position: relative;
+  z-index: 1;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 96px;
+}
+/* .dm-content's padding-bottom exists to clear the fixed BottomNav bar.
+   When reviewing a stack's word list the nav is hidden, but that padding
+   was still reserved everywhere (all breakpoints below), leaving a big
+   dead zone under the last card. This class (added only for that screen)
+   overrides it down to roughly the same gap used between cards. Higher
+   specificity than the plain .dm-content rules below/in media queries
+   means it always wins regardless of source order. */
+.dm-content.dm-content-noreserve {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+.dm-loading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+.dm-skeleton-wrap {
+  width: 100%;
+  max-width: 420px;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 40px;
+  box-sizing: border-box;
+}
+.dm-skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.dm-skeleton-brand {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+.dm-skeleton-bar {
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-strong) 37%,
+    var(--surface) 63%
+  );
+  background-size: 400% 100%;
+  animation: dm-shimmer 1.5s ease-in-out infinite;
+}
+.dm-skeleton-bar-title {
+  width: 46%;
+  height: 22px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+.dm-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dm-skeleton-card {
+  height: 60px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-strong) 37%,
+    var(--surface) 63%
+  );
+  background-size: 400% 100%;
+  animation: dm-shimmer 1.5s ease-in-out infinite;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.dm-skeleton-line {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.dm-skeleton-line-lg {
+  width: 55%;
+}
+.dm-skeleton-line-sm {
+  width: 32%;
+  opacity: 0.7;
+}
+.dm-light .dm-skeleton-line {
+  background: rgba(20, 24, 36, 0.06);
+}
+@keyframes dm-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.dm-loading-glow {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cyan), transparent 70%);
+  animation: dm-pulse 1.4s ease-in-out infinite;
+}
+.dm-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  perspective: 700px;
+}
+.dm-logo::before {
+  content: "";
+  position: absolute;
+  inset: -16%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224, 165, 38, 0.4), transparent 70%);
+  z-index: -1;
+  opacity: 0.35;
+  animation: dm-logo-glow-pulse 5s ease-in-out infinite;
+  pointer-events: none;
+}
+.dm-logo::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14%;
+  width: 68%;
+  height: 16%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4), transparent 72%);
+  z-index: -1;
+  pointer-events: none;
+}
+.dm-logo-animated::after {
+  animation: dm-logo-ground-shadow 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.dm-app.dm-light .dm-logo::after {
+  background: radial-gradient(ellipse, rgba(30, 34, 50, 0.22), transparent 72%);
+}
+.dm-book-stage {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  perspective: 500px;
+}
+.dm-book-pages {
+  position: absolute;
+  inset: 0;
+  border-radius: 22%;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+.dm-book-cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 22%;
+  transform-style: preserve-3d;
+  transform-origin: 0% 50%;
+  animation: dm-book-flip 5s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
+}
+.dm-book-cover-face,
+.dm-book-cover-inside {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 22%;
+  overflow: hidden;
+}
+.dm-book-cover-inside {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #d9b869, #8a6a2c);
+}
+.dm-logo-loading .dm-book-stage {
+  perspective: 800px;
+}
+.dm-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+  position: relative;
+  z-index: 1;
+}
+.dm-header-logo {
+  align-self: center;
+}
+.dm-logo-motion {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 60%;
+  transform-style: preserve-3d;
+}
+.dm-logo-animated .dm-logo-motion {
+  animation: dm-logo-premium 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.dm-logo-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 62%
+  );
+  background-size: 300% 300%;
+  background-position: -40% -40%;
+  mix-blend-mode: overlay;
+  opacity: 0;
+  pointer-events: none;
+}
+.dm-logo-animated .dm-logo-sweep {
+  animation: dm-logo-sweep-move 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.dm-logo-flag {
+  position: absolute;
+  left: 37.5%;
+  top: 32.42%;
+  width: 22.27%;
+  height: 17.97%;
+  border-radius: 22%;
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 2px 3px rgba(0, 0, 0, 0.28);
+  z-index: 1;
+}
+@keyframes dm-logo-premium {
+  0% {
+    transform: translateY(0) scale(0.95) rotateZ(0deg) rotateX(0deg)
+      rotateY(0deg);
+    filter: blur(1px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.16));
+  }
+  12% {
+    transform: translateY(-6px) scale(0.98) rotateZ(-2deg) rotateX(6deg)
+      rotateY(-8deg);
+    filter: blur(0.4px) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
+  }
+  25% {
+    transform: translateY(-12px) scale(1.01) rotateZ(4deg) rotateX(10deg)
+      rotateY(-14deg);
+    filter: blur(0) drop-shadow(0 12px 16px rgba(0, 0, 0, 0.22));
+  }
+  38% {
+    transform: translateY(-13px) scale(1.03) rotateZ(2deg) rotateX(8deg)
+      rotateY(10deg);
+    filter: blur(0) drop-shadow(0 13px 17px rgba(0, 0, 0, 0.23));
+  }
+  50% {
+    transform: translateY(-11px) scale(1) rotateZ(-3deg) rotateX(-6deg)
+      rotateY(14deg);
+    filter: blur(0) drop-shadow(0 11px 15px rgba(0, 0, 0, 0.2));
+  }
+  65% {
+    transform: translateY(-8px) scale(1.01) rotateZ(3deg) rotateX(-9deg)
+      rotateY(6deg);
+    filter: blur(0) drop-shadow(0 9px 13px rgba(0, 0, 0, 0.19));
+  }
+  80% {
+    transform: translateY(-4px) scale(0.99) rotateZ(-2deg) rotateX(-4deg)
+      rotateY(-6deg);
+    filter: blur(0.2px) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.17));
+  }
+  92% {
+    transform: translateY(-1px) scale(0.96) rotateZ(1deg) rotateX(2deg)
+      rotateY(-3deg);
+    filter: blur(0.6px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.16));
+  }
+  100% {
+    transform: translateY(0) scale(0.95) rotateZ(0deg) rotateX(0deg)
+      rotateY(0deg);
+    filter: blur(1px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.16));
+  }
+}
+@keyframes dm-logo-ground-shadow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(-50%) scale(1);
+  }
+  25% {
+    opacity: 0.3;
+    transform: translateX(-50%) scale(0.72);
+  }
+  50% {
+    opacity: 0.25;
+    transform: translateX(-50%) scale(0.68);
+  }
+  80% {
+    opacity: 0.4;
+    transform: translateX(-50%) scale(0.85);
+  }
+}
+@keyframes dm-logo-sweep-move {
+  0%,
+  18% {
+    background-position: -40% -40%;
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  46%,
+  100% {
+    background-position: 140% 140%;
+    opacity: 0;
+  }
+}
+.dm-header-text {
+  min-width: 0;
+}
+.dm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 10000;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+@keyframes dm-logo-glow-pulse {
+  0%,
+  40%,
+  94%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.88);
+  }
+  55%,
+  80% {
+    opacity: 0.6;
+    transform: scale(1.18);
+  }
+}
+@keyframes dm-book-flip {
+  0%,
+  40% {
+    transform: rotateY(0deg);
+  }
+  52%,
+  82% {
+    transform: rotateY(-155deg);
+  }
+  94%,
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+.dm-loading-text {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+}
+@keyframes dm-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.dm-view {
+  animation: dm-fadein 0.12s ease;
+}
+@keyframes dm-fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Appearance module: the generic .dm-view fade above is very quick (0.12s);
+   this page gets its own slower, gentler entrance so the theme picker feels
+   less abrupt, plus a staggered pop-in for each theme card. */
+.dm-appearance-view {
+  animation: dm-appearance-fadein 0.55s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+@keyframes dm-appearance-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dm-appearance-view .dm-theme-card {
+  animation: dm-theme-card-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes dm-theme-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.dm-settings-subview > *:not(.dm-topbar):not(.dm-modal-backdrop) {
+  opacity: 0;
+  animation: dm-settings-content-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes dm-settings-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dm-settings-subview > *:nth-child(2):not(.dm-modal-backdrop) {
+  animation-delay: 0.09s;
+}
+.dm-settings-subview > *:nth-child(3):not(.dm-modal-backdrop) {
+  animation-delay: 0.18s;
+}
+.dm-settings-subview > *:nth-child(4):not(.dm-modal-backdrop) {
+  animation-delay: 0.27s;
+}
+.dm-settings-subview > *:nth-child(5):not(.dm-modal-backdrop) {
+  animation-delay: 0.36s;
+}
+.dm-settings-subview > *:nth-child(6):not(.dm-modal-backdrop) {
+  animation-delay: 0.45s;
+}
+.dm-settings-subview > *:nth-child(7):not(.dm-modal-backdrop) {
+  animation-delay: 0.54s;
+}
+.dm-settings-subview > *:nth-child(8):not(.dm-modal-backdrop) {
+  animation-delay: 0.6s;
+}
+.dm-settings-subview > *:nth-child(9):not(.dm-modal-backdrop) {
+  animation-delay: 0.66s;
+}
+.dm-settings-subview > *:nth-child(n + 10):not(.dm-modal-backdrop) {
+  animation-delay: 0.72s;
+}

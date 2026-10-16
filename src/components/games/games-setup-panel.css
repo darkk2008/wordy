@@ -1,0 +1,505 @@
+/* components/games/games-setup-panel.css
+ * Games setup panel (stack picker, mode picker, stack rail).
+ */
+/* ==================================================================
+   GAMES SETUP PANEL
+   One panel, two zones: which stack you practice, and what it asks
+   of you. A single button (top-right) folds the whole panel into a
+   slim bar that still holds a stack dropdown and a one-tap
+   "whole words / word forms" switch, so nothing is out of reach
+   while it is closed.
+   ================================================================== */
+@property --ft { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --fb { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+.dm-gsetup {
+  --dm-gs-ease: cubic-bezier(0.3, 0.8, 0.2, 1);
+  --dm-gs-pop: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 6;
+  max-width: 100%;
+  margin: 14px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(var(--cyan-rgb), 0.07), transparent 58%),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.3s ease, max-width 0.4s var(--dm-gs-ease), margin 0.4s var(--dm-gs-ease);
+}
+.dm-gsetup.dm-gsetup-collapsed {
+  max-width: 100%;
+  border-radius: 18px;
+  border-color: rgba(var(--cyan-rgb), 0.16);
+}
+.dm-gsetup .dm-label { margin: 0 0 11px; }
+.dm-gsetup-stack { min-width: 0; }
+.dm-gsetup-mode {
+  min-width: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Body: folds away by animating its own height (1fr -> 0fr), so
+       there is no magic max-height and it works for any stack count.
+       The content's own reveal is deliberately timed to finish no later
+       than this track does — letting it run long past the box settling
+       is what read as janky before: the box would finish opening and the
+       content would keep sliding/blurring into place on its own a beat
+       later, instead of everything arriving together. ---- */
+.dm-gsetup-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.42s var(--dm-gs-ease), visibility 0s linear 0s;
+}
+.dm-gsetup-collapsed .dm-gsetup-collapse {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.3s var(--dm-gs-ease), visibility 0s linear 0.3s;
+}
+.dm-gsetup-collapse-inner { min-height: 0; overflow: hidden; }
+.dm-gsetup-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+/* The two zones rise and fade into place, timed to land within the same
+   window the box takes to open — no overshoot, no filter, just a clean
+   ease so it reads as one continuous motion instead of two. */
+.dm-gsetup-stack,
+.dm-gsetup-mode {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.3s ease 0.04s, transform 0.38s var(--dm-gs-pop) 0.02s;
+}
+.dm-gsetup-mode { transition-delay: 0.09s, 0.07s; }
+.dm-gsetup-collapsed .dm-gsetup-stack,
+.dm-gsetup-collapsed .dm-gsetup-mode {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  transition: opacity 0.14s ease, transform 0.2s ease;
+}
+
+/* The old inline switch stays in the tree for its state; the mode
+   picker is what you see. */
+.dm-gsetup .dm-stackselect { margin-bottom: 0; max-width: none; }
+.dm-gsetup .dm-forms-mix-row { display: none; }
+
+/* ---- Toggle: one physical button that glides between its two homes ---- */
+.dm-gsetup-toggle {
+  position: absolute;
+  z-index: 3;
+  top: 6px;
+  right: 10px;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: top 0.4s var(--dm-gs-ease), background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+.dm-gsetup-toggle:active { transform: scale(0.9); }
+.dm-gsetup-toggle-icon { transform: rotate(180deg); transition: transform 0.4s var(--dm-gs-ease); }
+.dm-gsetup-collapsed .dm-gsetup-toggle { top: 14px; color: var(--cyan); border-color: transparent; }
+.dm-gsetup-collapsed .dm-gsetup-toggle-icon { transform: rotate(0deg); }
+
+/* ---- Compact bar: shown only while the panel is folded ---- */
+.dm-gsetup-bar {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.3s var(--dm-gs-ease), visibility 0s linear 0.3s;
+}
+.dm-gsetup-bar-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.4s var(--dm-gs-ease) 0.04s, visibility 0s linear 0s;
+}
+.dm-gsetup-bar-inner { min-height: 0; overflow: hidden; }
+/* Once the fold has finished, let the dropdown menu spill out of the bar. */
+.dm-gsetup-bar-settled .dm-gsetup-bar-inner { overflow: visible; }
+.dm-gsetup-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 54px 10px 10px;
+}
+.dm-gsetup-bar .dm-stackselect,
+.dm-gsetup-modechip {
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transition: opacity 0.2s ease, transform 0.3s ease, background-color 0.2s ease,
+              border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.dm-gsetup-bar-open .dm-stackselect,
+.dm-gsetup-bar-open .dm-gsetup-modechip {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.26s ease 0.14s, transform 0.4s var(--dm-gs-ease) 0.12s, background-color 0.2s ease,
+              border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.dm-gsetup-bar-open .dm-gsetup-modechip { transition-delay: 0.2s, 0.16s, 0s, 0s, 0s, 0s; }
+.dm-gsetup-bar-open .dm-gsetup-modechip:active { transform: scale(0.95); transition-delay: 0s; }
+
+.dm-gsetup-bar .dm-stackselect { flex: 1 1 0; min-width: 0; max-width: none; margin: 0; }
+.dm-gsetup-bar .dm-stackselect-trigger {
+  max-width: none;
+  min-height: 42px;
+  padding: 5px 10px 5px 5px;
+  gap: 10px;
+  border-radius: 14px;
+  background: var(--surface-strong);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.dm-gsetup-bar .dm-stackselect-emoji { width: 32px; height: 32px; border-radius: 10px; background: rgba(var(--cyan-rgb), 0.12); }
+.dm-gsetup-bar .dm-stackselect-emoji .dm-aicon { transform: none; }
+.dm-gsetup-bar .dm-stackselect-name { font-size: 13.5px; }
+.dm-gsetup-bar .dm-stackselect-count { font-size: 11px; }
+.dm-gsetup-bar .dm-stackselect-chevron { width: 16px; height: 16px; }
+.dm-gsetup-bar .dm-stackselect-menu {
+  top: calc(100% + 14px);
+  right: auto;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 56px));
+  max-height: 260px;
+  transform-origin: 24px top;
+  animation: dm-gsetup-pop 0.24s var(--dm-gs-ease) both;
+}
+@keyframes dm-gsetup-pop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+/* Closing: the menu stays mounted for ~0.18s (see StackSelect) so it can fade out
+   instead of vanishing. Selectors are deliberately more specific than the open rules. */
+.dm-stackselect-menu { overscroll-behavior: contain; }
+.dm-stackselect-menu.dm-stackselect-menu-leaving,
+.dm-gsetup-bar .dm-stackselect-menu.dm-stackselect-menu-leaving {
+  animation: dm-gsetup-pop-out 0.16s ease-in both;
+  pointer-events: none;
+}
+@keyframes dm-gsetup-pop-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-6px) scale(0.96); }
+}
+
+/* Tablet and desktop: the trigger now spans the bar, so the list opens
+   at exactly the trigger's width instead of shrink-wrapping its content. */
+@media (min-width: 600px) {
+  /* The picker used to be the only flex:1 item in the row next to a
+     content-sized mode chip, so it swallowed all the row's leftover width
+     — and since its label is itself flex:1 inside the button, that width
+     became a dead gap between the stack name and the chevron rather than
+     going anywhere useful. Capping it lets the button size to something
+     that actually looks intentional. */
+  .dm-gsetup-bar .dm-stackselect { flex: 0 1 300px; max-width: 300px; }
+  .dm-gsetup-bar .dm-stackselect-menu {
+    right: 0;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+  /* Capping the picker alone just moved the dead space from inside the
+     button to the right of it — the outer card was still full-width. In
+     mini mode the card should size to what it actually holds and sit
+     centered, the same way a toolbar/pill group would, instead of being a
+     wide empty shell with a small cluster of controls stranded on the left. */
+  .dm-gsetup-bar-row { justify-content: center; }
+  /* Auto margins can't be transitioned to/from a fixed value — that jump
+     is what made the panel snap sideways mid-animation instead of
+     growing its two edges evenly. Keeping margin-left/right at auto in
+     BOTH states means only max-width ever actually animates, and the
+     browser recomputes the (still-auto) margins symmetrically on every
+     frame of that animation for free. */
+  .dm-gsetup { margin-left: auto; margin-right: auto; }
+  .dm-gsetup.dm-gsetup-collapsed {
+    max-width: 580px;
+  }
+}
+
+/* Mouse / trackpad: the 0.24s pop above is over before the eye lands on
+   it, so on a computer the list just seemed to snap into place. Give it a
+   deliberate reveal and let the rows settle in one after another. Phones
+   and tablets with a finger keep the quick pop.
+
+   This used to be a clip-path "unfold": a hard rectangular mask animated
+   from fully-covering to fully-open over the menu. The menu's own
+   box-shadow (0 16px 40px, well outside its border) doesn't belong to the
+   clipped box in any simple way, so as the mask swept down it cut the
+   shadow off at a straight moving line instead of the shadow's natural
+   soft falloff — the shadow read as a separate rectangle trailing behind
+   the menu rather than being attached to it. Scaling the whole element
+   instead keeps the shadow rendered together with the box at every frame,
+   so it opens as one solid object with no detached edges. */
+@media (hover: hover) and (pointer: fine) {
+  .dm-gsetup-bar .dm-stackselect-menu {
+    transform-origin: top center;
+    animation: dm-gsetup-unfold 0.32s cubic-bezier(.16,1,.3,1) backwards;
+  }
+  .dm-gsetup-bar .dm-stackselect-item {
+    animation: dm-gsetup-item-in 0.3s cubic-bezier(.16,1,.3,1) backwards;
+    animation-delay: 0.1s;
+  }
+  .dm-gsetup-bar .dm-stackselect-item:nth-child(1) { animation-delay: 0.08s; }
+  .dm-gsetup-bar .dm-stackselect-item:nth-child(2) { animation-delay: 0.11s; }
+  .dm-gsetup-bar .dm-stackselect-item:nth-child(3) { animation-delay: 0.14s; }
+  .dm-gsetup-bar .dm-stackselect-item:nth-child(4) { animation-delay: 0.17s; }
+  .dm-gsetup-bar .dm-stackselect-chevron { transition-duration: 0.35s; }
+}
+@keyframes dm-gsetup-unfold {
+  0% { opacity: 0; transform: translateY(-6px) scaleY(0.82) scaleX(0.96); }
+  55% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scaleY(1) scaleX(1); }
+}
+@keyframes dm-gsetup-item-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.dm-gsetup-modechip {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 42px;
+  padding: 0 13px 0 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--text-dim);
+  font-family: 'Sora', sans-serif; font-weight: 600; font-size: 12.5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.dm-gsetup-modechip-on {
+  background: linear-gradient(140deg, rgba(var(--cyan-rgb), 0.24), rgba(var(--cyan-rgb), 0.1));
+  border-color: rgba(var(--cyan-rgb), 0.42);
+  color: var(--text);
+}
+.dm-gsetup-modechip-icon { display: inline-flex; animation: dm-gsetup-chip-pop 0.45s var(--dm-gs-ease); }
+.dm-gsetup-modechip-short { display: none; }
+@keyframes dm-gsetup-chip-pop {
+  0% { transform: scale(0.4) rotate(-40deg); opacity: 0; }
+  60% { transform: scale(1.18) rotate(6deg); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@media (max-width: 460px) {
+  .dm-gsetup-modechip { padding: 0 11px 0 9px; gap: 6px; }
+  .dm-gsetup-modechip-full { display: none; }
+  .dm-gsetup-modechip-short { display: inline; }
+}
+
+/* ---- Stack rail ---- */
+.dm-stackrail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+  gap: 8px;
+  max-height: 236px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* room for the 1px lift / glow that overflow would otherwise clip */
+  padding: 2px 2px 4px;
+  margin: -2px -2px -4px;
+  /* no scrollbar: it still scrolls, and a soft fade shows where more is */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  --ft: 0px;
+  --fb: 0px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--ft), #000 calc(100% - var(--fb)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--ft), #000 calc(100% - var(--fb)), transparent 100%);
+  transition: --ft 0.25s ease, --fb 0.25s ease;
+}
+.dm-stackrail::-webkit-scrollbar,
+.dm-gsetup .dm-stackrail::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.dm-stackrail-fade-t { --ft: 22px; }
+.dm-stackrail-fade-b { --fb: 26px; }
+.dm-stackrail-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 11px 12px 11px 10px;
+  border-radius: 15px;
+  border: 1px solid transparent;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease,
+              box-shadow 0.2s ease, transform 0.16s ease;
+}
+.dm-stackrail-item:active { transform: scale(0.985); }
+/* Each card in the rail pops in a beat after the last one, right as the
+   panel opens — same "none -> named" retrigger trick as the glow above,
+   so it plays fresh on every open without any JS. Kept short and tight
+   so the last card lands close to when the box itself finishes growing. */
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item {
+  animation: dm-gsetup-item-in 0.26s var(--dm-gs-pop) both;
+  animation-delay: 0.16s;
+}
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item:nth-child(1) { animation-delay: 0.06s; }
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item:nth-child(2) { animation-delay: 0.09s; }
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item:nth-child(3) { animation-delay: 0.12s; }
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item:nth-child(4) { animation-delay: 0.15s; }
+.dm-gsetup:not(.dm-gsetup-collapsed) .dm-stackrail-item:nth-child(5) { animation-delay: 0.16s; }
+.dm-stackrail-item-active,
+.dm-stackrail-item-active:hover {
+  background: linear-gradient(140deg, rgba(var(--cyan-rgb), 0.2), rgba(var(--cyan-rgb), 0.06) 70%);
+  border-color: rgba(var(--cyan-rgb), 0.5);
+  box-shadow: 0 12px 26px -16px rgba(var(--cyan-rgb), 0.6);
+}
+.dm-stackrail-emoji {
+  width: 36px; height: 36px; flex: 0 0 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: var(--surface-strong);
+  transition: background-color 0.16s ease;
+}
+.dm-stackrail-item-active .dm-stackrail-emoji { background: rgba(var(--cyan-rgb), 0.16); }
+.dm-stackrail-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.dm-stackrail-name {
+  font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px;
+  color: var(--text-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color 0.16s ease;
+}
+.dm-stackrail-item-active .dm-stackrail-name { color: var(--text); }
+.dm-stackrail-count { font-size: 11.5px; font-weight: 500; color: var(--text-dim); opacity: 0.8; }
+.dm-stackrail-item-active .dm-stackrail-count { color: var(--cyan); opacity: 1; }
+
+/* ---- Mode picker: two named choices beat a switch with a caption in
+     brackets, because each option says what it gives you. ---- */
+.dm-formsmode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 15px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-inset);
+  max-width: 420px;
+}
+.dm-formsmode-btn {
+  padding: 10px 8px 11px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.2s ease;
+}
+.dm-formsmode-btn-active,
+.dm-formsmode-btn-active:hover {
+  background: linear-gradient(140deg, rgba(var(--cyan-rgb), 0.24), rgba(var(--cyan-rgb), 0.1));
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.4);
+}
+.dm-formsmode-hint {
+  max-width: 520px;
+  margin: 10px 2px 0;
+  font-size: 11.5px; line-height: 1.45;
+  color: var(--text-dim);
+}
+
+/* Tablet: the panel is one wide column here, so a 420px switch hugging the
+   left edge looked lost. Centre the label, the switch and the hint together.
+   (At 900px+ this zone is a narrow side column and stays as it was; phones
+   already have the switch filling the width.) */
+@media (min-width: 600px) and (max-width: 899px) {
+  .dm-gsetup-mode .dm-gsetup-modelabel { text-align: center; }
+  .dm-gsetup-mode .dm-formsmode { margin-left: auto; margin-right: auto; }
+  .dm-gsetup-mode .dm-formsmode-hint { margin-left: auto; margin-right: auto; text-align: center; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dm-stackrail-item:hover { border-color: rgba(var(--cyan-rgb), 0.3); transform: translateY(-1px); }
+  .dm-stackrail-item-active:hover { transform: none; }
+  .dm-stackrail-item:hover .dm-stackrail-name { color: var(--text); }
+  .dm-formsmode-btn:hover { color: var(--text); }
+  .dm-gsetup-toggle:hover {
+    border-color: transparent;
+    color: var(--cyan);
+    background: transparent;
+    box-shadow: none;
+  }
+  .dm-gsetup-modechip:hover { border-color: rgba(var(--cyan-rgb), 0.35); color: var(--text); }
+}
+
+/* ---- Two zones side by side once there is room for them ---- */
+@media (min-width: 900px) {
+  .dm-gsetup {
+    max-width: 100%;
+    margin: 16px auto 26px;
+    border-radius: 24px;
+  }
+  .dm-gsetup.dm-gsetup-collapsed { max-width: 580px; border-radius: 20px; }
+  .dm-gsetup-body {
+    grid-template-columns: minmax(0, 1fr) minmax(236px, 288px);
+    align-items: start;
+    gap: 0;
+    padding: 20px 4px 20px 22px;
+  }
+  .dm-gsetup-toggle { top: 10px; }
+  .dm-gsetup-collapsed .dm-gsetup-toggle { top: 14px; }
+  .dm-gsetup-modelabel { padding-right: 44px; }
+  .dm-gsetup-stack { padding-right: 22px; }
+  .dm-gsetup-mode {
+    align-self: stretch;
+    padding: 0 22px;
+    border-top: none;
+    border-left: 1px solid var(--border);
+  }
+  .dm-stackrail { max-height: 208px; }
+
+  /* ---- Desktop craft: things a pointer and a keyboard expect ---- */
+
+  /* Keyboard focus is visible everywhere, and never on a mouse click. */
+  .dm-app :is(button, a, [role="button"], [role="radio"], input, textarea, select):focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  /* Scrollbars match the app instead of the operating system. */
+  .dm-app *::-webkit-scrollbar { width: 10px; height: 10px; }
+  .dm-app *::-webkit-scrollbar-track { background: transparent; }
+  .dm-app *::-webkit-scrollbar-thumb {
+    background: var(--surface-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+  .dm-app *::-webkit-scrollbar-thumb:hover { background: rgba(var(--cyan-rgb), 0.35); background-clip: content-box; }
+  .dm-app { scrollbar-width: thin; scrollbar-color: var(--surface-strong) transparent; }
+  .dm-app .dm-admin-body,
+  .dm-app .dm-admin-code-list { scrollbar-width: none; }
+  .dm-app .dm-admin-body::-webkit-scrollbar,
+  .dm-app .dm-admin-code-list::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  .dm-app ::selection { background: rgba(var(--cyan-rgb), 0.28); color: var(--text); }
+
+  /* Game cards answer the pointer: one lift, one accent, nothing else. */
+  .dm-game-card { min-height: 132px; transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.22s ease; }
+  .dm-game-card:not(:disabled):hover {
+    transform: translateY(-3px);
+    border-color: rgba(var(--cyan-rgb), 0.32);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm-gsetup, .dm-gsetup *, .dm-gsetup-bar .dm-stackselect-menu { transition: none !important; animation: none !important; }
+  .dm-stackrail-item,
+  .dm-formsmode-btn,
+  .dm-game-card { transition: none; }
+  .dm-stackrail-item:hover,
+  .dm-stackrail-item:active,
+  .dm-game-card:not(:disabled):hover { transform: none; }
+}
