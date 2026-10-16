@@ -1,7 +1,7 @@
 /* services/config-and-validation.js
  * AI proxy config, size limits, backup/import sanitizers, analytics consent.
  */
-
+   import "../boot/config.js"; // must run first: it sets window.DM_CONFIG read just below
 import { uid } from "../core/constants";
 import { initAnalytics } from "./analytics-presence";
 
