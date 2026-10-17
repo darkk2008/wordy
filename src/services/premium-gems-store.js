@@ -119,7 +119,7 @@ export function saveStorePreview(packId, learningLanguage, nativeLanguage, words
   } catch (e) {}
 }
 export const FREE_FAMILY_LIMIT = 1;
-export const FREE_THEME_LIMIT = 6;
+export const FREE_THEME_LIMIT = 8;
 export const FREE_FAVORITE_LIMIT = 10;
 export const FREE_TRANSLATE_LIMIT = 4;
 const FREE_TRANSLATE_COUNT_KEY = "deutschmaster-free-translate-count";

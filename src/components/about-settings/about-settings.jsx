@@ -19,7 +19,15 @@ import {
   Star,
   Zap,
 } from "../icons/icons";
-import { GraduationCap, LockIcon, UsersIcon } from "../icons/settings-icons";
+import {
+  BellIcon,
+  GemIcon,
+  GlobeIcon,
+  GraduationCap,
+  LockIcon,
+  ShieldIcon,
+  UsersIcon,
+} from "../icons/settings-icons";
 
 function useRevealOnView() {
   const ref = useRef(null);
@@ -366,55 +374,79 @@ export function AppAboutSettings({ onBack }) {
       id: "stack",
       icon: <Layers size={20} />,
       q: "What is a stack?",
-      a: "A stack is a themed set of vocabulary words, like “Kitchen” or “Travel.” You can add words to a stack yourself, import them, or ask the AI Tutor to build one for you. Each stack can be studied on its own with flashcards, games, and quizzes.",
+      a: "A stack is a themed set of words, like “Kitchen” or “Travel.” Add words yourself, import them, pick up a ready-made word pack in the Store, or ask the AI Tutor to build one for you. Every stack can be studied on its own with flashcards, games, and quizzes.",
     },
     {
       id: "family",
       icon: <UsersIcon size={20} />,
       q: "What is a family?",
-      a: "A family groups several related stacks together, for example all your travel stacks. It lets you see combined progress across those stacks and play games that pull words from all of them at once.",
+      a: "A family groups several related stacks together, for example all your travel stacks. You see combined progress across them, can filter Home by family, and can play games that pull words from all of them at once. You can also make a mini-stack, a small custom set of words, for a quick session.",
     },
     {
       id: "srs",
       icon: <Zap size={20} />,
       q: "How does spaced repetition work?",
-      a: "Every word has a level that tracks how well you know it. Answer correctly and the word is scheduled further out before it comes up again; get it wrong and it comes back sooner. This keeps your review time focused on the words you find hardest, instead of ones you already know well.",
+      a: "Every word has a level that tracks how well you know it. Answer correctly and the word is scheduled further out before it comes up again; get it wrong and it comes back sooner. Words you've pushed to the top level count as mastered. The Home screen shows how many words are due today, so your review time goes to the words you find hardest.",
     },
     {
       id: "cefr",
       icon: <GraduationCap size={20} />,
       q: "What are CEFR levels?",
-      a: "A1 through C2 is the standard European scale for language difficulty, from complete beginner (A1) to near-native (C2). wwordy uses it to label how advanced a word is, so you can see the mix of easy and hard words in your stacks.",
+      a: "A1 through C2 is the standard European scale for language difficulty, from complete beginner (A1) to near-native (C2). wwordy uses it to label how advanced a word is, so you can see the mix of easy and hard words in your stacks. Prefer a cleaner look? You can hide the level badge on word cards in Settings > Guardrails.",
     },
     {
       id: "games",
       icon: <Grid3x3 size={20} />,
       q: "What are the practice games?",
-      a: "Beyond flashcards, you can drill a stack with games like Matching, Multiple Choice, Memory, Scramble, Write, and more. They all pull from the same words and update the same progress, just with different ways of testing recall.",
+      a: "Beyond flashcards, the Games tab has around twenty ways to train: Matching, Sprint, True or False, Memory, Word Scramble, Write the Word, Multiple Choice, Listening Dictation, Speaking Practice, Word Rain, a Daily Mix, and more. For German there are extra grammar drills too, such as Word Forms, Verb Tense Mixer, Adjective Endings, Cases, and Conjugation Ladder. Some games need Premium. They all use your own words and update the same progress.",
+    },
+    {
+      id: "languages",
+      icon: <GlobeIcon size={20} />,
+      q: "Which languages can I learn?",
+      a: "wwordy isn't only for German. In Settings > Languages you choose the language you're learning and your own language, from a list of around eighteen. Pronunciation, word forms, and grammar tools adapt to what you pick, and the app interface can follow your language too.",
     },
     {
       id: "streak",
       icon: <Flame size={20} />,
       q: "What is a streak?",
-      a: "Your streak counts the consecutive days you've completed at least one review. It resets if you miss a day, and your best streak is saved separately so you can see your longest run.",
+      a: "Your streak counts the consecutive days you've completed at least one review. It resets if you miss a day, and your best streak is saved separately so you can see your longest run. Set a daily review goal and reminder times in Settings > Notifications & Goals to keep it going.",
+    },
+    {
+      id: "gems",
+      icon: <GemIcon size={20} />,
+      q: "What are gems and the Store?",
+      a: "Gems are the in-app currency. You earn a daily bonus just for showing up, and you can buy more in the Store. Spend them on hint reveals, streak freezes, unlockable themes, and ready-made word packs on topics like travel, food, business, and technology.",
+    },
+    {
+      id: "premium",
+      icon: <Star size={20} />,
+      q: "What does Premium include?",
+      a: "Premium unlocks unlimited AI Tutor chats, auto-fill and translations, deeper stats, unlimited stacks, families, and mini-stacks, every app theme, priority cloud backup and sync, and early access to new games and features. Free accounts have a few limits on things like families, favorites, themes, and daily translations. Have a promo code? You can redeem it in the Premium screen.",
     },
     {
       id: "ai",
       icon: <Bot size={20} />,
       q: "What does the AI Tutor do?",
-      a: "The AI Tutor is a built-in chat for German questions — grammar, articles, plurals, verb forms, and example sentences. It can also add words or build a whole stack for you directly when you ask it to.",
+      a: "The AI Tutor is a built-in chat for questions about the language you're learning — grammar, articles, plurals, verb forms, and example sentences. It can also add words or build a whole stack for you directly when you ask it to.",
     },
     {
       id: "translator",
       icon: <Languages size={20} />,
       q: "What does the Translator do?",
-      a: "Type a German or English word or phrase to get a quick translation, its grammar forms (like article, plural, or past tense), and an example sentence — then add it straight to a stack with one tap.",
+      a: "Type a word or phrase in either of your two languages to get a quick translation, its grammar forms (like article, plural, or past tense), and an example sentence — then add it straight to a stack with one tap.",
+    },
+    {
+      id: "guardrails",
+      icon: <ShieldIcon size={20} />,
+      q: "What can I customize?",
+      a: "Settings has more than themes. Under Appearance you pick a color theme. Under Guardrails you can hide noun articles, hide the level badge on word cards, restrict copying text, and choose whether Home shows family filters and family progress. Notifications & Goals holds your reminders and daily review goal.",
     },
     {
       id: "data",
       icon: <LockIcon size={20} />,
       q: "Where is my data stored?",
-      a: "Your stacks, families, and progress are stored locally on your device. If you create an account, a copy is also stored in the cloud so it can sync to your other devices; you can delete it any time from Settings > Account. The text you send to the AI Tutor or Translator is sent to an AI service to generate a response. You can also move data with a file export/import or a QR code.",
+      a: "Your stacks, families, and progress are stored locally on your device, and the app works offline once installed. If you create an account, a copy is also stored in the cloud so it can sync to your other devices; you can delete it any time from Settings > Account. The text you send to the AI Tutor or Translator is sent to an AI service to generate a response. You can also move data with a file export/import or a QR code.",
     },
   ];
   return (

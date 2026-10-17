@@ -52,6 +52,8 @@ export function SettingsView({
   onToggleRestrictCopy,
   hideArticles,
   onToggleHideArticles,
+  showLevelBadge,
+  onToggleShowLevelBadge,
   dueCount,
   todayReviews,
   bestStreak,
@@ -145,6 +147,8 @@ export function SettingsView({
         onToggleHideFamilyFilters={onToggleHideFamilyFilters}
         hideArticles={hideArticles}
         onToggleHideArticles={onToggleHideArticles}
+        showLevelBadge={showLevelBadge}
+        onToggleShowLevelBadge={onToggleShowLevelBadge}
       />
     );
   if (section === "stats")

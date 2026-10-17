@@ -1067,6 +1067,315 @@ body {
       transparent 55%
     );
 }
+.dm-app.dm-peach {
+  --bg: #FFF1E8;
+  --surface: rgba(232, 116, 59, 0.07);
+  --surface-strong: rgba(232, 116, 59, 0.11);
+  --border: rgba(232, 116, 59, 0.2);
+  --text: #3d2417;
+  --text-dim: #7a5644;
+  --cyan: #be5f30;
+  --cyan-rgb: 232, 116, 59;
+  --gold: #8a5a12;
+  --gold-rgb: 138, 90, 18;
+  --red: #973333;
+  --green: #2f6b45;
+  --nav-bg: rgba(255, 241, 232, 0.92);
+  --modal-bg: linear-gradient(180deg, #fff8f3, #FFF1E8);
+  --modal-backdrop: rgba(61, 36, 23, 0.4);
+  --shadow-xs:
+    0 1px 3px rgba(61, 36, 23, 0.14), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  --shadow-sm:
+    0 4px 14px -4px rgba(61, 36, 23, 0.22),
+    0 16px 32px -22px rgba(232, 116, 59, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --shadow-md:
+    0 16px 34px -14px rgba(61, 36, 23, 0.26),
+    0 26px 52px -26px rgba(232, 116, 59, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-lg:
+    0 28px 60px -20px rgba(61, 36, 23, 0.32),
+    0 34px 74px -28px rgba(138, 90, 18, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-inset:
+    inset 0 2px 4px rgba(61, 36, 23, 0.16), inset 0 1px 0 rgba(61, 36, 23, 0.08);
+  --shadow-press:
+    0 1px 2px rgba(61, 36, 23, 0.18), inset 0 1px 3px rgba(61, 36, 23, 0.12);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(232, 116, 59, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(138, 90, 18, 0.07),
+      transparent 55%
+    );
+}
+.dm-app.dm-emerald {
+  --bg: #0a1511;
+  --surface: rgba(52, 211, 153, 0.08);
+  --surface-strong: rgba(52, 211, 153, 0.13);
+  --border: rgba(52, 211, 153, 0.18);
+  --text: #e2f5ee;
+  --text-dim: #8ab5a5;
+  --cyan: #34D399;
+  --cyan-rgb: 52, 211, 153;
+  --gold: #ffb020;
+  --gold-rgb: 255, 176, 32;
+  --red: #ff6b6b;
+  --green: #6ee7b7;
+  --nav-bg: rgba(10, 21, 17, 0.92);
+  --modal-bg: linear-gradient(180deg, #18231f, #0a1511);
+  --modal-backdrop: rgba(4, 9, 7, 0.72);
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  --shadow-sm:
+    0 3px 10px -3px rgba(0, 0, 0, 0.5),
+    0 14px 26px -20px rgba(52, 211, 153, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --shadow-md:
+    0 14px 30px -12px rgba(0, 0, 0, 0.6),
+    0 22px 46px -24px rgba(52, 211, 153, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-lg:
+    0 26px 56px -18px rgba(0, 0, 0, 0.68),
+    0 32px 72px -28px rgba(var(--gold-rgb), 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-inset:
+    inset 0 2px 5px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-press:
+    0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(52, 211, 153, 0.09),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(var(--gold-rgb), 0.05),
+      transparent 55%
+    );
+}
+.dm-app.dm-onyx {
+  --bg: #0c0b09;
+  --surface: rgba(229, 180, 84, 0.08);
+  --surface-strong: rgba(229, 180, 84, 0.13);
+  --border: rgba(229, 180, 84, 0.18);
+  --text: #f2ece0;
+  --text-dim: #a99f8c;
+  --cyan: #E5B454;
+  --cyan-rgb: 229, 180, 84;
+  --gold: #f0c870;
+  --gold-rgb: 240, 200, 112;
+  --red: #ff6b6b;
+  --green: #6ee7b7;
+  --nav-bg: rgba(12, 11, 9, 0.92);
+  --modal-bg: linear-gradient(180deg, #1a1917, #0c0b09);
+  --modal-backdrop: rgba(5, 4, 4, 0.72);
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  --shadow-sm:
+    0 3px 10px -3px rgba(0, 0, 0, 0.5),
+    0 14px 26px -20px rgba(229, 180, 84, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --shadow-md:
+    0 14px 30px -12px rgba(0, 0, 0, 0.6),
+    0 22px 46px -24px rgba(229, 180, 84, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-lg:
+    0 26px 56px -18px rgba(0, 0, 0, 0.68),
+    0 32px 72px -28px rgba(var(--gold-rgb), 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-inset:
+    inset 0 2px 5px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-press:
+    0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(229, 180, 84, 0.09),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(var(--gold-rgb), 0.05),
+      transparent 55%
+    );
+}
+.dm-app.dm-plum {
+  --bg: #150b17;
+  --surface: rgba(232, 121, 249, 0.08);
+  --surface-strong: rgba(232, 121, 249, 0.13);
+  --border: rgba(232, 121, 249, 0.18);
+  --text: #f6e6f8;
+  --text-dim: #b595ba;
+  --cyan: #E879F9;
+  --cyan-rgb: 232, 121, 249;
+  --gold: #ffb020;
+  --gold-rgb: 255, 176, 32;
+  --red: #ff6b6b;
+  --green: #6ee7b7;
+  --nav-bg: rgba(21, 11, 23, 0.92);
+  --modal-bg: linear-gradient(180deg, #231924, #150b17);
+  --modal-backdrop: rgba(9, 4, 10, 0.72);
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  --shadow-sm:
+    0 3px 10px -3px rgba(0, 0, 0, 0.5),
+    0 14px 26px -20px rgba(232, 121, 249, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --shadow-md:
+    0 14px 30px -12px rgba(0, 0, 0, 0.6),
+    0 22px 46px -24px rgba(232, 121, 249, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-lg:
+    0 26px 56px -18px rgba(0, 0, 0, 0.68),
+    0 32px 72px -28px rgba(var(--gold-rgb), 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --shadow-inset:
+    inset 0 2px 5px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-press:
+    0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(232, 121, 249, 0.09),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(var(--gold-rgb), 0.05),
+      transparent 55%
+    );
+}
+.dm-app.dm-sage {
+  --bg: #EDF1E8;
+  --surface: rgba(95, 138, 85, 0.07);
+  --surface-strong: rgba(95, 138, 85, 0.11);
+  --border: rgba(95, 138, 85, 0.2);
+  --text: #26331f;
+  --text-dim: #55674c;
+  --cyan: #4d7145;
+  --cyan-rgb: 95, 138, 85;
+  --gold: #7a5a14;
+  --gold-rgb: 122, 90, 20;
+  --red: #973333;
+  --green: #2f6b45;
+  --nav-bg: rgba(237, 241, 232, 0.92);
+  --modal-bg: linear-gradient(180deg, #f6f8f3, #EDF1E8);
+  --modal-backdrop: rgba(38, 51, 31, 0.4);
+  --shadow-xs:
+    0 1px 3px rgba(38, 51, 31, 0.14), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  --shadow-sm:
+    0 4px 14px -4px rgba(38, 51, 31, 0.22),
+    0 16px 32px -22px rgba(95, 138, 85, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --shadow-md:
+    0 16px 34px -14px rgba(38, 51, 31, 0.26),
+    0 26px 52px -26px rgba(95, 138, 85, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-lg:
+    0 28px 60px -20px rgba(38, 51, 31, 0.32),
+    0 34px 74px -28px rgba(122, 90, 20, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-inset:
+    inset 0 2px 4px rgba(38, 51, 31, 0.16), inset 0 1px 0 rgba(38, 51, 31, 0.08);
+  --shadow-press:
+    0 1px 2px rgba(38, 51, 31, 0.18), inset 0 1px 3px rgba(38, 51, 31, 0.12);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(95, 138, 85, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(122, 90, 20, 0.07),
+      transparent 55%
+    );
+}
+.dm-app.dm-citrus {
+  --bg: #FBFAE8;
+  --surface: rgba(141, 182, 0, 0.07);
+  --surface-strong: rgba(141, 182, 0, 0.11);
+  --border: rgba(141, 182, 0, 0.2);
+  --text: #2f3410;
+  --text-dim: #626a2c;
+  --cyan: #739500;
+  --cyan-rgb: 141, 182, 0;
+  --gold: #7a5a14;
+  --gold-rgb: 122, 90, 20;
+  --red: #973333;
+  --green: #2f6b45;
+  --nav-bg: rgba(251, 250, 232, 0.92);
+  --modal-bg: linear-gradient(180deg, #fdfcf3, #FBFAE8);
+  --modal-backdrop: rgba(47, 52, 16, 0.4);
+  --shadow-xs:
+    0 1px 3px rgba(47, 52, 16, 0.14), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  --shadow-sm:
+    0 4px 14px -4px rgba(47, 52, 16, 0.22),
+    0 16px 32px -22px rgba(141, 182, 0, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --shadow-md:
+    0 16px 34px -14px rgba(47, 52, 16, 0.26),
+    0 26px 52px -26px rgba(141, 182, 0, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-lg:
+    0 28px 60px -20px rgba(47, 52, 16, 0.32),
+    0 34px 74px -28px rgba(122, 90, 20, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  --shadow-inset:
+    inset 0 2px 4px rgba(47, 52, 16, 0.16), inset 0 1px 0 rgba(47, 52, 16, 0.08);
+  --shadow-press:
+    0 1px 2px rgba(47, 52, 16, 0.18), inset 0 1px 3px rgba(47, 52, 16, 0.12);
+  --sheen: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  background-image:
+    radial-gradient(
+      ellipse 900px 500px at 15% -5%,
+      rgba(141, 182, 0, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 20%,
+      rgba(122, 90, 20, 0.07),
+      transparent 55%
+    );
+}
 .dm-app.dm-midnight .dm-bg-glow,
 .dm-app.dm-sunset .dm-bg-glow,
 .dm-app.dm-slate .dm-bg-glow,
@@ -1075,7 +1384,10 @@ body {
 .dm-app.dm-cobalt .dm-bg-glow,
 .dm-app.dm-graphite .dm-bg-glow,
 .dm-app.dm-nord .dm-bg-glow,
-.dm-app.dm-lagoon .dm-bg-glow {
+.dm-app.dm-lagoon .dm-bg-glow,
+.dm-app.dm-emerald .dm-bg-glow,
+.dm-app.dm-onyx .dm-bg-glow,
+.dm-app.dm-plum .dm-bg-glow {
   opacity: 0.22;
 }
 .dm-app.dm-forest .dm-bg-glow,
@@ -1086,7 +1398,10 @@ body {
 .dm-app.dm-mint .dm-bg-glow,
 .dm-app.dm-cocoa .dm-bg-glow,
 .dm-app.dm-clay .dm-bg-glow,
-.dm-app.dm-mauve .dm-bg-glow {
+.dm-app.dm-mauve .dm-bg-glow,
+.dm-app.dm-peach .dm-bg-glow,
+.dm-app.dm-sage .dm-bg-glow,
+.dm-app.dm-citrus .dm-bg-glow {
   opacity: 0.12;
 }
 .dm-app,

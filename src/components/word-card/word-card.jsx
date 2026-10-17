@@ -3,7 +3,7 @@
  */
 
 import { useContext, useEffect, useRef, useState } from "react";
-import { HideArticlesContext } from "../../core/contexts";
+import { HideArticlesContext, ShowLevelBadgeContext } from "../../core/contexts";
 import { useRomanizationEnabled } from "../../core/speech-voices";
 import { LEVEL_COLOR } from "../../core/srs-and-seed-data";
 import { FitText, IconBtn, WordMeta } from "../common/common";
@@ -44,6 +44,7 @@ export function WordCard({
   isPremium,
 }) {
   const hideArticles = useContext(HideArticlesContext);
+  const showLevelBadge = useContext(ShowLevelBadgeContext);
   const displayDe = hideArticles ? stripArticle(w.de) : w.de;
   const romanizationEnabled = useRomanizationEnabled();
   const isFormsMode = displayMode === "FORMS";
@@ -261,10 +262,10 @@ export function WordCard({
                 }
           }
         >
-          {(index !== undefined || w.level) && (
+          {(index !== undefined || (showLevelBadge && w.level)) && (
             <div className="dm-card-badges">
               {index !== undefined && <span className="dm-card-index">{index}</span>}
-              {w.level && (
+              {showLevelBadge && w.level && (
                 <span
                   className="dm-level-badge"
                   style={{

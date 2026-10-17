@@ -45,6 +45,18 @@ export const THEMES = [
     accent: "#0B84A6",
   },
   {
+    id: "peach",
+    name: "Peach",
+    swatch: "#FFF1E8",
+    accent: "#E8743B",
+  },
+  {
+    id: "emerald",
+    name: "Emerald",
+    swatch: "#0a1511",
+    accent: "#34D399",
+  },
+  {
     id: "rose",
     name: "Rose",
     swatch: "#FBF0F4",
@@ -127,6 +139,30 @@ export const THEMES = [
     name: "Mauve",
     swatch: "#D9BFC4",
     accent: "#8C3B4A",
+  },
+  {
+    id: "onyx",
+    name: "Onyx",
+    swatch: "#0c0b09",
+    accent: "#E5B454",
+  },
+  {
+    id: "plum",
+    name: "Plum",
+    swatch: "#150b17",
+    accent: "#E879F9",
+  },
+  {
+    id: "sage",
+    name: "Sage",
+    swatch: "#EDF1E8",
+    accent: "#5F8A55",
+  },
+  {
+    id: "citrus",
+    name: "Citrus",
+    swatch: "#FBFAE8",
+    accent: "#8DB600",
   },
 ];
 export function AppearanceSettings({ theme, onSelectTheme, onBack, isPremium, onOpenPremium }) {

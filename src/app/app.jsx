@@ -19,7 +19,7 @@ import { StackView } from "../components/stack-view/stack-view";
 import { TranslationLoadingOverlay } from "../components/translation-overlay/translation-overlay";
 import { stripArticle } from "../components/word-forms/word-forms";
 import { DAY, ROMAN_LANGS, todayStr, uid } from "../core/constants";
-import { HideArticlesContext } from "../core/contexts";
+import { HideArticlesContext, ShowLevelBadgeContext } from "../core/contexts";
 import { FAMILY_ICON_IDS, MINISTACK_ICON_IDS } from "../core/icon-registry";
 import { currentLearningLangCode, setSpeechLanguage, speak } from "../core/speech-voices";
 import {
@@ -336,6 +336,19 @@ export function App() {
       window.localStorage.setItem("deutschmaster-hide-articles", val ? "1" : "0");
     } catch (e) {}
   };
+  const [showLevelBadge, setShowLevelBadge] = useState(() => {
+    try {
+      return window.localStorage.getItem("deutschmaster-show-level-badge") !== "0";
+    } catch (e) {
+      return true;
+    }
+  });
+  const toggleShowLevelBadge = (val) => {
+    setShowLevelBadge(val);
+    try {
+      window.localStorage.setItem("deutschmaster-show-level-badge", val ? "1" : "0");
+    } catch (e) {}
+  };
   const [showFamilyStats, setShowFamilyStats] = useState(() => {
     try {
       return window.localStorage.getItem("deutschmaster-show-family-stats") !== "0";
@@ -546,6 +559,12 @@ export function App() {
       clay: "#E0C9A6",
       lagoon: "#16302E",
       mauve: "#D9BFC4",
+      peach: "#FFF1E8",
+      emerald: "#0a1511",
+      onyx: "#0c0b09",
+      plum: "#150b17",
+      sage: "#EDF1E8",
+      citrus: "#FBFAE8",
     };
     document.body.style.background = THEME_BG[theme] || THEME_BG.dark;
   }, [theme]);
@@ -1618,6 +1637,8 @@ export function App() {
         onToggleRestrictCopy={toggleRestrictCopy}
         hideArticles={hideArticles}
         onToggleHideArticles={toggleHideArticles}
+        showLevelBadge={showLevelBadge}
+        onToggleShowLevelBadge={toggleShowLevelBadge}
         dueCount={dueWords.length}
         todayReviews={todayReviews}
         bestStreak={bestStreak}
@@ -1660,6 +1681,7 @@ export function App() {
   }
   return (
     <HideArticlesContext.Provider value={hideArticles}>
+      <ShowLevelBadgeContext.Provider value={showLevelBadge}>
         <div
           className={`dm-app ${theme !== "dark" ? `dm-${theme}` : ""} ${restrictCopy ? "dm-restrict-copy" : ""} ${game || tab === "games" ? "dm-section-games" : ""}`}
         >
@@ -1807,6 +1829,7 @@ export function App() {
             />
           )}
         </div>
+      </ShowLevelBadgeContext.Provider>
     </HideArticlesContext.Provider>
   );
 }

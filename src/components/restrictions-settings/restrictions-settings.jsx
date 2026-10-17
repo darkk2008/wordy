@@ -1,35 +1,19 @@
 /* components/restrictions-settings/restrictions-settings.jsx
- * Restrictions / guardrails settings.
+ * Restrictions / guardrails settings, built from the standard settings rows.
  */
 
 import { IconBtn } from "../common/common";
-import { Check, ChevronLeft, EyeOff, Layers } from "../icons/icons";
-import { BarChartIcon, LockIcon, ShieldIcon } from "../icons/settings-icons";
+import { ChevronLeft } from "../icons/icons";
+import { FormsToggle } from "../games/setup-controls";
 
-function GuardRow({ icon, color, title, sub, checked, onChange }) {
+function SettingToggle({ title, sub, checked, onChange }) {
   return (
-    <div
-      className={`dm-guard-row ${checked ? "dm-guard-row-on" : ""}`}
-      style={{
-        "--guard-color": color,
-      }}
-    >
-      <div className="dm-guard-icon">{icon}</div>
-      <div className="dm-guard-text">
-        <div className="dm-guard-title">{title}</div>
-        <div className="dm-guard-sub">{sub}</div>
+    <div className="dm-settings-row">
+      <div>
+        <div className="dm-settings-row-title">{title}</div>
+        <div className="dm-settings-row-sub">{sub}</div>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        className={`dm-guard-switch ${checked ? "dm-guard-switch-on" : ""}`}
-        onClick={() => onChange(!checked)}
-      >
-        <span className="dm-guard-switch-knob">
-          <Check size={12} />
-        </span>
-      </button>
+      <FormsToggle checked={checked} onChange={onChange} compact title={title} />
     </div>
   );
 }
@@ -43,6 +27,8 @@ export function RestrictionsSettings({
   onToggleHideFamilyFilters,
   hideArticles,
   onToggleHideArticles,
+  showLevelBadge,
+  onToggleShowLevelBadge,
 }) {
   return (
     <div className="dm-view dm-settings-subview">
@@ -52,79 +38,39 @@ export function RestrictionsSettings({
         </IconBtn>
         <div className="dm-topbar-title">Guardrails</div>
       </div>
-      <div className="dm-guard-hero">
-        <span className="dm-guard-hero-glow" />
-        <span className="dm-guard-hero-ring" />
-        <div className="dm-guard-hero-icon">
-          <ShieldIcon size={28} />
-        </div>
-        <div className="dm-guard-hero-title">Guardrails</div>
-        <p className="dm-guard-hero-text">
-          Shape what's copyable and visible throughout the app.
-        </p>
-      </div>
-      <div className="dm-guard-group">
-        <div
-          className="dm-guard-group-label"
-          style={{
-            "--guard-group-color": "var(--red)",
-          }}
-        >
-          Privacy
-        </div>
-        <GuardRow
-          icon={<LockIcon size={18} />}
-          color="var(--red)"
-          title="Restrict copying messages"
-          sub="Prevent selecting or copying message text anywhere in the app."
-          checked={restrictCopy}
-          onChange={onToggleRestrictCopy}
-        />
-      </div>
-      <div className="dm-guard-group">
-        <div
-          className="dm-guard-group-label"
-          style={{
-            "--guard-group-color": "var(--cyan)",
-          }}
-        >
-          Home layout
-        </div>
-        <GuardRow
-          icon={<Layers size={18} />}
-          color="var(--cyan)"
-          title="Family filters on Home"
-          sub="Show the row of family filter chips (All + each family) above your stacks on Home."
-          checked={!hideFamilyFilters}
-          onChange={(val) => onToggleHideFamilyFilters(!val)}
-        />
-        <GuardRow
-          icon={<BarChartIcon size={18} />}
-          color="var(--green)"
-          title="Family progress on Home"
-          sub="Show the stats card and due-words review banner on Home when a family filter is selected."
-          checked={showFamilyStats}
-          onChange={onToggleShowFamilyStats}
-        />
-      </div>
-      <div className="dm-guard-group">
-        <div
-          className="dm-guard-group-label"
-          style={{
-            "--guard-group-color": "var(--gold)",
-          }}
-        >
-          Word display
-        </div>
-        <GuardRow
-          icon={<EyeOff size={18} />}
-          color="var(--gold)"
-          title="Hide noun articles"
-          sub="When on, der/die/das is hidden everywhere a noun is shown. When off, nouns are shown with their article."
-          checked={hideArticles}
-          onChange={onToggleHideArticles}
-        />
-      </div>
+      <div className="dm-settings-section-label">Privacy</div>
+      <SettingToggle
+        title="Restrict copying messages"
+        sub="Prevent selecting or copying message text anywhere in the app."
+        checked={restrictCopy}
+        onChange={onToggleRestrictCopy}
+      />
+      <div className="dm-settings-section-label">Home layout</div>
+      <SettingToggle
+        title="Family filters on Home"
+        sub="Show the row of family filter chips (All + each family) above your stacks on Home."
+        checked={!hideFamilyFilters}
+        onChange={(val) => onToggleHideFamilyFilters(!val)}
+      />
+      <SettingToggle
+        title="Family progress on Home"
+        sub="Show the stats card and due-words review banner on Home when a family filter is selected."
+        checked={showFamilyStats}
+        onChange={onToggleShowFamilyStats}
+      />
+      <div className="dm-settings-section-label">Word display</div>
+      <SettingToggle
+        title="Hide noun articles"
+        sub="When on, der/die/das is hidden everywhere a noun is shown. When off, nouns are shown with their article."
+        checked={hideArticles}
+        onChange={onToggleHideArticles}
+      />
+      <SettingToggle
+        title="Show level badge"
+        sub="When on, the level badge (A1, B2, …) is shown on word cards. Turn off for a cleaner card."
+        checked={showLevelBadge}
+        onChange={onToggleShowLevelBadge}
+      />
     </div>
   );
 }
