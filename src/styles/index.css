@@ -42,3 +42,5 @@
 @import "../components/account/account.css";
 @import "layer-small-screens.css";
 @import "../components/qr-sync-settings/qr-sync-settings.css";
+@import "layer-wide-topbar.css";
+@import "layer-word-index-v2.css";

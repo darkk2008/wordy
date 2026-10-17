@@ -233,7 +233,7 @@ ${lines}`;
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="dm-view notranslate" translate="no">
+    <div className="dm-view notranslate" translate="no" data-ui-ru="1">
       <div className="dm-topbar">
         <IconBtn onClick={onBack} className="dm-topbar-fixed-btn">
           <ChevronLeft size={20} />

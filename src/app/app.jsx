@@ -82,9 +82,36 @@ const AuthModal = lazyNamed(() => import("../components/account/account"), "Auth
 const AiModal = lazyNamed(() => import("../components/ai-modal/ai-modal"), "AiModal");
 const SettingsView = lazyNamed(() => import("../components/settings-view/settings-view"), "SettingsView");
 const StoreView = lazyNamed(() => import("../components/store/store"), "StoreView");
+const AdminPage = lazyNamed(() => import("../components/admin-panel/admin-panel"), "AdminPage");
 const OnboardingFlow = lazyNamed(() => import("../components/onboarding/onboarding"), "OnboardingFlow");
 
+// Warm the on-demand chunks (modals, settings, store) once the app is idle, so the first
+// click opens instantly instead of waiting for the chunk to download and parse.
+const preloadLazyScreens = () => {
+  [
+    () => import("../components/account/account"),
+    () => import("../components/ai-modal/ai-modal"),
+    () => import("../components/settings-view/settings-view"),
+    () => import("../components/store/store"),
+  ].forEach((load) => load().catch(() => {}));
+};
+if (typeof window !== "undefined") {
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
+  window.addEventListener("load", () => idle(preloadLazyScreens, { timeout: 4000 }), { once: true });
+}
+
 export function App() {
+  // Admin page: opened by the secret gesture on the home screen, which sets the URL hash to #admin.
+  const [adminPage, setAdminPage] = useState(() => typeof window !== "undefined" && window.location.hash === "#admin");
+  useEffect(() => {
+    const onHash = () => setAdminPage(window.location.hash === "#admin");
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const closeAdminPage = useCallback(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    setAdminPage(false);
+  }, []);
   const [premiumRefreshTick, setPremiumRefreshTick] = useState(0);
   const isPremium = useMemo(() => loadPremiumStatus().active, [premiumRefreshTick]);
   useEffect(() => {
@@ -384,7 +411,7 @@ export function App() {
     try {
       hasKey = !!window.localStorage.getItem("deutschmaster-groq-key");
     } catch (e) {}
-    if (code === "en" || !hasKey) {
+    if (code === "en" || code === "ru" || !hasKey) {
       commitNativeLanguage(code);
       return;
     }
@@ -1631,6 +1658,19 @@ export function App() {
         onDeleteAccount={handleDeleteAccount}
         onCreateStack={createStack}
       />
+    );
+  }
+  if (adminPage) {
+    return (
+      <div className={`dm-app ${theme !== "dark" ? `dm-${theme}` : ""}`}>
+        <div className="dm-bg-glow dm-bg-glow-1" />
+        <div className="dm-bg-glow dm-bg-glow-2" />
+        <div className="dm-content dm-content-noreserve">
+          <Suspense fallback={null}>
+            <AdminPage onClose={closeAdminPage} />
+          </Suspense>
+        </div>
+      </div>
     );
   }
   return (

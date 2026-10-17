@@ -484,3 +484,143 @@
   font-weight: 500;
   margin-right: 4px;
 }
+
+/* ===== Admin page (opened by the secret gesture; replaces the old pop-up) ===== */
+.dm-admin-page {
+  padding-bottom: 40px;
+}
+.dm-admin-page-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  margin-bottom: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow:
+    var(--shadow-xs),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+.dm-admin-page-bar .dm-iconbtn {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+}
+.dm-admin-backsite {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--text);
+  font: 700 13px "Inter", system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+.dm-admin-backsite:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-admin-backsite:hover {
+    background: rgba(var(--cyan-rgb), 0.14);
+    border-color: rgba(var(--cyan-rgb), 0.35);
+  }
+}
+.dm-admin-backsite:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-admin-page-tag {
+  margin-left: auto;
+  margin-right: 12px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a78bfa;
+}
+.dm-admin-page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 2px 16px;
+}
+.dm-admin-page-title h3 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 20px;
+}
+.dm-admin-page-body {
+  margin-top: 10px;
+}
+.dm-admin-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  max-width: 380px;
+  margin: 36px auto 0;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.dm-admin-gate h3 {
+  margin: 4px 0 0;
+  font-family: "Sora", sans-serif;
+  font-size: 19px;
+}
+.dm-admin-gate .dm-admin-head-sub {
+  margin: -6px 0 4px;
+}
+.dm-admin-gate-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--text);
+  font: 500 16px "Inter", system-ui, sans-serif;
+}
+.dm-admin-gate-input:focus {
+  outline: none;
+  border-color: rgba(var(--cyan-rgb), 0.55);
+  box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), 0.15);
+}
+.dm-admin-gate-error {
+  color: var(--red);
+  font-size: 13px;
+}
+.dm-admin-gate-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+.dm-admin-gate-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+@media (min-width: 900px) {
+  .dm-admin-page {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+.dm-admin-page .dm-admin-tabs {
+  max-width: none;
+}

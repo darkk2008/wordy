@@ -497,3 +497,42 @@
   margin-bottom: 4px;
   margin-left: 2px;
 }
+
+/* Mobile: the forms line (e.g. "exacerbated → exacerbated") spans the full card width and
+   flows under the action buttons instead of wrapping inside the narrow left column.
+   The buttons sit beside the badges + word only, so the card height stays the same. */
+@media (max-width: 600px) {
+  .dm-card.dm-card-wrapmeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 0;
+  }
+  .dm-card.dm-card-wrapmeta > .dm-card-left {
+    display: contents;
+  }
+  .dm-card.dm-card-wrapmeta .dm-card-badges {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .dm-card.dm-card-wrapmeta .dm-word-pair {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .dm-card.dm-card-wrapmeta > .dm-card-left > .dm-meta {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin-top: 2px;
+  }
+  .dm-card.dm-card-wrapmeta .dm-card-actions {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .dm-card.dm-card-wrapmeta .dm-meta .dm-mono {
+    overflow-wrap: anywhere;
+  }
+}

@@ -18,7 +18,7 @@ import { fetchOnlineCount, getAnalyticsSnapshot } from "../../services/analytics
 import { grantPremium, loadPremiumStatus, revokePremium } from "../../services/premium-gems-store";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
-import { Check, Eye, Sparkles, Trash2, X } from "../icons/icons";
+import { Check, ChevronLeft, Eye, Sparkles, Trash2, X } from "../icons/icons";
 import { BarChartIcon, CrownIcon, LockIcon, TagIcon, UsersIcon } from "../icons/settings-icons";
 import { PROMO_TYPE_LABELS, formatAdminDate } from "../stack-card/stack-card";
 
@@ -59,7 +59,72 @@ const ADMIN_TABS = [
     label: "Premium",
   },
 ];
-export function AdminPanel({ onClose, stacks, families, streak }) {
+// Top bar of the admin page: same glass dock as the stack screen, with a clear way back to the site.
+function AdminPageBar({ onBack }) {
+  return (
+    <div className="dm-admin-page-bar">
+      <IconBtn title="Back to site" onClick={onBack}>
+        <ChevronLeft size={20} />
+      </IconBtn>
+      <button type="button" className="dm-admin-backsite" onClick={onBack}>
+        Back to site
+      </button>
+      <span className="dm-admin-page-tag">Admin</span>
+    </div>
+  );
+}
+
+// The admin page. Nothing is shown until the admin key has been accepted by the server.
+export function AdminPage({ onClose }) {
+  const [authed, setAuthed] = useState(false);
+  const [key, setKey] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const unlock = async (e) => {
+    e.preventDefault();
+    if (!key.trim() || busy) return;
+    setBusy(true);
+    setError("");
+    setAdminSecret(key.trim());
+    const result = await adminPromoRequest("list");
+    setBusy(false);
+    if (result.ok) {
+      setAuthed(true);
+      return;
+    }
+    setAdminSecret("");
+    setError(result.unauthorized ? "That admin key was not accepted." : result.message || "Couldn't check the key.");
+  };
+  if (authed) return <AdminPanel asPage onClose={onClose} />;
+  return (
+    <div className="dm-view dm-admin-page notranslate" translate="no">
+      <AdminPageBar onBack={onClose} />
+      <form className="dm-admin-gate" onSubmit={unlock}>
+        <div className="dm-admin-head-icon">
+          <LockIcon size={16} />
+        </div>
+        <h3>Admin access</h3>
+        <p className="dm-admin-head-sub">Enter the admin key to continue.</p>
+        <input
+          id="dm-admin-key"
+          className="dm-admin-gate-input"
+          type="password"
+          autoComplete="off"
+          placeholder="Admin key"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          autoFocus
+        />
+        {error && <div className="dm-admin-gate-error">{error}</div>}
+        <button type="submit" className="dm-btn-primary dm-admin-gate-btn" disabled={busy || !key.trim()}>
+          {busy ? "Checking…" : "Unlock"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
   const ADMIN_TAB_ICONS = {
     overview: BarChartIcon,
     promo: TagIcon,
@@ -472,6 +537,45 @@ export function AdminPanel({ onClose, stacks, families, streak }) {
       </div>
     </>
   );
+  if (asPage) {
+    return (
+      <div className="dm-view dm-admin-page notranslate" translate="no">
+        <AdminPageBar onBack={onClose} />
+        <div className="dm-admin-page-title">
+          <div className="dm-admin-head-icon">
+            <LockIcon size={16} />
+          </div>
+          <div>
+            <h3>Admin Panel</h3>
+            <p className="dm-admin-head-sub">Promo codes, premium and analytics</p>
+          </div>
+        </div>
+        <div className="dm-segmented dm-admin-tabs">
+          {ADMIN_TABS.map((t) => {
+            const TabIcon = ADMIN_TAB_ICONS[t.id];
+            return (
+              <button
+                key={t.id}
+                type="button"
+                className={`dm-seg dm-admin-tab ${tab === t.id ? "dm-seg-active" : ""}`}
+                onClick={() => setTab(t.id)}
+              >
+                <TabIcon size={14} className="dm-admin-tab-icon" />
+                <span className="dm-admin-tab-label">{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="dm-admin-page-body">
+          <div className="dm-admin-tab-panel" key={tab}>
+            {tab === "overview" && overviewTab}
+            {tab === "promo" && promoTab}
+            {tab === "premium" && premiumTab}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="dm-modal-backdrop" onClick={onClose}>
       <div

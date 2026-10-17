@@ -3,7 +3,13 @@
  */
 
 import { Fragment, useEffect, useState } from "react";
-import { GENDER_SETS, ROMAN_LANGS, uid, usesGenderTag } from "../../core/constants";
+import {
+  DM_DE_FORM_RULES,
+  GENDER_SETS,
+  ROMAN_LANGS,
+  uid,
+  usesGenderTag,
+} from "../../core/constants";
 import { currentLearningLangCode } from "../../core/speech-voices";
 import { LEVELS, LEVEL_COLOR } from "../../core/srs-and-seed-data";
 import {
@@ -75,7 +81,9 @@ export function WordLookupPopup({
           currentLearningLangCode === "de"
             ? 'You are a German dictionary engine built into a vocabulary app. The user gives you a single German word or short phrase exactly as it appeared inside a sentence (it may be inflected or capitalized mid-sentence). Respond ONLY with a single JSON object (no prose, no markdown fences) describing its dictionary base form, with these exact keys: de (dictionary base form — nominative singular for nouns WITHOUT the article, infinitive for verbs, positive form for adjectives, or the word itself for other types; for a REFLEXIVE verb, this MUST include the leading "sich ", e.g. "sich erinnern", "sich freuen" — never just the bare infinitive), en (a concise translation in ' +
               nativeLangName +
-              '), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly), article ("der"/"die"/"das" — REQUIRED if type is noun, else empty string; SINGULAR gender only — plural always uses "die" regardless, don\'t let that bias this field), plural (REQUIRED if type is noun, else empty string; BARE plural noun, no article), praeteritum (REQUIRED if type is verb, else empty string), partizipII (REQUIRED if type is verb, else empty string), reflexiv (REQUIRED if type is verb, else false; true/false — whether the verb is typically used reflexively with sich, e.g. sich freuen, sich erinnern — true; regular verbs like gehen, essen — false), komparativ (empty string if not adj or not gradable), superlativ (empty string if not adj or not gradable).'
+              '), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly), article ("der"/"die"/"das" — REQUIRED if type is noun, else empty string; SINGULAR gender only — plural always uses "die" regardless, don\'t let that bias this field), plural (REQUIRED if type is noun, else empty string; BARE plural noun, no article), praeteritum (REQUIRED if type is verb, else empty string), partizipII (REQUIRED if type is verb, else empty string), reflexiv (REQUIRED if type is verb, else false; true/false — whether the verb is typically used reflexively with sich, e.g. sich freuen, sich erinnern — true; regular verbs like gehen, essen — false), komparativ (empty string if not adj or not gradable), superlativ (empty string if not adj or not gradable).' +
+              ' ' +
+              DM_DE_FORM_RULES
             : dmLookupPrompt(currentLearningLangCode, nativeLangName);
         const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",

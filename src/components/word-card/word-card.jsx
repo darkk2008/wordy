@@ -232,7 +232,7 @@ export function WordCard({
       disableGestures={multiPickMode}
     >
       <div
-        className={`dm-card${longPressed ? " dm-card-longpress" : ""}${multiPickMode ? " dm-card-multipick" : ""}${multiPickMode && isPicked ? " dm-card-picked" : ""}`}
+        className={`dm-card${showMetaBelow ? " dm-card-wrapmeta" : ""}${longPressed ? " dm-card-longpress" : ""}${multiPickMode ? " dm-card-multipick" : ""}${multiPickMode && isPicked ? " dm-card-picked" : ""}`}
         ref={cardElRef}
         onPointerDown={multiPickMode ? undefined : startLongPress}
         onPointerMove={multiPickMode ? undefined : moveLongPress}

@@ -5,6 +5,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { Gamepad2, Home, IconBase, Star } from "../icons/icons";
 import { SettingsIcon } from "../icons/settings-icons";
+import { uiNavLabel } from "../../services/ui-translation";
 
 export function BottomNav({ tab, setTab, hidden, learningLanguage }) {
   const items = [
@@ -68,7 +69,7 @@ export function BottomNav({ tab, setTab, hidden, learningLanguage }) {
             onClick={() => setTab(it.id)}
           >
             <it.Icon size={20} />
-            <span className="dm-navbtn-label">{it.label}</span>
+            <span className="dm-navbtn-label">{uiNavLabel(it.label)}</span>
           </button>
         );
       })}
