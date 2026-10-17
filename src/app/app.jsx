@@ -19,7 +19,7 @@ import { StackView } from "../components/stack-view/stack-view";
 import { TranslationLoadingOverlay } from "../components/translation-overlay/translation-overlay";
 import { stripArticle } from "../components/word-forms/word-forms";
 import { DAY, ROMAN_LANGS, todayStr, uid } from "../core/constants";
-import { HideArticlesContext, StickyFiltersContext } from "../core/contexts";
+import { HideArticlesContext } from "../core/contexts";
 import { FAMILY_ICON_IDS, MINISTACK_ICON_IDS } from "../core/icon-registry";
 import { currentLearningLangCode, setSpeechLanguage, speak } from "../core/speech-voices";
 import {
@@ -82,9 +82,36 @@ const AuthModal = lazyNamed(() => import("../components/account/account"), "Auth
 const AiModal = lazyNamed(() => import("../components/ai-modal/ai-modal"), "AiModal");
 const SettingsView = lazyNamed(() => import("../components/settings-view/settings-view"), "SettingsView");
 const StoreView = lazyNamed(() => import("../components/store/store"), "StoreView");
+const AdminPage = lazyNamed(() => import("../components/admin-panel/admin-panel"), "AdminPage");
 const OnboardingFlow = lazyNamed(() => import("../components/onboarding/onboarding"), "OnboardingFlow");
 
+// Warm the on-demand chunks (modals, settings, store) once the app is idle, so the first
+// click opens instantly instead of waiting for the chunk to download and parse.
+const preloadLazyScreens = () => {
+  [
+    () => import("../components/account/account"),
+    () => import("../components/ai-modal/ai-modal"),
+    () => import("../components/settings-view/settings-view"),
+    () => import("../components/store/store"),
+  ].forEach((load) => load().catch(() => {}));
+};
+if (typeof window !== "undefined") {
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
+  window.addEventListener("load", () => idle(preloadLazyScreens, { timeout: 4000 }), { once: true });
+}
+
 export function App() {
+  // Admin page: opened by the secret gesture on the home screen, which sets the URL hash to #admin.
+  const [adminPage, setAdminPage] = useState(() => typeof window !== "undefined" && window.location.hash === "#admin");
+  useEffect(() => {
+    const onHash = () => setAdminPage(window.location.hash === "#admin");
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const closeAdminPage = useCallback(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    setAdminPage(false);
+  }, []);
   const [premiumRefreshTick, setPremiumRefreshTick] = useState(0);
   const isPremium = useMemo(() => loadPremiumStatus().active, [premiumRefreshTick]);
   useEffect(() => {
@@ -335,19 +362,6 @@ export function App() {
       window.localStorage.setItem("deutschmaster-hide-family-filters", val ? "1" : "0");
     } catch (e) {}
   };
-  const [stickyFilters, setStickyFilters] = useState(() => {
-    try {
-      return window.localStorage.getItem("deutschmaster-sticky-filters") !== "0";
-    } catch (e) {
-      return true;
-    }
-  });
-  const toggleStickyFilters = (val) => {
-    setStickyFilters(val);
-    try {
-      window.localStorage.setItem("deutschmaster-sticky-filters", val ? "1" : "0");
-    } catch (e) {}
-  };
   const [dailyGoal, setDailyGoal] = useState(() => {
     try {
       const stored = parseInt(window.localStorage.getItem("deutschmaster-daily-goal"), 10);
@@ -384,7 +398,7 @@ export function App() {
     try {
       hasKey = !!window.localStorage.getItem("deutschmaster-groq-key");
     } catch (e) {}
-    if (code === "en" || !hasKey) {
+    if (code === "en" || code === "ru" || !hasKey) {
       commitNativeLanguage(code);
       return;
     }
@@ -1604,8 +1618,6 @@ export function App() {
         onToggleRestrictCopy={toggleRestrictCopy}
         hideArticles={hideArticles}
         onToggleHideArticles={toggleHideArticles}
-        stickyFilters={stickyFilters}
-        onToggleStickyFilters={toggleStickyFilters}
         dueCount={dueWords.length}
         todayReviews={todayReviews}
         bestStreak={bestStreak}
@@ -1633,9 +1645,21 @@ export function App() {
       />
     );
   }
+  if (adminPage) {
+    return (
+      <div className={`dm-app ${theme !== "dark" ? `dm-${theme}` : ""}`}>
+        <div className="dm-bg-glow dm-bg-glow-1" />
+        <div className="dm-bg-glow dm-bg-glow-2" />
+        <div className="dm-content dm-content-noreserve">
+          <Suspense fallback={null}>
+            <AdminPage onClose={closeAdminPage} />
+          </Suspense>
+        </div>
+      </div>
+    );
+  }
   return (
     <HideArticlesContext.Provider value={hideArticles}>
-      <StickyFiltersContext.Provider value={stickyFilters}>
         <div
           className={`dm-app ${theme !== "dark" ? `dm-${theme}` : ""} ${restrictCopy ? "dm-restrict-copy" : ""} ${game || tab === "games" ? "dm-section-games" : ""}`}
         >
@@ -1783,7 +1807,6 @@ export function App() {
             />
           )}
         </div>
-      </StickyFiltersContext.Provider>
     </HideArticlesContext.Provider>
   );
 }

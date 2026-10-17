@@ -63,108 +63,6 @@
 .dm-display-toggle {
   margin-bottom: 16px;
 }
-.dm-filters-sentinel {
-  height: 0;
-  margin: 0;
-  padding: 0;
-}
-.dm-filters-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    backdrop-filter 0.25s ease;
-}
-.dm-filters-sticky.dm-filters-stuck {
-  background-image: none;
-  background-color: var(--nav-bg);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border-bottom: 1px solid var(--border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 12px 24px -20px rgba(0, 0, 0, 0.4);
-}
-.dm-filters-sticky.dm-filters-stuck .dm-seg-active {
-  background: color-mix(in srgb, var(--surface-strong) 75%, transparent);
-}
-
-.dm-filters-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 16px;
-}
-.dm-filters-row.dm-filters-sticky {
-  margin-bottom: 0;
-  padding-bottom: 16px;
-}
-.dm-filters-row.dm-filters-sticky.dm-filters-stuck {
-  background: transparent;
-  background-image: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-bottom: none;
-  box-shadow: none;
-}
-.dm-filters-row.dm-filters-stuck .dm-segmented.dm-display-toggle {
-  background-image: none;
-  background-color: var(--nav-bg);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 12px 24px -20px rgba(0, 0, 0, 0.4);
-}
-.dm-filters-row.dm-filters-stuck .dm-seg-active {
-  background: color-mix(in srgb, var(--surface-strong) 75%, transparent);
-}
-.dm-filters-row .dm-segmented.dm-display-toggle {
-  flex: 1;
-  min-width: 0;
-  margin-bottom: 0;
-  transition:
-    background-color 0.25s ease,
-    box-shadow 0.25s ease,
-    backdrop-filter 0.25s ease;
-}
-.dm-filters-row .dm-filters-back-btn.dm-iconbtn {
-  width: 0;
-  height: 40px;
-  opacity: 0;
-  margin-right: 0;
-  padding: 0;
-  border-width: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transition:
-    width 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.2s ease,
-    margin-right 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-    border-width 0.2s ease;
-}
-.dm-filters-row .dm-filters-back-btn.dm-iconbtn.dm-filters-back-btn-visible {
-  width: 40px;
-  opacity: 1;
-  margin-right: 8px;
-  border-width: 1px;
-  pointer-events: auto;
-  background-color: var(--nav-bg);
-  background-image: none;
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border-color: var(--border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 12px 24px -20px rgba(0, 0, 0, 0.4);
-}
-.dm-filters-row:has(.dm-filters-back-btn-visible) .dm-seg {
-  padding: 8px 6px;
-  font-size: 13px;
-}
 
 .dm-list {
   display: flex;
@@ -496,4 +394,43 @@
   letter-spacing: 0.04em;
   margin-bottom: 4px;
   margin-left: 2px;
+}
+
+/* Mobile: the forms line (e.g. "exacerbated → exacerbated") spans the full card width and
+   flows under the action buttons instead of wrapping inside the narrow left column.
+   The buttons sit beside the badges + word only, so the card height stays the same. */
+@media (max-width: 600px) {
+  .dm-card.dm-card-wrapmeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 0;
+  }
+  .dm-card.dm-card-wrapmeta > .dm-card-left {
+    display: contents;
+  }
+  .dm-card.dm-card-wrapmeta .dm-card-badges {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .dm-card.dm-card-wrapmeta .dm-word-pair {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .dm-card.dm-card-wrapmeta > .dm-card-left > .dm-meta {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin-top: 2px;
+  }
+  .dm-card.dm-card-wrapmeta .dm-card-actions {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .dm-card.dm-card-wrapmeta .dm-meta .dm-mono {
+    overflow-wrap: anywhere;
+  }
 }

@@ -5,7 +5,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { uid } from "../../core/constants";
 import { ICON_IDS } from "../../core/icon-registry";
-import { AdminPanel } from "../admin-panel/admin-panel";
 import { AnimatedIcon, AppLogo, IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import {
@@ -101,7 +100,6 @@ export function HomeView({
   useEffect(() => {
     if (searchOpen && searchInputRef.current) searchInputRef.current.focus();
   }, [searchOpen]);
-  const [adminOpen, setAdminOpen] = useState(false);
   const secretRef = useRef({
     stage: 0,
     clicks: 0,
@@ -136,7 +134,8 @@ export function HomeView({
       if (s.clicks >= 2) {
         if (s.timer) clearTimeout(s.timer);
         resetSecret();
-        setAdminOpen(true);
+        // The admin tools are a separate page (#admin), handled in app.jsx.
+        window.location.hash = "admin";
       }
     }
   };
@@ -462,13 +461,13 @@ export function HomeView({
             <span className="dm-brand-ww">ww</span>ordy
           </h1>
           <div className="dm-home-hero-sub">
-            {stacks.length}
-            {stacks.length === 1 ? " stack" : " stacks"}
+            {`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}`}
             {" · "}
-            {stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0)}
-            {stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0) === 1
-              ? " word"
-              : " words"}
+            {`${stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0)} ${
+              stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0) === 1
+                ? "word"
+                : "words"
+            }`}
           </div>
         </div>
         <div className="dm-header-actions">
@@ -581,10 +580,7 @@ export function HomeView({
           </div>
           <div className="dm-due-banner-text">
             <div className="dm-due-banner-title">
-              {dueCount}
-              {" word"}
-              {dueCount === 1 ? "" : "s"}
-              {" due for review"}
+              {`${dueCount} word${dueCount === 1 ? "" : "s"} due for review`}
             </div>
             <div className="dm-due-banner-sub">Tap to review now</div>
           </div>
@@ -791,8 +787,7 @@ export function HomeView({
                 </div>
                 <div className="dm-stack-name">{s.name}</div>
                 <div className="dm-stack-count">
-                  {s.words.length}
-                  {s.words.length === 1 ? " word" : " words"}
+                  {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
                 </div>
                 {s.familyId && familyById[s.familyId] && (
                   <div className="dm-stack-family-badge" title={familyById[s.familyId].name}>
@@ -1062,14 +1057,6 @@ export function HomeView({
             </div>
           </div>
         </div>
-      )}
-      {adminOpen && (
-        <AdminPanel
-          onClose={() => setAdminOpen(false)}
-          stacks={stacks}
-          families={families}
-          streak={streak}
-        />
       )}
     </div>
   );

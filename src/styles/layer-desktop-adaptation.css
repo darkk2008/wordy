@@ -132,6 +132,17 @@
     margin-left: auto;
     margin-right: auto;
   }
+  /* Settings sub-pages (Premium, Guardrails, Account, ...) lay their content
+     out at the full content width, so a 760px centered top bar left the
+     back button floating ~300px in from the content's left edge. Let the
+     bar span the same width as the content so the back button lines up
+     with the left edge of the labels and cards below it. Stack and word
+     list screens keep the capped bar because their lists are capped too. */
+  .dm-settings-subview > .dm-topbar {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
   .dm-topbar-premium-btn:not(.dm-home-premium-btn) {
     flex: 0 0 auto;
     width: 134px;
@@ -236,5 +247,83 @@
     width: 30px;
     height: 30px;
     padding: 6px;
+  }
+}
+
+/* ==================================================================
+   SETTINGS HOME (desktop): one consistent card grid
+   The groups hold 3 / 4 / 3 / 3 cards and the grid used auto-fit, which
+   stretched each group's cards to a different width (and made tall
+   mobile-style tiles ~400px wide). Use a fixed minimum column width so
+   every card across every group has the same width and lines up in the
+   same columns, and lay each card out horizontally (icon tile on the
+   left, title + description on the right) like a desktop settings list.
+   ================================================================== */
+@media (min-width: 900px) {
+  .dm-settings-home .dm-settings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    margin-top: 0;
+    perspective: none;
+  }
+  .dm-settings-home .dm-settings-group-label {
+    margin: 30px 2px 14px;
+  }
+  .dm-settings-home .dm-settings-card {
+    min-height: 84px;
+    padding: 16px 18px;
+    border-radius: 16px;
+  }
+  .dm-settings-home .dm-settings-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: color-mix(in srgb, currentColor 13%, transparent);
+  }
+  .dm-settings-home .dm-settings-card-name,
+  .dm-settings-home .dm-settings-card-desc {
+    min-width: 0;
+  }
+  .dm-settings-home .dm-settings-card-name {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .dm-settings-home .dm-settings-card-desc {
+    font-size: 13px;
+    line-height: 1.35;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* icon tile on the left, name + desc stacked in the right-hand column */
+  .dm-settings-home .dm-settings-card {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    grid-template-areas:
+      "icon name"
+      "icon desc";
+    column-gap: 14px;
+    row-gap: 0;
+    align-content: center;
+  }
+  .dm-settings-home .dm-settings-card-icon {
+    grid-area: icon;
+  }
+  .dm-settings-home .dm-settings-card-name {
+    grid-area: name;
+    align-self: end;
+  }
+  .dm-settings-home .dm-settings-card-desc {
+    grid-area: desc;
+    align-self: start;
+  }
+  /* calm hover: a small lift instead of the 3D tilt, which looks jittery
+     on a row of list-style cards */
+  .dm-settings-home .dm-settings-grid > .dm-settings-card:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
 }

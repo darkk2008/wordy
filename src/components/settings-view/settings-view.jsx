@@ -52,8 +52,6 @@ export function SettingsView({
   onToggleRestrictCopy,
   hideArticles,
   onToggleHideArticles,
-  stickyFilters,
-  onToggleStickyFilters,
   dueCount,
   todayReviews,
   bestStreak,
@@ -147,8 +145,6 @@ export function SettingsView({
         onToggleHideFamilyFilters={onToggleHideFamilyFilters}
         hideArticles={hideArticles}
         onToggleHideArticles={onToggleHideArticles}
-        stickyFilters={stickyFilters}
-        onToggleStickyFilters={onToggleStickyFilters}
       />
     );
   if (section === "stats")
@@ -312,7 +308,7 @@ export function SettingsView({
     },
   ];
   return (
-    <div className="dm-view">
+    <div className="dm-view dm-settings-home">
       <div className="dm-header">
         <div>
           <div className="dm-eyebrow">Customize</div>

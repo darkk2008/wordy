@@ -12,7 +12,7 @@
   text-align: center;
   font-size: 13px;
   color: var(--text-dim);
-  margin: -4px 0 10px;
+  margin: 10px 0 10px;
 }
 .dm-tr-free-upgrade {
   background: none;
@@ -48,6 +48,10 @@
   transform: rotate(180deg);
 }
 
+.dm-tr-input-row .dm-ai-input {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
 .dm-tr-input-row {
   border-top: none;
   padding-top: 0;

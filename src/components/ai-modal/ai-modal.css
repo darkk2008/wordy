@@ -232,6 +232,26 @@
   cursor: pointer;
   transition: transform 0.12s ease;
 }
+.dm-ai-clear {
+  background: var(--surface-strong);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.dm-ai-clear:active {
+  transform: scale(0.94);
+}
+.dm-ai-clear:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 .dm-ai-send:active {
   transform: scale(0.94);
 }

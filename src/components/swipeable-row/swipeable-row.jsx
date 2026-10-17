@@ -84,25 +84,6 @@ if (typeof document !== "undefined") {
     passive: false,
   });
 }
-export function useStickyStuck() {
-  const sentinelRef = useRef(null);
-  const [stuck, setStuck] = useState(false);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        setStuck(!entry.isIntersecting);
-      },
-      {
-        threshold: 0,
-      }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [sentinelRef, stuck];
-}
 const SWIPE_ACTION_BTN = 44;
 const SWIPE_ACTION_GAP = 4;
 const SWIPE_ACTION_PADDING = 14;

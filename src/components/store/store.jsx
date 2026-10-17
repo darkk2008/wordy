@@ -6,6 +6,7 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   GENDER_SETS,
   ROMAN_LANGS,
+  DM_DE_FORM_RULES,
   dmNonGermanFieldRule,
   uid,
   usesGenderTag,
@@ -658,7 +659,7 @@ export function StoreView({
   const generatePackWords = async (pack, countOverride) => {
     const count = countOverride || getEffective(pack).count;
     const grammarRule = isLearningGerman
-      ? `Grammar fields are mandatory: for a noun, set article to its TRUE grammatical gender (der/die/das) in the singular, and always include the bare plural (no article). For a verb, always give praeteritum, partizipII, and set trennbar/reflexiv (true/false) correctly — whenever reflexiv is true, the 'de' field must include the leading "sich " (e.g. "sich freuen"). For a gradable adjective, always give komparativ and superlativ. Mix der/die/das genders realistically and mix nouns/verbs/adjectives rather than only nouns.`
+      ? `Grammar fields are mandatory: for a noun, set article to its TRUE grammatical gender (der/die/das) in the singular, and always include the bare plural (no article). For a verb, always give praeteritum, partizipII, and set trennbar/reflexiv (true/false) correctly — whenever reflexiv is true, the 'de' field must include the leading "sich " (e.g. "sich freuen"). For a gradable adjective, always give komparativ and superlativ. Mix der/die/das genders realistically and mix nouns/verbs/adjectives rather than only nouns. ${DM_DE_FORM_RULES}`
       : `${dmNonGermanFieldRule(learningLanguage || "de", learnLangName)} Use 'plural' for the plural/base form where ${learnLangName} has one, else leave it empty. Use 'praeteritum' for a simple past-tense form if ${learnLangName} has one and 'partizipII' for a past-participle form if it has one, else leave those empty. For a gradable adjective, give komparativ and superlativ in ${learnLangName} if that concept exists there. Mix nouns/verbs/adjectives naturally.`;
     const sysPrompt =
       `You are a vocabulary generator built into a language-learning app called wwordy. Generate exactly ${count} ${learnLangName} vocabulary flashcards about the topic: ${pack.topic}. The words must be genuinely about that topic and useful for a learner, with no duplicates or near-duplicates. Target CEFR difficulty range: ${pack.level}. Respond ONLY with a single JSON object (no prose, no markdown fences) of the exact shape {"words": [...]} where each array item has these exact keys: de (the ${learnLangName} word/phrase, in dictionary base form — nominative singular for nouns with no article, infinitive for verbs, positive form for adjectives), en (the translation in ${nativeLangName}), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly), article, plural, praeteritum, partizipII, trennbar, reflexiv, komparativ, superlativ${ROMAN_LANGS[learningLanguage || "de"] ? ", roman" : ""}. ` +

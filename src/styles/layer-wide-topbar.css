@@ -1,0 +1,55 @@
+/* styles/layer-wide-topbar.css
+ * Stack screen toolbar on wide screens (tablet and laptop).
+ * On phones the menu button swaps between two rows of icons because they do not all fit.
+ * From 700px up everything fits, so the menu button goes away and both groups show side by side,
+ * in one row. No JS changes: this only overrides the "morph" styles.
+ */
+@media (min-width: 700px) {
+  /* The menu toggle is only needed when space is short. */
+  .dm-topbar:has(.dm-topbar-morph) > .dm-iconbtn.dm-topbar-fixed-btn:nth-child(2) {
+    display: none;
+  }
+
+  /* Both groups in one row, always visible, no crossfade. */
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: none;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-default,
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-default.dm-topbar-default-hidden,
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-extra,
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-extra.dm-topbar-extra-open {
+    position: static;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    pointer-events: auto;
+    transition: none;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-extra > * {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-default > * {
+    animation: none;
+  }
+}
+
+/* A little more air between the buttons on tablets and desktops only.
+   The height check keeps phones held sideways (wide but short) on the original phone spacing. */
+@media (min-width: 700px) and (min-height: 560px) {
+  .dm-topbar:has(.dm-topbar-morph) {
+    gap: 10px;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph {
+    margin-left: 8px;
+  }
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-morph,
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-default,
+  .dm-topbar:has(.dm-topbar-morph) .dm-topbar-extra {
+    gap: 10px;
+  }
+}

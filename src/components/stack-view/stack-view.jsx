@@ -2,8 +2,7 @@
  * StackView: the screen showing one stack's words.
  */
 
-import { useContext, useState } from "react";
-import { StickyFiltersContext } from "../../core/contexts";
+import { useState } from "react";
 import { FREE_FAVORITE_LIMIT } from "../../services/premium-gems-store";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { FormsAudioToggle } from "../games/setup-controls";
@@ -24,7 +23,7 @@ import {
 import { getLangAbbr } from "../language-settings/language-settings";
 import { MiniStackCreateModal, MiniStackManageModal } from "../mini-stack/mini-stack";
 import { QRShareModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
-import { dmListClickGuard, useStickyStuck } from "../swipeable-row/swipeable-row";
+import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 import { WordCard } from "../word-card/word-card";
 import { AllFormsModal, stripArticle } from "../word-forms/word-forms";
 import { WordModal, buildShareHTML } from "../word-modal/word-modal";
@@ -53,8 +52,6 @@ export function StackView({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState("BOTH");
-  const [filtersSentinelRef, filtersStuck] = useStickyStuck();
-  const stickyFiltersEnabled = useContext(StickyFiltersContext);
   const [query, setQuery] = useState("");
   const [modalWord, setModalWord] = useState(undefined);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -233,7 +230,7 @@ ${lines}`;
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="dm-view notranslate" translate="no">
+    <div className="dm-view notranslate" translate="no" data-ui-ru="1">
       <div className="dm-topbar">
         <IconBtn onClick={onBack} className="dm-topbar-fixed-btn">
           <ChevronLeft size={20} />
@@ -316,35 +313,20 @@ ${lines}`;
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
       </div>
-      <div ref={filtersSentinelRef} className="dm-filters-sentinel" />
-      <div
-        className={`dm-filters-row${stickyFiltersEnabled ? ` dm-filters-sticky${filtersStuck ? " dm-filters-stuck" : ""}` : ""}`}
-      >
-        {stickyFiltersEnabled && (
-          <IconBtn
-            onClick={onBack}
-            className={`dm-filters-back-btn${filtersStuck ? " dm-filters-back-btn-visible" : ""}`}
-            aria-hidden={!filtersStuck}
-            tabIndex={filtersStuck ? 0 : -1}
+      <div className="dm-segmented dm-display-toggle">
+        {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
+          <button
+            key={m}
+            className={`dm-seg ${displayMode === m ? "dm-seg-active" : ""}`}
+            onClick={() => setDisplayMode(m)}
           >
-            <ChevronLeft size={18} />
-          </IconBtn>
-        )}
-        <div className="dm-segmented dm-display-toggle">
-          {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
-            <button
-              key={m}
-              className={`dm-seg ${displayMode === m ? "dm-seg-active" : ""}`}
-              onClick={() => setDisplayMode(m)}
-            >
-              {m === "GER"
-                ? getLangAbbr(learningLanguage)
-                : m === "ENG"
-                  ? getLangAbbr(nativeLanguage)
-                  : m}
-            </button>
-          ))}
-        </div>
+            {m === "GER"
+              ? getLangAbbr(learningLanguage)
+              : m === "ENG"
+                ? getLangAbbr(nativeLanguage)
+                : m}
+          </button>
+        ))}
       </div>
       <div
         className="dm-list"

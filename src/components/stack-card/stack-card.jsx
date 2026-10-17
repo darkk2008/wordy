@@ -181,8 +181,7 @@ export function StackCard({
             </div>
             <div className="dm-stack-name">{s.name}</div>
             <div className="dm-stack-count">
-              {s.words.length}
-              {s.words.length === 1 ? " word" : " words"}
+              {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
             </div>
             {(isPinned || familyName) && (
               <div className="dm-stack-badge-row">

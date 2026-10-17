@@ -5,6 +5,7 @@
 import { Fragment, useEffect, useState } from "react";
 import {
   ARTICLE_SETS,
+  DM_DE_FORM_RULES,
   GENDER_SETS,
   ROMAN_LANGS,
   usesGenderTag,
@@ -812,7 +813,7 @@ async function dmFetchMissingForms(apiKey, w, need) {
     komparativ: `komparativ (the bare comparative form; empty string only if the adjective is not gradable)`,
     superlativ: `superlativ (the superlative form; empty string only if the adjective is not gradable)`,
   };
-  const sys = `You are a ${langName} dictionary and grammar engine inside a vocabulary app. The user gives you one ${langName} word (dictionary base form) of type "${w.type}". Respond ONLY with a single JSON object (no prose, no markdown fences) with exactly these keys: ${need.map((k) => desc[k]).join("; ")}. Be accurate, including irregular forms and umlauts. Never guess a regular pattern when the word is irregular.`;
+  const sys = `You are a ${langName} dictionary and grammar engine inside a vocabulary app. The user gives you one ${langName} word (dictionary base form) of type "${w.type}". Respond ONLY with a single JSON object (no prose, no markdown fences) with exactly these keys: ${need.map((k) => desc[k]).join("; ")}. Be accurate, including irregular forms and umlauts. Never guess a regular pattern when the word is irregular.${isDe ? ` ${DM_DE_FORM_RULES}` : ""}`;
   const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {

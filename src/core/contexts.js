@@ -5,4 +5,3 @@
 import { createContext } from "react";
 
 export const HideArticlesContext = createContext(false);
-export const StickyFiltersContext = createContext(true);

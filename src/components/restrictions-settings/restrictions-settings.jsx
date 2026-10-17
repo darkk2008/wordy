@@ -4,7 +4,7 @@
 
 import { IconBtn } from "../common/common";
 import { Check, ChevronLeft, EyeOff, Layers } from "../icons/icons";
-import { BarChartIcon, LockIcon, PinIcon, ShieldIcon } from "../icons/settings-icons";
+import { BarChartIcon, LockIcon, ShieldIcon } from "../icons/settings-icons";
 
 function GuardRow({ icon, color, title, sub, checked, onChange }) {
   return (
@@ -43,8 +43,6 @@ export function RestrictionsSettings({
   onToggleHideFamilyFilters,
   hideArticles,
   onToggleHideArticles,
-  stickyFilters,
-  onToggleStickyFilters,
 }) {
   return (
     <div className="dm-view dm-settings-subview">
@@ -62,7 +60,7 @@ export function RestrictionsSettings({
         </div>
         <div className="dm-guard-hero-title">Guardrails</div>
         <p className="dm-guard-hero-text">
-          Shape what's copyable, visible, and pinned throughout the app.
+          Shape what's copyable and visible throughout the app.
         </p>
       </div>
       <div className="dm-guard-group">
@@ -125,14 +123,6 @@ export function RestrictionsSettings({
           sub="When on, der/die/das is hidden everywhere a noun is shown. When off, nouns are shown with their article."
           checked={hideArticles}
           onChange={onToggleHideArticles}
-        />
-        <GuardRow
-          icon={<PinIcon size={18} />}
-          color="#A78BFA"
-          title="Sticky filters"
-          sub="Keep the GER/ENG/BOTH/FORMS filter bar pinned to the top while scrolling a stack's word list. Off: the filter bar scrolls away with the list like any other element."
-          checked={stickyFilters}
-          onChange={onToggleStickyFilters}
         />
       </div>
     </div>

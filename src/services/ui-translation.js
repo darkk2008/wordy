@@ -3,6 +3,7 @@
  */
 
 import { dmGroqFetch, dmParseJson } from "./ai-groq";
+import { UI_RU_DICT, UI_RU_NAV, UI_RU_PATTERNS } from "./ui-ru";
 
 export const UI_LANG_NAMES = {
   en: "English",
@@ -87,9 +88,48 @@ function uiApplyTemplate(translatedTemplate, nums) {
     return nums[idx] !== undefined ? nums[idx] : m;
   });
 }
+/* Russian is a built-in language: its strings live in ui-ru.js and are never sent to the AI translator. */
+const RU_TEMPLATES = (() => {
+  const map = {};
+  Object.keys(UI_RU_DICT).forEach((en) => {
+    map[uiTemplateOf(en).template.replace(/\s+/g, " ").trim()] = uiTemplateOf(UI_RU_DICT[en]).template;
+  });
+  return map;
+})();
+function uiLookup(template) {
+  if (uiTranslationLangCode !== "ru") return uiTranslationCache[template];
+  const m = template.match(/^(\s*)([\s\S]*?)(\s*)$/);
+  const core = m[2].replace(/\s+/g, " ");
+  let hit = RU_TEMPLATES[core];
+  if (!hit) {
+    for (const [re, rep] of UI_RU_PATTERNS) {
+      if (re.test(core)) {
+        hit = core.replace(re, rep);
+        break;
+      }
+    }
+  }
+  return hit ? m[1] + hit + m[3] : undefined;
+}
+export function uiNavLabel(label) {
+  return uiTranslationLangCode === "ru" && UI_RU_NAV[label] ? UI_RU_NAV[label] : label;
+}
+/* Static (no-AI) translation of a whole string, for places that split text into pieces (e.g. animated titles). */
+export function uiStaticText(text) {
+  if (uiTranslationLangCode !== "ru" || typeof text !== "string") return text;
+  const { template, nums } = uiTemplateOf(text);
+  const hit = uiLookup(template);
+  return hit ? uiApplyTemplate(hit, nums) : text;
+}
 function uiAncestorExcluded(startEl) {
   let el = startEl;
   while (el) {
+    // Russian is static (no AI), so the stack view's interface text may be translated there;
+    // the learning words inside it are still protected by the content classes below.
+    if (uiTranslationLangCode === "ru" && el.getAttribute && el.getAttribute("data-ui-ru")) {
+      el = el.parentElement;
+      continue;
+    }
     if (
       el.classList &&
       (el.classList.contains("notranslate") ||
@@ -121,7 +161,22 @@ function uiAncestorExcluded(startEl) {
         el.classList.contains("dm-scramble-pool") ||
         el.classList.contains("dm-sentence-suggested") ||
         el.classList.contains("dm-sentence-prompt-card") ||
-        el.classList.contains("dm-write-hint"))
+        el.classList.contains("dm-write-hint") ||
+        el.classList.contains("dm-de") ||
+        el.classList.contains("dm-en") ||
+        el.classList.contains("dm-option") ||
+        el.classList.contains("dm-match-item") ||
+        el.classList.contains("dm-memory-face") ||
+        el.classList.contains("dm-tf-word") ||
+        el.classList.contains("dm-tf-translation") ||
+        el.classList.contains("dm-rain-word") ||
+        el.classList.contains("dm-write-answer") ||
+        el.classList.contains("dm-speak-target") ||
+        el.classList.contains("dm-letter-tile") ||
+        el.classList.contains("dm-letter-chip") ||
+        el.classList.contains("dm-listen-word") ||
+        el.classList.contains("dm-flip-roman") ||
+        el.classList.contains("dm-roman-inline"))
     )
       return true;
     if (el.getAttribute && el.getAttribute("translate") === "no") return true;
@@ -146,7 +201,7 @@ function processUiTextNode(node) {
     uiOriginalTextByNode.set(node, original);
   } else {
     const { template: prevTemplate, nums: prevNums } = uiTemplateOf(original);
-    const cachedForOriginal = uiTranslationCache[prevTemplate];
+    const cachedForOriginal = uiLookup(prevTemplate);
     const expectedDisplay = cachedForOriginal
       ? uiApplyTemplate(cachedForOriginal, prevNums)
       : undefined;
@@ -156,12 +211,12 @@ function processUiTextNode(node) {
     }
   }
   const { template, nums } = uiTemplateOf(original);
-  const translatedTemplate = uiTranslationCache[template];
+  const translatedTemplate = uiLookup(template);
   if (translatedTemplate) {
     const display = uiApplyTemplate(translatedTemplate, nums);
     if (node.nodeValue !== display) node.nodeValue = display;
   } else {
-    uiTranslationQueue.add(template);
+    if (uiTranslationLangCode !== "ru") uiTranslationQueue.add(template);
   }
 }
 function processUiAttrEl(el, attrName) {
@@ -181,7 +236,7 @@ function processUiAttrEl(el, attrName) {
     rec[attrName] = original;
   } else {
     const { template: prevTemplate, nums: prevNums } = uiTemplateOf(original);
-    const cachedForOriginal = uiTranslationCache[prevTemplate];
+    const cachedForOriginal = uiLookup(prevTemplate);
     const expectedDisplay = cachedForOriginal
       ? uiApplyTemplate(cachedForOriginal, prevNums)
       : undefined;
@@ -191,12 +246,12 @@ function processUiAttrEl(el, attrName) {
     }
   }
   const { template, nums } = uiTemplateOf(original);
-  const translatedTemplate = uiTranslationCache[template];
+  const translatedTemplate = uiLookup(template);
   if (translatedTemplate) {
     const display = uiApplyTemplate(translatedTemplate, nums);
     if (el.getAttribute(attrName) !== display) el.setAttribute(attrName, display);
   } else {
-    uiTranslationQueue.add(template);
+    if (uiTranslationLangCode !== "ru") uiTranslationQueue.add(template);
   }
 }
 function scanUiAttrsInRoot(root) {
@@ -265,7 +320,7 @@ function applyCachedUiTranslations() {
       const original = uiOriginalTextByNode.get(n);
       if (original !== undefined) {
         const { template, nums } = uiTemplateOf(original);
-        const translatedTemplate = uiTranslationCache[template];
+        const translatedTemplate = uiLookup(template);
         if (translatedTemplate) {
           const display = uiApplyTemplate(translatedTemplate, nums);
           if (n.nodeValue !== display) n.nodeValue = display;
@@ -280,7 +335,7 @@ function applyCachedUiTranslations() {
         const original = rec && rec[attr];
         if (original !== undefined) {
           const { template, nums } = uiTemplateOf(original);
-          const translatedTemplate = uiTranslationCache[template];
+          const translatedTemplate = uiLookup(template);
           if (translatedTemplate) {
             const display = uiApplyTemplate(translatedTemplate, nums);
             if (el.getAttribute(attr) !== display) el.setAttribute(attr, display);
@@ -292,6 +347,10 @@ function applyCachedUiTranslations() {
 }
 async function flushUiTranslationQueue() {
   uiTranslationQueueTimer = null;
+  if (uiTranslationLangCode === "ru") {
+    uiTranslationQueue.clear();
+    return;
+  }
   if (uiTranslationInFlight || uiTranslationQueue.size === 0 || uiTranslationLangCode === "en")
     return;
   const batch = Array.from(uiTranslationQueue).slice(0, 60);
@@ -493,6 +552,10 @@ const UI_PRELOAD_STRINGS = [
   "Search",
 ];
 export async function preloadUiTranslations(code, onProgress) {
+  if (code === "ru") {
+    if (onProgress) onProgress(0, 0, 0);
+    return;
+  }
   const targetName = UI_LANG_NAMES[code] || code;
   let cache = {};
   try {

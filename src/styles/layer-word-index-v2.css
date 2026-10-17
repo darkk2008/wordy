@@ -1,0 +1,37 @@
+/* styles/layer-word-index-v2.css
+ * WORD NUMBER, VERSION 2: a bare number with a short fading line after it, instead of a boxed chip.
+ *
+ * The original boxed chip (v1) is still defined in components/word-card/word-card.css and is NOT removed.
+ * To go back to v1: delete the line `@import "layer-word-index-v2.css";` at the bottom of styles/index.css
+ * (or delete this file). Nothing else needs to change.
+ */
+.dm-card-index {
+  gap: 7px;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: rgba(var(--cyan-rgb), 0.85);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.dm-card-index::after {
+  content: "";
+  width: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--cyan-rgb), 0.7), transparent);
+}
+
+/* When a level badge (A1, B2...) follows the number, drop the line so the row stays compact. */
+.dm-card-badges:has(.dm-level-badge) .dm-card-index {
+  gap: 0;
+}
+.dm-card-badges:has(.dm-level-badge) .dm-card-index::after {
+  display: none;
+}

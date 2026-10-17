@@ -7,6 +7,7 @@ import { ONBOARDING_LOGO_SRC } from "../../assets/inline-images";
 import { speak } from "../../core/speech-voices";
 import { seedWord } from "../../core/srs-and-seed-data";
 import { FREE_THEME_LIMIT } from "../../services/premium-gems-store";
+import { uiStaticText } from "../../services/ui-translation";
 import { THEMES } from "../appearance-settings/appearance-settings";
 import { AppLogo } from "../common/common";
 import { CardsIcon, Check, Flame, Gamepad2, Plus, Volume2 } from "../icons/icons";
@@ -15,7 +16,7 @@ import { WordFormsLine } from "../word-forms/word-forms";
 
 function AnimatedText({ text, tag = "span", startDelay = 0, step = 0.045, className }) {
   const Tag = tag;
-  const words = text.split(" ");
+  const words = uiStaticText(text).split(" ");
   return (
     <Tag className={className}>
       {words.map((w, i) => (

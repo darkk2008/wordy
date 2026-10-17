@@ -2,8 +2,7 @@
  * Mini-stack create and manage modals.
  */
 
-import { Fragment, useContext, useState } from "react";
-import { StickyFiltersContext } from "../../core/contexts";
+import { Fragment, useState } from "react";
 import { MINISTACK_ICON_IDS } from "../../core/icon-registry";
 import { IconBtn } from "../common/common";
 import {
@@ -17,7 +16,7 @@ import {
   X,
 } from "../icons/icons";
 import { getLangAbbr } from "../language-settings/language-settings";
-import { dmListClickGuard, useStickyStuck } from "../swipeable-row/swipeable-row";
+import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 import { WordCard } from "../word-card/word-card";
 import { AllFormsModal } from "../word-forms/word-forms";
 import { WordModal } from "../word-modal/word-modal";
@@ -80,8 +79,6 @@ export function MiniStackManageModal({
   const [showForms, setShowForms] = useState(false);
   const [formsWord, setFormsWord] = useState(undefined);
   const [modalWord, setModalWord] = useState(undefined);
-  const [filtersSentinelRef, filtersStuck] = useStickyStuck();
-  const stickyFiltersEnabled = useContext(StickyFiltersContext);
   const isFormsMode = displayMode === "FORMS";
   const resolveStackId = (word) => {
     if (word.stackId) return word.stackId;
@@ -174,9 +171,8 @@ export function MiniStackManageModal({
         )}
         {view === "review" && (
           <>
-            <div ref={filtersSentinelRef} className="dm-filters-sentinel" />
             <div
-              className={`dm-segmented dm-display-toggle${stickyFiltersEnabled ? ` dm-filters-sticky${filtersStuck ? " dm-filters-stuck" : ""}` : ""}`}
+              className="dm-segmented dm-display-toggle"
             >
               {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
                 <button
