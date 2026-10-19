@@ -118,14 +118,23 @@ export function saveStorePreview(packId, learningLanguage, nativeLanguage, words
     );
   } catch (e) {}
 }
+// Free tier, simplified: everything that costs us nothing is free. The only real limit is on
+// things that cost money (AI translation), and it resets every day instead of running out forever.
 export const FREE_FAMILY_LIMIT = 1;
 export const FREE_THEME_LIMIT = 8;
-export const FREE_FAVORITE_LIMIT = 10;
-export const FREE_TRANSLATE_LIMIT = 4;
+export const FREE_FAVORITE_LIMIT = Infinity; // favorites cost nothing, so no limit
+export const FREE_TRANSLATE_LIMIT = 10; // per day (was 4 in total, ever)
 const FREE_TRANSLATE_COUNT_KEY = "deutschmaster-free-translate-count";
+function translateDay() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+// Stored as "<day>:<count>"; an old plain number or a different day counts as 0.
 export function getFreeTranslateCount() {
   try {
-    return parseInt(window.localStorage.getItem(FREE_TRANSLATE_COUNT_KEY) || "0", 10) || 0;
+    const raw = window.localStorage.getItem(FREE_TRANSLATE_COUNT_KEY) || "";
+    const [day, n] = raw.split(":");
+    return day === translateDay() ? parseInt(n, 10) || 0 : 0;
   } catch (e) {
     return 0;
   }
@@ -133,7 +142,7 @@ export function getFreeTranslateCount() {
 export function incFreeTranslateCount() {
   try {
     const n = getFreeTranslateCount() + 1;
-    window.localStorage.setItem(FREE_TRANSLATE_COUNT_KEY, String(n));
+    window.localStorage.setItem(FREE_TRANSLATE_COUNT_KEY, `${translateDay()}:${n}`);
     return n;
   } catch (e) {
     return getFreeTranslateCount();

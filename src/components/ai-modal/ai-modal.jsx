@@ -563,7 +563,7 @@ export function AiModal({
     if (!text || tLoading) return;
     if (!isPremium && tFreeCount >= FREE_TRANSLATE_LIMIT) {
       setTError(
-        `Free translations used up (${FREE_TRANSLATE_LIMIT}/${FREE_TRANSLATE_LIMIT}). Upgrade to Premium for unlimited translations.`
+        `Free translations used up for today (${FREE_TRANSLATE_LIMIT}/${FREE_TRANSLATE_LIMIT}). Try again tomorrow or upgrade to Premium for unlimited translations.`
       );
       return;
     }
@@ -867,7 +867,7 @@ export function AiModal({
         <div className="dm-tr-free-banner">
           {tFreeCount >= FREE_TRANSLATE_LIMIT ? (
             <>
-              {"You've used all " + FREE_TRANSLATE_LIMIT + " free translations. "}
+              {"You've used all " + FREE_TRANSLATE_LIMIT + " free translations for today. "}
               <button
                 type="button"
                 className="dm-tr-free-upgrade"
@@ -877,7 +877,7 @@ export function AiModal({
               </button>
             </>
           ) : (
-            `${FREE_TRANSLATE_LIMIT - tFreeCount} of ${FREE_TRANSLATE_LIMIT} free translations left`
+            `${FREE_TRANSLATE_LIMIT - tFreeCount} of ${FREE_TRANSLATE_LIMIT} free translations left today`
           )}
         </div>
       )}
