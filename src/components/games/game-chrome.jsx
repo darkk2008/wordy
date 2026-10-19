@@ -2,11 +2,13 @@
  * GameTopBar and GameDone (shared game header and results screen).
  */
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IconBtn } from "../common/common";
 import { ArrowRight, RotateCcw, X } from "../icons/icons";
 import { getLangAbbr } from "../language-settings/language-settings";
 
+// The results screen button says where "back" leads: games (default), the stack, etc.
+export const GameBackLabelContext = createContext("Back to games");
 export function GameTopBar({
   onExit,
   progress,
@@ -44,7 +46,10 @@ export function GameDone({
   onNext,
   nextLabel,
   showRing = true,
+  subtitle,
+  playAgainLabel = "Play again",
 }) {
+  const backLabel = useContext(GameBackLabelContext);
   let percent = null;
   if (score) {
     const m = /^(\d+)\/(\d+)$/.exec(score);
@@ -209,9 +214,15 @@ export function GameDone({
       </div>
       <h2 className="dm-h1 dm-done-heading">{heading}</h2>
       <p className="dm-done-sub">
-        {label}
-        {" round complete"}
-        {percent !== null ? ` — ${score} correct` : ""}.
+        {subtitle ? (
+          subtitle
+        ) : (
+          <>
+            {label}
+            {" round complete"}
+            {percent !== null ? ` — ${score} correct` : ""}.
+          </>
+        )}
       </p>
       <div className="dm-done-btn-row">
         {onNext ? (
@@ -223,11 +234,11 @@ export function GameDone({
           <>
             <button className="dm-btn-secondary dm-done-again" onClick={onPlayAgain}>
               <RotateCcw size={16} />
-              {" Play again"}
+              {` ${playAgainLabel}`}
             </button>
             <button className="dm-btn-primary dm-done-back" onClick={onExit}>
               <ArrowRight size={16} />
-              {" Back to games"}
+              {` ${backLabel}`}
             </button>
           </>
         )}

@@ -68,6 +68,21 @@ function dmValidateParadigm(p) {
     sections,
   };
 }
+function dmValidateConj(c) {
+  if (!c || typeof c !== "object") return null;
+  const out = { forInf: dmStr(c.forInf, 80) };
+  if (c.refl === "dat") out.refl = "dat";
+  for (const t of ["praesens", "praeteritum", "perfekt"]) {
+    if (!c[t] || typeof c[t] !== "object") return null;
+    out[t] = {};
+    for (const p of ["ich", "du", "er", "wir", "ihr", "sie"]) {
+      const v = dmStr(c[t][p], 80);
+      if (!v) return null;
+      out[t][p] = v;
+    }
+  }
+  return out;
+}
 function dmSanitizeWord(w) {
   if (!w || typeof w !== "object" || Array.isArray(w)) return null;
   const out = dmScalars(w);
@@ -102,6 +117,8 @@ function dmSanitizeWord(w) {
   };
   const par = dmValidateParadigm(w.paradigm);
   if (par) out.paradigm = par;
+  const conj = dmValidateConj(w.conj);
+  if (conj) out.conj = conj;
   return out;
 }
 export function dmSanitizeStack(st) {

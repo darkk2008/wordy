@@ -55,6 +55,12 @@ export function FlashcardsGame({
     setNavDir(1);
     setIdx((i) => i + 1);
   };
+  // Last card: show the results screen (score + play again) instead of leaving straight away.
+  const finish = () => {
+    setFlipped(false);
+    setNavDir(1);
+    setIdx(deck.length);
+  };
   const goPrev = () => {
     setFlipped(false);
     setNavDir(-1);
@@ -240,9 +246,9 @@ export function FlashcardsGame({
           {" Prev"}
         </button>
         {idx === deck.length - 1 ? (
-          <button className="dm-flip-nav-btn dm-flip-nav-btn-quit" onClick={onExit} type="button">
-            <X size={18} />
-            {" Quit"}
+          <button className="dm-flip-nav-btn dm-flip-nav-btn-quit" onClick={finish} type="button">
+            <Check size={18} />
+            {" Finish"}
           </button>
         ) : (
           <button className="dm-flip-nav-btn" onClick={goNext} type="button">

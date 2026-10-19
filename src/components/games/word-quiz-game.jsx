@@ -3,10 +3,9 @@
  */
 
 import { Fragment, useRef, useState } from "react";
-import { ArrowRight, RotateCcw } from "../icons/icons";
 import { AdjEndingsGame } from "./adj-endings-game";
 import { CasesGame, isRealNoun } from "./cases-game";
-import { GameTopBar } from "./game-chrome";
+import { GameDone, GameTopBar } from "./game-chrome";
 import { MultipleChoiceGame } from "./multiple-choice-game";
 import { ScrambleGame } from "./scramble-game";
 import { SpeedFormsGame } from "./speed-forms-game";
@@ -34,31 +33,11 @@ function buildWordQuizStages(w, learningLanguage) {
   stages.push(mkStage("sprint", "Sprint"));
   return stages;
 }
-// The list after a missed stage: it is replayed two stages later (used by goNext and the label preview).
+// The list after a missed stage is replayed two stages later (shared by goNext and the label preview).
 function withRetry(list, idx, cur) {
   const copy = list.slice();
   copy.splice(Math.min(idx + 3, copy.length), 0, mkStage(cur.id, `${cur.label} (retry)`, true));
   return copy;
-}
-function WordQuizSummary({ word, tally, weak, onExit, onRestart }) {
-  const percent = tally.total ? Math.round((tally.correct / tally.total) * 100) : 100;
-  return (
-    <div className="dm-game-play dm-game-done">
-      <h2 className="dm-h1 dm-done-heading">Quiz complete!</h2>
-      <p className="dm-done-sub">{`“${word.de}” — ${tally.correct}/${tally.total} correct on the first try (${percent}%).`}</p>
-      {weak.length > 0 && <p className="dm-done-sub">{`Needed a second go: ${weak.join(", ")}.`}</p>}
-      <div className="dm-done-btn-row">
-        <button className="dm-btn-secondary dm-done-again" onClick={onRestart}>
-          <RotateCcw size={16} />
-          {" Quiz again"}
-        </button>
-        <button className="dm-btn-primary dm-done-back" onClick={onExit}>
-          <ArrowRight size={16} />
-          {" Done"}
-        </button>
-      </div>
-    </div>
-  );
 }
 export function WordQuizGame({
   words,
@@ -109,8 +88,8 @@ export function WordQuizGame({
     const missed = missedRef.current;
     missedRef.current = false;
     if (missed && !cur.retry) {
-      // Missed a stage: replay it after a different exercise, so the learner has to pull the
-      // word out of memory again instead of echoing the answer they just saw.
+      // Missed a stage: play it again two stages later (after a different exercise),
+      // so the learner has to pull the word out of memory again instead of echoing it.
       setStages((list) => withRetry(list, stageIdx, cur));
       setWeak((w) => (w.includes(cur.label) ? w : [...w, cur.label]));
     }
@@ -125,20 +104,33 @@ export function WordQuizGame({
     );
   }
   if (stageIdx >= stages.length) {
-    return <WordQuizSummary word={target} tally={tally} weak={weak} onExit={onExit} onRestart={restart} />;
+    // One single results screen (ring + overall score) for the whole word quiz.
+    return (
+      <GameDone
+        onExit={onExit}
+        onPlayAgain={restart}
+        playAgainLabel="Quiz again"
+        label="Word quiz"
+        score={tally.total ? `${tally.correct}/${tally.total}` : undefined}
+        subtitle={
+          weak.length
+            ? `“${target.de}” — ${tally.correct}/${tally.total} on the first try. Needed a second go: ${weak.join(", ")}.`
+            : `“${target.de}” — ${tally.correct}/${tally.total} correct on the first try`
+        }
+      />
+    );
   }
   const stage = stages[stageIdx];
   // If the learner already missed something here, this stage will be replayed: label the button for that.
   const upcoming = missedRef.current && !stage.retry ? withRetry(stages, stageIdx, stage) : stages;
   const nextLabel = stageIdx < upcoming.length - 1 ? `Next: ${upcoming[stageIdx + 1].label}` : "Finish";
-  const isLastStage = stageIdx === upcoming.length - 1;
   const common = {
     onExit,
     onAnswer: handleAnswer,
     onPlayAgain: goNext,
     onNext: goNext,
     nextLabel,
-    showRing: isLastStage,
+    showRing: false, // the stages hand over silently; the final results screen is shown once, above
     progressOverride: `${stageIdx + 1}/${stages.length}`,
     learningLanguage,
     nativeLanguage,

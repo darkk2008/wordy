@@ -206,19 +206,40 @@ window.wwordyCloud = (function () {
     }
   }
 
+  // Returns { failed: true } when the cloud could not be read (so the caller must NOT overwrite
+  // the cloud with local data), { empty: true } when the account has no row yet, or the row.
   async function pullData() {
     var c = getClient();
-    if (!c) return null;
+    if (!c) return { failed: true };
     var uid = await getSessionId();
-    if (!uid) return null;
+    if (!uid) return { failed: true };
     var res = await c
       .from("user_data")
-      .select("payload,updated_by_device")
+      .select("payload,updated_by_device,updated_at")
       .eq("user_id", uid)
       .maybeSingle();
-    if (res.error || !res.data) return null;
+    if (res.error) {
+      setSync({ state: "error", error: res.error.message || "Sync failed." });
+      return { failed: true };
+    }
     setSync({ state: "idle", lastSyncAt: Date.now(), error: "" });
-    return res.data;
+    return res.data || { empty: true };
+  }
+
+  // Read-only: the server (promo/payment function) writes this row, the user cannot.
+  // Returns { failed: true } on error, otherwise the row or null when the account has none.
+  async function getEntitlements() {
+    var c = getClient();
+    if (!c) return { failed: true };
+    var uid = await getSessionId();
+    if (!uid) return { failed: true };
+    var res = await c
+      .from("entitlements")
+      .select("premium_type,premium_expires_at")
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (res.error) return { failed: true };
+    return res.data || null;
   }
 
   function subscribe(onRemoteChange) {
@@ -302,10 +323,12 @@ window.wwordyCloud = (function () {
     getMyPublicId: getMyPublicId,
     pushData: pushData,
     pullData: pullData,
+    getEntitlements: getEntitlements,
     subscribe: subscribe,
     changePassword: changePassword,
     deleteAccount: deleteAccount,
     getSyncStatus: getSyncStatus,
     getLastId: getLastId,
+    getDeviceId: getDeviceId,
   };
 })();

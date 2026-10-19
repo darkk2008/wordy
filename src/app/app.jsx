@@ -2,7 +2,7 @@
  * App: root component, global state, routing between screens, modals.
  */
 
-import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BottomNav } from "../components/bottom-nav/bottom-nav";
 import { AppLogo } from "../components/common/common";
 import { DailyBonusToast } from "../components/daily-bonus-toast/daily-bonus-toast";
@@ -42,12 +42,16 @@ import {
   touchLastActive,
   track,
 } from "../services/analytics-presence";
+import { GameBackLabelContext } from "../components/games/game-chrome";
 import { dmSanitizeBackup } from "../services/config-and-validation";
 import {
   FREE_FAVORITE_LIMIT,
   addGemsToBalance,
   loadGemsBalance,
+  applySyncedPremium,
+  applyServerPremium,
   loadPremiumStatus,
+  premiumForSync,
   spendGemsFromBalance,
 } from "../services/premium-gems-store";
 import {
@@ -645,9 +649,32 @@ export function App() {
       loaded,
     });
   }, [stacks, miniStacks, favMiniStack, families, streak, bestStreak, todayReviews, loaded]);
+  // ---- Cloud sync ---------------------------------------------------------------------------
+  // lastSyncedRef: fingerprint of the data the cloud is known to hold. A push only happens when the
+  // local data differs from it, and applying remote data records it - this is what stops two
+  // devices from endlessly re-uploading each other's data (and overwriting fresh edits).
+  const lastSyncedRef = useRef("");
+  const syncReadyRef = useRef(false); // true once the first pull for this account succeeded
+  const latestRef = useRef({});
+  const [syncTick, setSyncTick] = useState(0); // bumps the push effect once the first pull is done
+  const [retryTick, setRetryTick] = useState(0); // re-runs the first pull after a failed read
+  latestRef.current = { miniStacks, favMiniStack };
+  const cloudFingerprint = (c) =>
+    JSON.stringify([
+      c.stacks,
+      c.families,
+      c.miniStacks,
+      c.favMiniStack,
+      c.streak,
+      c.bestStreak,
+      c.reviews,
+      c.premium || null,
+    ]);
   const buildCloudPayload = () => ({
     stacks,
     families,
+    miniStacks,
+    favMiniStack,
     streak,
     bestStreak,
     lastActive: todayStr(),
@@ -655,41 +682,129 @@ export function App() {
       date: todayStr(),
       count: todayReviews,
     },
+    premium: premiumForSync(),
   });
-  const handleSyncNow = () => window.wwordyCloud.pushData(buildCloudPayload());
+  const fingerprintOfPayload = (p) =>
+    cloudFingerprint({
+      stacks: p.stacks,
+      families: p.families,
+      miniStacks: p.miniStacks,
+      favMiniStack: p.favMiniStack,
+      streak: p.streak,
+      bestStreak: p.bestStreak,
+      reviews: p.todayReviews.count,
+      premium: p.premium,
+    });
+  const handleSyncNow = async () => {
+    const payload = buildCloudPayload();
+    const ok = await window.wwordyCloud.pushData(payload);
+    if (ok) lastSyncedRef.current = fingerprintOfPayload(payload);
+    return ok;
+  };
+  // Applies data that came from the cloud (not from a backup file).
+  const applyRemote = (rawData) => {
+    const data = dmSanitizeBackup(rawData);
+    applySyncedPremium(rawData && rawData.premium);
+    // Older cloud copies were saved without mini stacks: keep this device's ones in that case.
+    const hasMini = !!(rawData && (rawData.miniStacks || rawData.miniStack));
+    const mini = hasMini ? migrateMiniStacks(data) : latestRef.current.miniStacks || {};
+    const fav = hasMini ? data.favMiniStack || null : latestRef.current.favMiniStack || null;
+    const best = Math.max(data.bestStreak || 0, data.streak || 1);
+    const today = todayStr();
+    const reviews =
+      data.todayReviews && data.todayReviews.date === today ? data.todayReviews.count || 0 : 0;
+    const fp = cloudFingerprint({
+      stacks: data.stacks || [],
+      families: data.families || [],
+      miniStacks: mini,
+      favMiniStack: fav,
+      streak: data.streak || 1,
+      bestStreak: best,
+      reviews,
+      premium: premiumForSync(),
+    });
+    if (fp === lastSyncedRef.current) return; // nothing new from the cloud
+    lastSyncedRef.current = fp;
+    setStacks(data.stacks || []);
+    setMiniStacks(mini);
+    setFavMiniStack(fav);
+    setFamilies(data.families || []);
+    setStreak(data.streak || 1);
+    setBestStreak(best);
+    setTodayReviews(reviews);
+  };
   useEffect(() => {
-    if (!account.id) return;
+    if (!account.id || !loaded) {
+      syncReadyRef.current = false;
+      lastSyncedRef.current = "";
+      return;
+    }
+    const cloud = window.wwordyCloud;
     let cancelled = false;
     let unsub = () => {};
+    let retry = null;
+    syncReadyRef.current = false;
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
+      const r = await cloud.pullData();
+      if (cancelled || r.failed || !r.payload) return;
+      if (r.updated_by_device === cloud.getDeviceId()) return;
+      applyRemote(r.payload);
+    };
     (async () => {
-      const remote = await window.wwordyCloud.pullData();
+      const remote = await cloud.pullData();
       if (cancelled) return;
-      if (
-        remote &&
-        remote.payload &&
-        Array.isArray(remote.payload.stacks) &&
-        remote.payload.stacks.length
-      ) {
-        importAllData(remote.payload);
-      } else {
-        window.wwordyCloud.pushData(buildCloudPayload());
+      if (remote.failed) {
+        // Could not read the cloud: keep local data and never overwrite the cloud blindly.
+        retry = setTimeout(() => setRetryTick((n) => n + 1), 5000);
+        return;
       }
-      unsub = window.wwordyCloud.subscribe((payload) => {
-        if (payload) importAllData(payload);
+      // Pro status comes from the server-owned entitlements table (no-op unless enabled in config).
+      const ent = await cloud.getEntitlements();
+      if (cancelled) return;
+      if (!ent || !ent.failed) applyServerPremium(ent);
+      const p = remote.payload;
+      if (p && Array.isArray(p.stacks) && p.stacks.length) applyRemote(p);
+      else applySyncedPremium(p && p.premium); // cloud has no stacks yet: local data gets uploaded
+      syncReadyRef.current = true;
+      setSyncTick((n) => n + 1);
+      unsub = cloud.subscribe((payload) => {
+        if (payload) applyRemote(payload);
       });
     })();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", onVisible);
     return () => {
       cancelled = true;
+      if (retry) clearTimeout(retry);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", onVisible);
       unsub();
     };
-  }, [account.id]);
+  }, [account.id, loaded, retryTick]);
   useEffect(() => {
-    if (!loaded || !account.id) return;
-    const t = setTimeout(() => {
-      window.wwordyCloud.pushData(buildCloudPayload());
+    if (!loaded || !account.id || !syncReadyRef.current) return;
+    const payload = buildCloudPayload();
+    const fp = fingerprintOfPayload(payload);
+    if (fp === lastSyncedRef.current) return;
+    const t = setTimeout(async () => {
+      const ok = await window.wwordyCloud.pushData(payload);
+      if (ok) lastSyncedRef.current = fp;
     }, 1200);
     return () => clearTimeout(t);
-  }, [stacks, families, streak, bestStreak, todayReviews, loaded, account.id]);
+  }, [
+    stacks,
+    families,
+    miniStacks,
+    favMiniStack,
+    streak,
+    bestStreak,
+    todayReviews,
+    loaded,
+    account.id,
+    syncTick,
+    premiumRefreshTick,
+  ]);
   const updateStack = (updated) =>
     setStacks((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   const importAllData = (rawData) => {
@@ -1000,6 +1115,7 @@ export function App() {
       },
       direction: "de2en",
       isReview: true,
+      backLabel: "Done",
     });
   };
   const startFamilyReview = (familyId) => {
@@ -1035,6 +1151,7 @@ export function App() {
       direction: direction || "de2en",
       level,
       isReview: true,
+      backLabel: "Done",
     });
     setFamilyReviewPick(null);
   };
@@ -1068,6 +1185,7 @@ export function App() {
       },
       direction: direction || "de2en",
       level,
+      backLabel: "Done",
     });
     setFamilyPlayPick(null);
   };
@@ -1094,6 +1212,7 @@ export function App() {
       },
       direction: direction || "de2en",
       level,
+      backLabel: "Done",
     });
     setArchivedPlayPick(null);
   };
@@ -1119,6 +1238,7 @@ export function App() {
       },
       direction: direction || "de2en",
       level,
+      backLabel: "Back to stack",
     });
     setStackPlayPick(null);
   };
@@ -1138,6 +1258,7 @@ export function App() {
       pool: poolWords && poolWords.length ? poolWords : [word],
       direction: "de2en",
       isDrill: true,
+      backLabel: openStackId ? "Back to stack" : "Done",
     });
   };
   const deleteStack = (id) => {
@@ -1696,7 +1817,9 @@ export function App() {
           <div className="dm-bg-glow dm-bg-glow-2" />
           <div className={`dm-content ${openStack && !game ? "dm-content-noreserve" : ""}`}>
             <Fragment key={viewKey}>
-              <Suspense fallback={null}>{content}</Suspense>
+              <GameBackLabelContext.Provider value={(game && game.backLabel) || "Back to games"}>
+                <Suspense fallback={null}>{content}</Suspense>
+              </GameBackLabelContext.Provider>
             </Fragment>
           </div>
           <BottomNav

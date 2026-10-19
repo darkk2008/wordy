@@ -39,6 +39,62 @@ function savePremiumStatus(status) {
     );
   } catch (e) {}
 }
+// ---- Cloud sync of premium ----------------------------------------------------------------------
+function cleanPremium(p) {
+  if (!p || typeof p !== "object" || !p.active) return null;
+  const type = p.type === "monthly" || p.type === "yearly" || p.type === "permanent" ? p.type : null;
+  if (!type) return null;
+  const expiresAt = typeof p.expiresAt === "number" && isFinite(p.expiresAt) ? p.expiresAt : null;
+  if (type !== "permanent" && (!expiresAt || expiresAt < Date.now())) return null;
+  return { active: true, type, expiresAt: type === "permanent" ? null : expiresAt };
+}
+function premiumRank(p) {
+  if (!p || !p.active) return 0;
+  return p.expiresAt ? p.expiresAt : Number.MAX_SAFE_INTEGER;
+}
+// When window.DM_CONFIG.serverEntitlements is true, Pro comes ONLY from the server's
+// `entitlements` table (see supabase-entitlements.sql). The user_data payload is writable by the
+// user, so it must never be a source of Pro, and the client no longer uploads its own status.
+function serverEntitlements() {
+  return !!(typeof window !== "undefined" && window.DM_CONFIG && window.DM_CONFIG.serverEntitlements);
+}
+// What goes into the cloud payload (only an active premium is worth sending).
+export function premiumForSync() {
+  if (serverEntitlements()) return null;
+  return cleanPremium(loadPremiumStatus());
+}
+// Applies the row read from the server's `entitlements` table. The server is the source of truth:
+// a missing/expired row removes Pro from this device, so a hand-edited localStorage entry only
+// lasts until the next sync. Pass null/undefined to mean "no row".
+export function applyServerPremium(row) {
+  if (!serverEntitlements()) return false;
+  const expiresAt = row && row.premium_expires_at ? Date.parse(row.premium_expires_at) : null;
+  const next = cleanPremium(
+    row && row.premium_type
+      ? { active: true, type: row.premium_type, expiresAt: isNaN(expiresAt) ? null : expiresAt }
+      : null
+  );
+  const local = loadPremiumStatus();
+  if (!next) {
+    if (!local.active) return false;
+    revokePremium();
+    return true;
+  }
+  if (local.active && local.type === next.type && local.expiresAt === next.expiresAt) return false;
+  savePremiumStatus(next);
+  return true;
+}
+// Merge a premium status that came from the cloud: the better of local/remote wins, so a device
+// without premium never downgrades the account. Returns true if this device's status changed.
+export function applySyncedPremium(remote) {
+  if (serverEntitlements()) return false; // payload is user-writable: never trusted for Pro
+  const incoming = cleanPremium(remote);
+  if (!incoming) return false;
+  const local = loadPremiumStatus();
+  if (premiumRank(incoming) <= premiumRank(local)) return false;
+  savePremiumStatus(incoming);
+  return true;
+}
 const GEMS_BALANCE_KEY = "deutschmaster-gems-balance";
 const GEMS_STARTER_AMOUNT = 50;
 export function loadGemsBalance() {

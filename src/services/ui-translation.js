@@ -488,6 +488,8 @@ const UI_PRELOAD_STRINGS = [
   "Get started",
   "Play again",
   "Back to games",
+  "Back to stack",
+  "Done",
   "Exit quiz",
   "round complete",
   "Customize",

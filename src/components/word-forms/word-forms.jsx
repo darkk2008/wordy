@@ -145,6 +145,9 @@ const IRREGULAR_PRAESENS = {
     ich: "bin",
     du: "bist",
     er: "ist",
+    wir: "sind",
+    ihr: "seid",
+    sie: "sind",
   },
   haben: {
     ich: "habe",
@@ -316,6 +319,45 @@ const IRREGULAR_PRAESENS = {
     er: "stiehlt",
   },
 };
+const FORM_PERSONS = ["ich", "du", "er", "wir", "ihr", "sie"];
+const REFL_ACC = { ich: "mich", du: "dich", er: "sich", wir: "uns", ihr: "euch", sie: "sich" };
+const REFL_DAT = { ich: "mir", du: "dir", er: "sich", wir: "uns", ihr: "euch", sie: "sich" };
+const REFL_WORDS = ["sich", "mich", "dich", "mir", "dir", "uns", "euch"];
+const AUX_WORDS = ["hat", "ist", "habe", "bin", "hast", "bist", "haben", "sind", "habt", "seid"];
+const INSEP_PREFIXES = ["be", "ge", "er", "ver", "zer", "ent", "emp", "miss", "über", "unter", "wider", "hinter", "durch"];
+const SEP_PREFIXES = [
+  "zusammen", "zurück", "zurecht", "herunter", "hinunter", "heraus", "hinaus", "herein", "hinein",
+  "herauf", "hinauf", "vorbei", "voraus", "weiter", "wieder", "empor", "statt", "teil", "wahr",
+  "fest", "frei", "hoch", "fort", "heim", "los", "weg", "her", "hin", "dar", "auf", "aus", "bei",
+  "ein", "mit", "nach", "vor", "ab", "an", "zu", "um",
+].sort((x, y) => y.length - x.length);
+function findIrregularPraesens(bare) {
+  const key = String(bare || "").toLowerCase();
+  if (IRREGULAR_PRAESENS[key]) return IRREGULAR_PRAESENS[key];
+  for (const p of INSEP_PREFIXES) {
+    if (key.startsWith(p) && IRREGULAR_PRAESENS[key.slice(p.length)])
+      return IRREGULAR_PRAESENS[key.slice(p.length)];
+  }
+  return {};
+}
+const formRows = (obj) => [
+  { label: "ich", value: obj.ich },
+  { label: "du", value: obj.du },
+  { label: "er/sie/es", value: obj.er },
+  { label: "wir", value: obj.wir },
+  { label: "ihr", value: obj.ihr },
+  { label: "sie/Sie", value: obj.sie },
+];
+// A full AI-generated table stored on the word (only trusted for the same infinitive).
+export function dmConjFor(w) {
+  const c = w && w.conj;
+  if (!c || typeof c !== "object" || c.forInf !== w.de) return null;
+  for (const t of ["praesens", "praeteritum", "perfekt"]) {
+    if (!c[t] || typeof c[t] !== "object") return null;
+    for (const p of FORM_PERSONS) if (typeof c[t][p] !== "string" || !c[t][p].trim()) return null;
+  }
+  return c;
+}
 export function computeVerbForms(w) {
   if (currentLearningLangCode !== "de") {
     return {
@@ -339,91 +381,83 @@ export function computeVerbForms(w) {
       ],
     };
   }
-  const inf = w.de || "";
-  const stem = inf.endsWith("en") ? inf.slice(0, -2) : inf.endsWith("n") ? inf.slice(0, -1) : inf;
-  const needsE = endsWithAny(stem, ["t", "d"]);
+  const conj = dmConjFor(w);
+  if (conj)
+    return {
+      praesens: formRows(conj.praesens),
+      praeteritum: formRows(conj.praeteritum),
+      perfekt: formRows(conj.perfekt),
+    };
+  // ---- rule-based fallback (used when there is no AI table yet) ----
+  const fullInf = String(w.de || "").trim();
+  const isRefl = !!w.reflexiv || /^sich\s/i.test(fullInf);
+  const refl = isRefl ? (w.reflexivCase === "dat" ? REFL_DAT : REFL_ACC) : null;
+  const inf = fullInf.replace(/^sich\s+/i, "");
+  const words = (str) =>
+    String(str || "")
+      .trim()
+      .split(/\s+/)
+      .filter((t) => t && !REFL_WORDS.includes(t.toLowerCase()));
+  // separable prefix: the last word of the stored Präteritum ("nahm wahr"), else guessed from the flag
+  const praetWords = words(w.praeteritum);
+  let prefix = "";
+  if (praetWords.length > 1) prefix = praetWords.pop();
+  else if (w.trennbar) {
+    const hit = SEP_PREFIXES.find((p) => inf.toLowerCase().startsWith(p) && inf.length > p.length + 2);
+    if (hit) prefix = hit;
+  }
+  let bare = inf;
+  if (prefix && inf.toLowerCase().startsWith(prefix.toLowerCase())) bare = inf.slice(prefix.length);
+  else prefix = "";
+  const isEln = /eln$/i.test(bare);
+  const stem = bare.endsWith("en") ? bare.slice(0, -2) : bare.endsWith("n") ? bare.slice(0, -1) : bare;
+  const needsE = endsWithAny(stem, ["t", "d"]) || /chn$/i.test(stem) || /[^aeiouäöüyhlrmn][mn]$/i.test(stem);
   const sEnding = endsWithAny(stem, ["s", "ß", "z", "x"]);
-  const irregular = IRREGULAR_PRAESENS[inf.trim().toLowerCase()] || {};
+  const irregular = findIrregularPraesens(bare);
+  const tail = (p) => `${refl ? " " + refl[p] : ""}${prefix ? " " + prefix : ""}`;
   const praesens = {
-    ich: irregular.ich || stem + "e",
+    ich: irregular.ich || (isEln ? bare.slice(0, -3) + "le" : stem + "e"),
     du: irregular.du || (sEnding ? stem + "t" : stem + (needsE ? "est" : "st")),
     er: irregular.er || stem + (needsE ? "et" : "t"),
-    wir: inf,
-    ihr: stem + (needsE ? "et" : "t"),
-    sie: inf,
+    wir: irregular.wir || bare,
+    ihr: irregular.ihr || stem + (needsE ? "et" : "t"),
+    sie: irregular.sie || bare,
   };
-  const rawPraet = (w.praeteritum || (needsE ? stem + "ete" : stem + "te")).trim();
-  const praetTokens = rawPraet.split(/\s+/).filter(Boolean);
-  const praetPrefix = praetTokens.length > 1 ? praetTokens.pop() : "";
-  const praet = praetTokens.join(" ") || rawPraet;
+  const praet = praetWords.join(" ") || (needsE ? stem + "ete" : stem + "te");
   const praetSEnding = endsWithAny(praet, ["s", "ß", "z", "x"]);
   const isWeak = praet.toLowerCase().endsWith("te");
-  const withPrefix = (form) => (praetPrefix ? `${form} ${praetPrefix}` : form);
+  const strongTD = !isWeak && /[td]$/i.test(praet);
   const praeteritum = {
-    ich: withPrefix(praet),
-    du: withPrefix(isWeak ? praet + "st" : praetSEnding ? praet + "t" : praet + "st"),
-    er: withPrefix(praet),
-    wir: withPrefix(isWeak ? praet + "n" : praet + "en"),
-    ihr: withPrefix(praet + "t"),
-    sie: withPrefix(isWeak ? praet + "n" : praet + "en"),
+    ich: praet,
+    du: isWeak ? praet + "st" : strongTD ? praet + "est" : praetSEnding ? praet + "t" : praet + "st",
+    er: praet,
+    wir: isWeak ? praet + "n" : praet + "en",
+    ihr: strongTD ? praet + "et" : praet + "t",
+    sie: isWeak ? praet + "n" : praet + "en",
   };
-  const partizip = w.partizipII || `ge${stem}${needsE ? "et" : "t"}`;
+  let partizip = words(w.partizipII)
+    .filter((t) => !AUX_WORDS.includes(t.toLowerCase()))
+    .join(" ");
+  if (!partizip) {
+    const base = stem + (needsE ? "et" : "t");
+    const noGe =
+      /ieren$/i.test(bare) || (!prefix && INSEP_PREFIXES.slice(0, 8).some((p) => bare.toLowerCase().startsWith(p)));
+    partizip = prefix ? `${prefix}ge${base}` : noGe ? base : `ge${base}`;
+  }
   const AUX =
     dmVerbAux(w) === "sein"
-      ? {
-          ich: "bin",
-          du: "bist",
-          er: "ist",
-          wir: "sind",
-          ihr: "seid",
-          sie: "sind",
-        }
-      : {
-          ich: "habe",
-          du: "hast",
-          er: "hat",
-          wir: "haben",
-          ihr: "habt",
-          sie: "haben",
-        };
-  const perfekt = {
-    ich: `${AUX.ich} ${partizip}`,
-    du: `${AUX.du} ${partizip}`,
-    er: `${AUX.er} ${partizip}`,
-    wir: `${AUX.wir} ${partizip}`,
-    ihr: `${AUX.ihr} ${partizip}`,
-    sie: `${AUX.sie} ${partizip}`,
-  };
-  const rows = (obj) => [
-    {
-      label: "ich",
-      value: obj.ich,
-    },
-    {
-      label: "du",
-      value: obj.du,
-    },
-    {
-      label: "er/sie/es",
-      value: obj.er,
-    },
-    {
-      label: "wir",
-      value: obj.wir,
-    },
-    {
-      label: "ihr",
-      value: obj.ihr,
-    },
-    {
-      label: "sie/Sie",
-      value: obj.sie,
-    },
-  ];
+      ? { ich: "bin", du: "bist", er: "ist", wir: "sind", ihr: "seid", sie: "sind" }
+      : { ich: "habe", du: "hast", er: "hat", wir: "haben", ihr: "habt", sie: "haben" };
+  const out = { praesens: {}, praeteritum: {}, perfekt: {} };
+  FORM_PERSONS.forEach((p) => {
+    out.praesens[p] = praesens[p] + tail(p);
+    out.praeteritum[p] = praeteritum[p] + tail(p);
+    out.perfekt[p] = `${AUX[p]}${refl ? " " + refl[p] : ""} ${partizip}`;
+  });
   return {
-    praesens: rows(praesens),
-    praeteritum: rows(praeteritum),
-    perfekt: rows(perfekt),
+    praesens: formRows(out.praesens),
+    praeteritum: formRows(out.praeteritum),
+    perfekt: formRows(out.perfekt),
   };
 }
 export function formatSuperlativ(raw, base) {
@@ -872,6 +906,81 @@ async function dmFetchMissingForms(apiKey, w, need) {
   }
   return out;
 }
+const CONJ_SYSTEM_PROMPT =
+  "You are a German conjugation engine inside a vocabulary app. The user sends a JSON object with the German infinitive (\"infinitive\") and optional hints. " +
+  "Respond ONLY with one JSON object (no prose, no markdown fences): " +
+  "{\"praesens\":{\"ich\":..,\"du\":..,\"er\":..,\"wir\":..,\"ihr\":..,\"sie\":..},\"praeteritum\":{same six keys},\"perfekt\":{same six keys},\"reflexive_case\":\"acc\"|\"dat\"|\"\"}. " +
+  "Keys: er = er/sie/es, sie = sie/Sie (plural/formal). Every value is the finite verb phrase as it stands in a MAIN clause, WITHOUT the subject pronoun. " +
+  "RULES: " +
+  "(1) Conjugate the FINITE verb itself. Never glue the infinitive stem onto a prefix or onto \"sich\". " +
+  "(2) SEPARABLE verbs: the prefix goes to the end of Präsens and Präteritum (ich nehme wahr, du nimmst wahr, ich nahm wahr). Perfekt uses the participle with ge- between prefix and stem (habe wahrgenommen). " +
+  "(3) REFLEXIVE verbs (infinitive starts with \"sich\"): put the correct reflexive pronoun right after the finite verb and conjugate it per person: ich mich, du dich, er sich, wir uns, ihr euch, sie sich (use the dative mir / dir for ich / du only if the verb takes a dative reflexive pronoun, e.g. sich etwas vorstellen, and then set reflexive_case to \"dat\"). For a verb that is both reflexive and separable the order is finite verb + pronoun + prefix (ich stelle mich vor). Perfekt: auxiliary + pronoun + participle (ich habe mich bemüht). " +
+  "(4) Get irregular forms right: stem-vowel changes in du/er (nehmen: du nimmst, er nimmt; geben: du gibst; fahren: du fährst; lesen: du liest), strong and mixed Präteritum, -est/-et endings after a stem in d/t or consonant+m/n (du arbeitest, er öffnet), -s/-ß/-z stems (du reist), -eln verbs (ich lächle). " +
+  "(5) Perfekt = finite auxiliary haben/sein (use sein for verbs of motion or change of state) + [reflexive pronoun] + participle. Inseparable prefixes and -ieren verbs have no ge-. " +
+  "(6) Only the forms, nothing else: no subject pronouns, no translations, no brackets, no alternatives. " +
+  "EXAMPLE sich bemühen -> praesens: bemühe mich | bemühst dich | bemüht sich | bemühen uns | bemüht euch | bemühen sich; praeteritum: bemühte mich | bemühtest dich | bemühte sich | bemühten uns | bemühtet euch | bemühten sich; perfekt: habe mich bemüht | hast dich bemüht | hat sich bemüht | haben uns bemüht | habt euch bemüht | haben sich bemüht. " +
+  "EXAMPLE wahrnehmen -> praesens: nehme wahr | nimmst wahr | nimmt wahr | nehmen wahr | nehmt wahr | nehmen wahr; praeteritum: nahm wahr | nahmst wahr | nahm wahr | nahmen wahr | nahmt wahr | nahmen wahr; perfekt: habe wahrgenommen | hast wahrgenommen | hat wahrgenommen | haben wahrgenommen | habt wahrgenommen | haben wahrgenommen.";
+// Checks an AI table against the grammar of the verb. Returns the clean table, or null if it is wrong.
+function dmCheckConj(parsed, w) {
+  if (!parsed || typeof parsed !== "object") return null;
+  const inf = String(w.de || "").trim();
+  const isRefl = /^sich\s/i.test(inf);
+  const clean = (v) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "";
+  const out = { forInf: w.de, praesens: {}, praeteritum: {}, perfekt: {} };
+  const subj = /^(ich|du|er|sie|es|wir|ihr|man)\s/i;
+  const praetWords = String(w.praeteritum || "").trim().split(/\s+/).filter((t) => !REFL_WORDS.includes(t.toLowerCase()));
+  const knownPrefix = praetWords.length > 1 ? praetWords[praetWords.length - 1].toLowerCase() : "";
+  for (const t of ["praesens", "praeteritum", "perfekt"]) {
+    if (!parsed[t] || typeof parsed[t] !== "object") return null;
+    for (const p of FORM_PERSONS) {
+      let v = clean(parsed[t][p]);
+      if (!v || v.length > 60 || /[0-9()\/,;:]/.test(v)) return null;
+      if (subj.test(v)) v = v.replace(subj, "");
+      const tokens = v.split(" ");
+      if (isRefl) {
+        // the pronoun must belong to this person and come AFTER the finite verb ("bemühe mich", "habe mich bemüht")
+        const allowed = [REFL_ACC[p], REFL_DAT[p]];
+        const at = tokens.findIndex((x) => allowed.includes(x.toLowerCase()));
+        if (at !== 1) return null;
+      }
+      if (t === "perfekt" && !AUX_WORDS.includes(tokens[0].toLowerCase())) return null;
+      if (t !== "perfekt" && knownPrefix && tokens[tokens.length - 1].toLowerCase() !== knownPrefix) return null;
+      out[t][p] = v;
+    }
+  }
+  if (parsed.reflexive_case === "dat" && isRefl) out.refl = "dat";
+  return out;
+}
+async function dmFetchGermanConj(apiKey, w) {
+  const hint = { infinitive: String(w.de || "") };
+  if (w.trennbar) hint.separable = true;
+  if (w.auxiliary) hint.auxiliary = w.auxiliary;
+  const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "openai/gpt-oss-120b",
+      messages: [
+        { role: "system", content: CONJ_SYSTEM_PROMPT },
+        { role: "user", content: JSON.stringify(hint) },
+      ],
+      temperature: 0.1,
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) throw new Error("Request failed (" + res.status + ")");
+  const data = await res.json();
+  const content =
+    data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  if (!content) throw new Error("no response");
+  const table = dmCheckConj(dmParseJson(content), w);
+  if (!table) throw new Error("table failed the grammar check");
+  return table;
+}
 export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremium }) {
   const locked = !isPremium;
   const [aiExtra, setAiExtra] = useState(null);
@@ -919,6 +1028,42 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
       })
       .catch(() => {
         setAiStatus("error");
+      })
+      .finally(() => {
+        window.__dmFormsBusy[key] = false;
+      });
+  };
+  const [cStatus, setCStatus] = useState("idle");
+  const runConj = (force) => {
+    if (currentLearningLangCode !== "de" || !wProp || !wProp.id || wProp.type !== "verb") return;
+    if (!force && dmConjFor(wProp)) return;
+    let apiKey = "";
+    try {
+      apiKey = window.localStorage.getItem("deutschmaster-groq-key") || "";
+    } catch (e) {}
+    if (!apiKey) return;
+    const key = "conj:" + wProp.id + ":" + wProp.de;
+    window.__dmFormsDone = window.__dmFormsDone || {};
+    window.__dmFormsBusy = window.__dmFormsBusy || {};
+    if ((!force && window.__dmFormsDone[key]) || window.__dmFormsBusy[key]) return;
+    window.__dmFormsBusy[key] = true;
+    setCStatus("loading");
+    dmFetchGermanConj(apiKey, wProp)
+      .then((table) => {
+        window.__dmFormsDone[key] = true;
+        setAiExtra((prev) => ({ ...(prev || {}), conj: table }));
+        try {
+          window.dispatchEvent(
+            new CustomEvent("dm-word-forms-filled", {
+              detail: { id: wProp.id, fields: { conj: table } },
+            })
+          );
+        } catch (e) {}
+        setCStatus("idle");
+      })
+      .catch(() => {
+        // The rule-based table stays on screen; the person can retry.
+        setCStatus("error");
       })
       .finally(() => {
         window.__dmFormsBusy[key] = false;
@@ -973,6 +1118,7 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
     if (!locked) {
       runFill();
       runParadigm(false);
+      runConj(false);
     }
   }, [wProp && wProp.id, locked]);
   const aiStatusEl =
@@ -1030,6 +1176,21 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
     const forms = computeVerbForms(w);
     body = (
       <>
+        {cStatus === "loading" && (
+          <div className="dm-autofill-hint">
+            <Loader2 size={13} className="dm-autofill-spin" />
+            {" AI is checking the conjugation…"}
+          </div>
+        )}
+        {cStatus === "error" && !locked && (
+          <div
+            className="dm-autofill-error"
+            style={{ cursor: "pointer" }}
+            onClick={() => runConj(true)}
+          >
+            Couldn't verify the table with AI — tap to retry.
+          </div>
+        )}
         <div className="dm-forms-modal-section">
           <div className="dm-forms-modal-title">{isDeWordModal ? "Präsens" : "Base form"}</div>
           <FormsTable rows={forms.praesens} hidden={effectiveHidden} locked={locked} />
