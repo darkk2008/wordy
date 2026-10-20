@@ -246,7 +246,7 @@ export function FlashcardsGame({
           {" Prev"}
         </button>
         {idx === deck.length - 1 ? (
-          <button className="dm-flip-nav-btn dm-flip-nav-btn-quit" onClick={finish} type="button">
+          <button className="dm-flip-nav-btn dm-flip-nav-btn-finish" onClick={finish} type="button">
             <Check size={18} />
             {" Finish"}
           </button>

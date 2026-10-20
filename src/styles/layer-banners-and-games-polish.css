@@ -51,8 +51,11 @@
 .dm-game-play > .dm-topbar { width: 100%; max-width: none; margin-left: 0; margin-right: 0; }
 @media (min-width: 900px) {
   .dm-game-play { max-width: 720px; min-height: min(calc(100vh - 108px), 760px); }
-  .dm-game-play > .dm-topbar + * { margin-top: auto; }
-  .dm-game-play > :last-child:not(.dm-topbar) { margin-bottom: auto; }
+  .dm-game-play:not(.dm-game-done) > .dm-topbar + * { margin-top: auto; }
+  .dm-game-play:not(.dm-game-done) > :last-child:not(.dm-topbar) { margin-bottom: auto; }
+  /* Results screen: content is centred as a group by justify-content (no auto margins) */
+  .dm-game-play.dm-game-done { justify-content: center; align-items: center; }
+  .dm-game-play.dm-game-done > .dm-done-btn-row { margin-top: 8px; }
 }
 
 /* ===== Games: comfortable tap targets (layout-neutral hit areas where the look must not change) ===== */

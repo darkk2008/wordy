@@ -178,8 +178,8 @@ export function GameDone({
           ))}
         </div>
       )}
-      <div className="dm-done-glow" />
       <div className="dm-done-ring-wrap">
+        <div className="dm-done-glow" />
         <div className="dm-done-sparkles">
           {sparkles.map((s, i) => (
             <span
