@@ -172,6 +172,8 @@ export function SwipeableRow({
     if (!el) return;
     const rx = Math.round(x);
     const ry = Math.round(y);
+    // Styling hook only (word-card-glass.css): which action panel is being revealed.
+    el.dataset.swipeDir = rx < 0 ? "right" : rx > 0 ? "left" : ry > 0 ? "down" : "none";
     el.style.transition = animate ? "transform 0.38s cubic-bezier(.16,1,.3,1)" : "none";
     el.style.transform = `translate(${rx}px, ${ry}px)`;
     el.classList.add("dm-swipe-settling");

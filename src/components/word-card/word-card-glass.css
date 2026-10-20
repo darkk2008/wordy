@@ -1,0 +1,101 @@
+/* components/word-card/word-card-glass.css
+ * Minimal glass look for word cards: translucent fill, blurred background, thin border.
+ * APPEARANCE ONLY. Size, padding, buttons and gestures are untouched.
+ * To go back to the old flat look, delete this file and its @import at the end of styles/index.css.
+ */
+
+/* dark themes (default) */
+.dm-app {
+  --wc-fill: rgba(255, 255, 255, 0.055);
+  --wc-fill-hover: rgba(255, 255, 255, 0.085);
+  --wc-border: rgba(255, 255, 255, 0.14);
+  --wc-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+}
+/* light themes */
+.dm-app.dm-light,
+.dm-app.dm-forest,
+.dm-app.dm-ocean,
+.dm-app.dm-rose,
+.dm-app.dm-amber,
+.dm-app.dm-lavender,
+.dm-app.dm-mint,
+.dm-app.dm-cocoa,
+.dm-app.dm-clay,
+.dm-app.dm-mauve,
+.dm-app.dm-peach,
+.dm-app.dm-sage,
+.dm-app.dm-citrus {
+  --wc-fill: rgba(255, 255, 255, 0.45);
+  --wc-fill-hover: rgba(255, 255, 255, 0.6);
+  --wc-border: rgba(255, 255, 255, 0.8);
+  --wc-shadow: 0 8px 24px -12px rgba(30, 34, 50, 0.22);
+}
+
+/* The swipe wrapper used to be an opaque plate behind the card, which hid everything the glass
+   should blur. Make it transparent (word-card rows only) and keep the swipe buttons that sit
+   behind it hidden until their side is actually being swiped / opened (SwipeableRow sets
+   data-swipe-dir). Gestures and click handlers are unchanged. */
+.dm-swipe-content:has(> .dm-card) {
+  background: transparent;
+}
+.dm-swipe-outer:has(> .dm-swipe-content > .dm-card)
+  > :is(.dm-swipe-actions, .dm-swipe-actions-left, .dm-swipe-actions-down) {
+  opacity: 0;
+  transition: opacity 0.2s ease 0.32s;
+}
+.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="right"] > .dm-card) > .dm-swipe-actions,
+.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="left"] > .dm-card) > .dm-swipe-actions-left,
+.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="down"] > .dm-card) > .dm-swipe-actions-down,
+.dm-swipe-outer:has(> .dm-swipe-content > .dm-card)
+  > :is(.dm-swipe-actions, .dm-swipe-actions-left, .dm-swipe-actions-down):has(:focus-visible) {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* the card */
+.dm-card {
+  background-color: var(--wc-fill);
+  border-color: var(--wc-border);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: var(--wc-shadow);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-card:hover {
+    background-color: var(--wc-fill-hover);
+    border-color: rgba(var(--cyan-rgb), 0.4);
+    box-shadow: var(--wc-shadow);
+  }
+}
+.dm-card.dm-card-longpress {
+  background-color: var(--wc-fill-hover);
+  border-color: rgba(var(--cyan-rgb), 0.5);
+  box-shadow: var(--wc-shadow);
+}
+.dm-card.dm-card-picked {
+  background-color: var(--wc-fill-hover);
+  border-color: rgba(67, 217, 153, 0.55);
+  box-shadow: var(--wc-shadow);
+}
+/* keep the card calm while the row is being dragged */
+.dm-swipe-content.dm-swipe-settling .dm-card:hover:not(.dm-card-longpress) {
+  transform: translateZ(0) !important;
+  background-color: var(--wc-fill) !important;
+  border-color: var(--wc-border) !important;
+  box-shadow: var(--wc-shadow) !important;
+  transition: none !important;
+}
+
+/* fallbacks */
+@media (prefers-reduced-transparency: reduce) {
+  .dm-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dm-card {
+    background-color: color-mix(in srgb, var(--bg) 90%, var(--text) 10%);
+  }
+}
