@@ -173,7 +173,29 @@ export function SwipeableRow({
     const rx = Math.round(x);
     const ry = Math.round(y);
     // Styling hook only (word-card-glass.css): which action panel is being revealed.
-    el.dataset.swipeDir = rx < 0 ? "right" : rx > 0 ? "left" : ry > 0 ? "down" : "none";
+    const dir = rx < 0 ? "right" : rx > 0 ? "left" : ry > 0 ? "down" : "none";
+    el.dataset.swipeDir = dir;
+    if (el.parentElement) {
+      el.parentElement.dataset.swipeDir = dir;
+      // Glass cards: show only the panel of the side being swiped. Set inline so it does not
+      // depend on any CSS selector support (this was why buttons never appeared on mobile).
+      if (el.parentElement.hasAttribute("data-glass")) {
+        const panels = [
+          ["dm-swipe-actions", "right"],
+          ["dm-swipe-actions-left", "left"],
+          ["dm-swipe-actions-down", "down"],
+        ];
+        for (const child of el.parentElement.children) {
+          for (const [cls, side] of panels) {
+            if (child.classList.contains(cls)) {
+              const on = dir === side;
+              child.style.opacity = on ? "1" : "0";
+              child.style.transition = on ? "opacity 0.15s ease" : "opacity 0.2s ease 0.32s";
+            }
+          }
+        }
+      }
+    }
     el.style.transition = animate ? "transform 0.38s cubic-bezier(.16,1,.3,1)" : "none";
     el.style.transform = `translate(${rx}px, ${ry}px)`;
     el.classList.add("dm-swipe-settling");
@@ -487,6 +509,7 @@ export function SwipeableRow({
           : undefined
       }
       data-swipe-open={openSide}
+      data-glass={children && children.props && /dm-card/.test(String(children.props.className || "")) ? "" : undefined}
       onClick={() => {
         if (disableGestures) return;
         if (openSide !== "none") closeRow();

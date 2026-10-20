@@ -12,14 +12,6 @@
   --wc-border: rgba(255, 255, 255, 0.24);
   --wc-shadow:
     0 10px 30px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  --wc-orb: 0.4;
-  --wc-orb-strong: 0.85;
-}
-/* mid-tone dark themes: calmer shapes so text keeps its contrast */
-.dm-app.dm-nord,
-.dm-app.dm-lagoon {
-  --wc-orb: 0.28;
-  --wc-orb-strong: 0.55;
 }
 /* light themes */
 .dm-app.dm-light,
@@ -40,8 +32,6 @@
   --wc-border: rgba(255, 255, 255, 0.95);
   --wc-shadow:
     0 10px 30px -12px rgba(30, 34, 50, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --wc-orb: 0.34;
-  --wc-orb-strong: 0.7;
 }
 
 /* The swipe wrapper used to be an opaque plate behind the card, which hid everything the glass
@@ -51,64 +41,18 @@
 .dm-swipe-content:has(> .dm-card) {
   background: transparent;
 }
-.dm-swipe-outer:has(> .dm-swipe-content > .dm-card)
-  > :is(.dm-swipe-actions, .dm-swipe-actions-left, .dm-swipe-actions-down) {
+/* Swipe buttons stay hidden until their side is being swiped / opened. SwipeableRow sets
+   data-swipe-dir on the outer wrapper (plain attribute, no :has(), so it works on every mobile
+   browser). */
+.dm-swipe-outer[data-glass] > :is(.dm-swipe-actions, .dm-swipe-actions-left, .dm-swipe-actions-down) {
   opacity: 0;
   transition: opacity 0.2s ease 0.32s;
 }
-.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="right"] > .dm-card) > .dm-swipe-actions,
-.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="left"] > .dm-card) > .dm-swipe-actions-left,
-.dm-swipe-outer:has(> .dm-swipe-content[data-swipe-dir="down"] > .dm-card) > .dm-swipe-actions-down,
-.dm-swipe-outer:has(> .dm-swipe-content > .dm-card)
-  > :is(.dm-swipe-actions, .dm-swipe-actions-left, .dm-swipe-actions-down):has(:focus-visible) {
+.dm-swipe-outer[data-glass][data-swipe-dir="right"] > .dm-swipe-actions,
+.dm-swipe-outer[data-glass][data-swipe-dir="left"] > .dm-swipe-actions-left,
+.dm-swipe-outer[data-glass][data-swipe-dir="down"] > .dm-swipe-actions-down {
   opacity: 1;
   transition-delay: 0s;
-}
-
-/* Colourful shapes behind the word list. Glass only looks like glass when there is something
-   behind it to blur: the shapes are crisp out here in the gaps and turn soft and frosted behind
-   each card. Built from theme colours, repeats down the whole list, never blocks taps. */
-.dm-list:has(.dm-card) {
-  position: relative;
-  isolation: isolate;
-}
-.dm-list:has(.dm-card)::before {
-  content: "";
-  position: absolute;
-  top: -24px;
-  bottom: -24px;
-  left: -60px;
-  right: -60px;
-  z-index: -1;
-  pointer-events: none;
-  background-repeat: repeat-y;
-  background-size: 100% 980px;
-  background-image:
-    radial-gradient(
-      125px circle at 100% 140px,
-      rgba(var(--cyan-rgb), var(--wc-orb-strong)) 82%,
-      transparent 100%
-    ),
-    radial-gradient(
-      62px circle at 0% 320px,
-      rgba(var(--gold-rgb), var(--wc-orb)) 82%,
-      transparent 100%
-    ),
-    radial-gradient(
-      95px circle at 98% 560px,
-      color-mix(in srgb, var(--red) calc(var(--wc-orb-strong) * 100%), transparent) 82%,
-      transparent 100%
-    ),
-    radial-gradient(
-      58px circle at 1% 760px,
-      rgba(var(--cyan-rgb), var(--wc-orb)) 82%,
-      transparent 100%
-    ),
-    radial-gradient(
-      115px circle at 100% 900px,
-      rgba(var(--gold-rgb), var(--wc-orb-strong)) 82%,
-      transparent 100%
-    );
 }
 
 /* the card */
