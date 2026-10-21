@@ -49,7 +49,7 @@ export function WordFormsLine({ w, showAudio }) {
     );
   }
   if (w.type === "adj" && (w.komparativ || w.superlativ)) {
-    const supDisplay = formatSuperlativ(w.superlativ, w.de || "");
+    const supDisplay = mainSuperlativ(formatSuperlativ(w.superlativ, w.de || ""));
     return (
       <div className="dm-meta">
         <span className="dm-mono dm-meta-sub">{w.komparativ}</span>
@@ -358,6 +358,54 @@ export function dmConjFor(w) {
   }
   return c;
 }
+// Imperativ (du / wir / ihr / Sie), derived from the Präsens rows so that irregular stem changes
+// (gib!, lies!, nimm!) come through, with umlauts dropped (fahr!, lauf!) and the few special verbs
+// handled explicitly. Separable prefixes and reflexive pronouns stay at the end (steh auf!, setz dich!).
+const IMPERATIV_SPECIAL = {
+  sein: { du: "sei", wir: "seien wir", ihr: "seid", sie: "seien Sie" },
+  haben: { du: "hab", wir: "haben wir", ihr: "habt", sie: "haben Sie" },
+  werden: { du: "werde", wir: "werden wir", ihr: "werdet", sie: "werden Sie" },
+  wissen: { du: "wisse", wir: "wissen wir", ihr: "wisst", sie: "wissen Sie" },
+};
+function buildImperativ(w, praesensRows) {
+  // rows come from formRows(): ich, du, er/sie/es, wir, ihr, sie/Sie (so look them up by position)
+  const POS = { du: 1, wir: 3, ihr: 4, sie: 5 };
+  const get = (key) => (praesensRows[POS[key]] || {}).value || "";
+  const split = (str) => {
+    const t = String(str || "").trim().split(/\s+/).filter(Boolean);
+    return { head: t[0] || "", rest: t.slice(1).join(" ") };
+  };
+  const join = (head, rest) => (rest ? `${head} ${rest}` : head);
+  const du = split(get("du"));
+  const wir = split(get("wir"));
+  const ihr = split(get("ihr"));
+  const sie = split(get("sie"));
+  if (!du.head || !ihr.head || !wir.head || !sie.head) return null;
+  const inf = String(w.de || "").replace(/^sich\s+/i, "").trim().toLowerCase();
+  const special = IMPERATIV_SPECIAL[inf];
+  if (special) {
+    // same tail (separable prefix / reflexive pronoun) rules as the other forms
+    return [
+      { label: "du", value: join(special.du, du.rest) },
+      { label: "wir", value: join(special.wir, wir.rest) },
+      { label: "ihr", value: join(special.ihr, ihr.rest) },
+      { label: "Sie", value: join(special.sie, sie.rest) },
+    ];
+  }
+  const stem = inf.endsWith("en") ? inf.slice(0, -2) : inf.endsWith("n") ? inf.slice(0, -1) : inf;
+  let imp = du.head;
+  if (/eln$/i.test(inf)) imp = inf.slice(0, -3) + "le";
+  else if (/[sßzx]$/i.test(stem)) imp = imp.replace(/t$/i, "");
+  else imp = imp.replace(/st$/i, "");
+  if (!/[äöü]/i.test(inf) && /[äöü]/i.test(imp))
+    imp = imp.replace(/äu/g, "au").replace(/ä/g, "a").replace(/ö/g, "o").replace(/ü/g, "u");
+  return [
+    { label: "du", value: join(imp, du.rest) },
+    { label: "wir", value: join(`${wir.head} wir`, wir.rest) },
+    { label: "ihr", value: join(ihr.head, ihr.rest) },
+    { label: "Sie", value: join(`${sie.head} Sie`, sie.rest) },
+  ];
+}
 export function computeVerbForms(w) {
   if (currentLearningLangCode !== "de") {
     return {
@@ -382,12 +430,15 @@ export function computeVerbForms(w) {
     };
   }
   const conj = dmConjFor(w);
-  if (conj)
+  if (conj) {
+    const praesensRows = formRows(conj.praesens);
     return {
-      praesens: formRows(conj.praesens),
+      praesens: praesensRows,
       praeteritum: formRows(conj.praeteritum),
       perfekt: formRows(conj.perfekt),
+      imperativ: buildImperativ(w, praesensRows),
     };
+  }
   // ---- rule-based fallback (used when there is no AI table yet) ----
   const fullInf = String(w.de || "").trim();
   const isRefl = !!w.reflexiv || /^sich\s/i.test(fullInf);
@@ -454,11 +505,23 @@ export function computeVerbForms(w) {
     out.praeteritum[p] = praeteritum[p] + tail(p);
     out.perfekt[p] = `${AUX[p]}${refl ? " " + refl[p] : ""} ${partizip}`;
   });
+  const praesensOut = formRows(out.praesens);
   return {
-    praesens: formRows(out.praesens),
+    praesens: praesensOut,
     praeteritum: formRows(out.praeteritum),
     perfekt: formRows(out.perfekt),
+    imperativ: buildImperativ(w, praesensOut),
   };
+}
+// German has two superlative forms: "am wütendsten" (predicative) and "wütendste" (the form
+// before a noun). The MAIN stored form is the second one ("wütendste"). The forms table still
+// shows "am wütendsten" (formatSuperlativ), while the compact forms line shows only "wütendste".
+export function mainSuperlativ(raw) {
+  let sup = String(raw || "").trim();
+  if (!sup || currentLearningLangCode !== "de") return sup;
+  sup = sup.replace(/^am\s+/i, "").trim();
+  if (/en$/i.test(sup)) sup = sup.slice(0, -1);
+  return sup;
 }
 export function formatSuperlativ(raw, base) {
   let sup = (raw || "").trim();
@@ -479,7 +542,7 @@ export function computeAdjForms(w) {
   const base = w.de || "";
   const komp = w.komparativ || (isDe ? `${base}er` : "—");
   let sup = formatSuperlativ(w.superlativ, base);
-  return [
+  const rows = [
     {
       label: isDe ? "Positiv" : "Base",
       value: base,
@@ -493,18 +556,32 @@ export function computeAdjForms(w) {
       value: sup,
     },
   ];
+  if (isDe) {
+    // German has two superlative forms, each used in a different place:
+    //   am schnellsten   -> after the verb:   Er läuft am schnellsten.
+    //   schnellste       -> before a noun:    der schnellste Läufer.
+    rows[2].label = "Superlativ (Prädikat)";
+    rows.push({
+      label: "Superlativ (vor Nomen)",
+      value: mainSuperlativ(sup),
+    });
+  }
+  return rows;
 }
 export function buildTenseMixerQuestions(w) {
   if (!(w && w.type === "verb" && w.de)) return [];
   const forms = computeVerbForms(w);
-  const tenseKeys = ["praesens", "praeteritum", "perfekt"];
+  const tenseKeys = ["praesens", "praeteritum", "perfekt", "imperativ"];
   const allValues = [];
-  tenseKeys.forEach((t) => forms[t].forEach((r) => allValues.push(r.value)));
+  ["praesens", "praeteritum", "perfekt"].forEach((t) => forms[t].forEach((r) => allValues.push(r.value)));
   const qs = [];
   tenseKeys.forEach((t) => {
+    if (!forms[t]) return;
     forms[t].forEach((r) => {
       const correct = r.value;
-      const pool = [...new Set(allValues.filter((v) => v !== correct))];
+      // imperative options come from the other imperative rows, not from the indicative tenses
+      const source = t === "imperativ" ? forms.imperativ.map((x) => x.value) : allValues;
+      const pool = [...new Set(source.filter((v) => v !== correct))];
       const distractors = shuffle(pool).slice(0, 3);
       const options = shuffle([correct, ...distractors]);
       qs.push({
@@ -845,7 +922,7 @@ async function dmFetchMissingForms(apiKey, w, need) {
     roman: `roman (the ${ROMAN_LANGS[code] || "Latin transliteration"} of the word itself, in Latin letters with the standard tone marks or diacritics; never a translation)`,
     auxiliary: `auxiliary (exactly "haben" or "sein": the auxiliary this verb normally takes in the Perfekt; "sein" for verbs of motion or change of state such as gehen, kommen, sterben, aufstehen)`,
     komparativ: `komparativ (the bare comparative form; empty string only if the adjective is not gradable)`,
-    superlativ: `superlativ (the superlative form; empty string only if the adjective is not gradable)`,
+    superlativ: `superlativ (the superlative form; empty string only if the adjective is not gradable${isDe ? "; for German give the -ste form used before a noun WITHOUT \"am\", e.g. \"schnellste\", \"beste\", \"wütendste\"" : ""})`,
   };
   const sys = `You are a ${langName} dictionary and grammar engine inside a vocabulary app. The user gives you one ${langName} word (dictionary base form) of type "${w.type}". Respond ONLY with a single JSON object (no prose, no markdown fences) with exactly these keys: ${need.map((k) => desc[k]).join("; ")}. Be accurate, including irregular forms and umlauts. Never guess a regular pattern when the word is irregular.${isDe ? ` ${DM_DE_FORM_RULES}` : ""}`;
   const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -885,6 +962,7 @@ async function dmFetchMissingForms(apiKey, w, need) {
     v = v.trim();
     if (!v) return;
     if (k === "plural") v = stripArticle(v);
+    if (k === "superlativ") v = mainSuperlativ(v);
     if (k === "partizipII") v = v.replace(/^(hat|ist|habe|bin|has|have|is|am)\s+/i, "");
     if (k === "roman") {
       v = v.replace(/^["'(\[]+|["')\]]+$/g, "").trim();
@@ -1203,6 +1281,12 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
           <div className="dm-forms-modal-title">{isDeWordModal ? "Perfekt" : "Participle"}</div>
           <FormsTable rows={forms.perfekt} hidden={effectiveHidden} locked={locked} />
         </div>
+        {isDeWordModal && forms.imperativ && (
+          <div className="dm-forms-modal-section">
+            <div className="dm-forms-modal-title">Imperativ</div>
+            <FormsTable rows={forms.imperativ} hidden={effectiveHidden} locked={locked} />
+          </div>
+        )}
       </>
     );
   } else if (w.type === "adj") {

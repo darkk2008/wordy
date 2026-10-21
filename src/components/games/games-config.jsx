@@ -42,7 +42,7 @@ export const GAME_LIST = [
   {
     id: "truefalse",
     name: "True or False",
-    desc: "Word + translation: right or wrong?",
+    desc: "Right or wrong?",
     icon: <Check size={22} />,
   },
   {
@@ -171,4 +171,16 @@ export const FORMS_ONLY_GAMES = [
   "scramble",
   "write",
   "truefalse",
+];
+
+// Games that need word forms (plurals, conjugations, cases, comparatives...).
+// Hidden from pickers that should offer translation-only games.
+export const FORMS_REQUIRED_GAMES = [
+  "wordforms",
+  "speedforms",
+  "tensemixer",
+  "adjendings",
+  "cases",
+  "ladder",
+  "paradigm",
 ];

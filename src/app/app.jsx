@@ -1923,6 +1923,7 @@ export function App() {
               title={stackPlayPick.name}
               onClose={() => setStackPlayPick(null)}
               onStart={startStackPlayGame}
+              translationsOnly
               learningLanguage={learningLanguage}
               nativeLanguage={nativeLanguage}
               isPremium={isPremium}

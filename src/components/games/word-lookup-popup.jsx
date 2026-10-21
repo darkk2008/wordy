@@ -23,7 +23,7 @@ import { IconBtn } from "../common/common";
 import { Check, Plus, Volume2, X } from "../icons/icons";
 import { getLangName } from "../language-settings/language-settings";
 import { StackPickerUp } from "../stack-select/stack-select";
-import { stripArticle } from "../word-forms/word-forms";
+import { mainSuperlativ, stripArticle } from "../word-forms/word-forms";
 import { normTok, stripPunct } from "./speaking-game";
 
 export function WordLookupPopup({
@@ -184,7 +184,7 @@ export function WordLookupPopup({
           data.reflexiv === 1 ||
           data.reflexiv === "1"),
       komparativ: data.komparativ || "",
-      superlativ: data.superlativ || "",
+      superlativ: mainSuperlativ(data.superlativ || ""),
       favorite: false,
       srs: {
         level: 0,

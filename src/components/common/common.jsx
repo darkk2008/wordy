@@ -10,7 +10,7 @@ import { currentLearningLangCode, speak } from "../../core/speech-voices";
 import { ARTICLE_COLOR } from "../../core/srs-and-seed-data";
 import { Eye, EyeOff, Volume2 } from "../icons/icons";
 import { LANGUAGES } from "../language-settings/language-settings";
-import { formatSuperlativ, stripArticle } from "../word-forms/word-forms";
+import { formatSuperlativ, mainSuperlativ, stripArticle } from "../word-forms/word-forms";
 
 export function AnimatedIcon({ id, size = 24, className = "" }) {
   const resolved = resolveIconId(id);
@@ -135,7 +135,7 @@ export function WordMeta({ w }) {
       <div className="dm-meta">
         <span className="dm-mono dm-meta-sub">{w.komparativ}</span>
         <span className="dm-meta-arrow">→</span>
-        <span className="dm-mono dm-meta-sub">{formatSuperlativ(w.superlativ, w.de || "")}</span>
+        <span className="dm-mono dm-meta-sub">{mainSuperlativ(formatSuperlativ(w.superlativ, w.de || ""))}</span>
       </div>
     );
   }

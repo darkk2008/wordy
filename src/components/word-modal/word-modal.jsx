@@ -23,7 +23,7 @@ import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import { Check, Loader2, Sparkles, Trash2, X } from "../icons/icons";
 import { getLangName } from "../language-settings/language-settings";
-import { stripArticle } from "../word-forms/word-forms";
+import { mainSuperlativ, stripArticle } from "../word-forms/word-forms";
 
 export function WordModal({
   initial,
@@ -76,7 +76,7 @@ export function WordModal({
       const articleInstruction = genderOptions
         ? `article (one of ${genderOptions.map((a) => `"${a}"`).join("/")} — REQUIRED if type is noun, else empty string; this is the ${usesGenderTag(currentLearningLangCode) ? "grammatical gender tag: m = masculine, f = feminine, n = neuter" : "grammatical gender article for the word"})`
         : `article (leave as an empty string — ${learningLangName} nouns aren't marked with this field)`;
-      const sysPrompt = `You are a ${learningLangName} dictionary and grammar engine built into a vocabulary app. The user gives you a ${learningLangName} word or short phrase (it may already be in dictionary base form, or not — normalize it). Respond ONLY with a single JSON object (no prose, no markdown fences) with these exact keys: en (a concise translation in ${nativeLangName}), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly based on real difficulty/frequency), ${articleInstruction}, plural (REQUIRED if type is noun, else empty string; the bare plural form with no article), praeteritum (REQUIRED if type is verb and ${isDeWord ? "German has this simple-past form" : "the language has a simple/preterite past tense"}, else empty string), partizipII (REQUIRED if type is verb, else empty string; the past-participle form), komparativ (REQUIRED if type is adj and gradable, else empty string; the bare comparative form), superlativ (REQUIRED if type is adj and gradable, else empty string; the superlative form)${romanName ? `, roman (REQUIRED for every word: the ${romanName} of the word in Latin letters, never a translation)` : ""}. Never leave grammar fields blank when required by the type and applicable to ${learningLangName}.${isDeWord ? ` ${DM_DE_FORM_RULES} ${DM_DE_SPELLING_RULES}return the same JSON with en set to a short question naming the candidates (for example "Did you mean X or Y?"), type "other", and every other field an empty string.` : ""}`;
+      const sysPrompt = `You are a ${learningLangName} dictionary and grammar engine built into a vocabulary app. The user gives you a ${learningLangName} word or short phrase (it may already be in dictionary base form, or not — normalize it). Respond ONLY with a single JSON object (no prose, no markdown fences) with these exact keys: en (a concise translation in ${nativeLangName}), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly based on real difficulty/frequency), ${articleInstruction}, plural (REQUIRED if type is noun, else empty string; the bare plural form with no article), praeteritum (REQUIRED if type is verb and ${isDeWord ? "German has this simple-past form" : "the language has a simple/preterite past tense"}, else empty string), partizipII (REQUIRED if type is verb, else empty string; the past-participle form), komparativ (REQUIRED if type is adj and gradable, else empty string; the bare comparative form), superlativ (REQUIRED if type is adj and gradable, else empty string; the superlative form; for German give the -ste form used before a noun WITHOUT \"am\", e.g. \"schnellste\")${romanName ? `, roman (REQUIRED for every word: the ${romanName} of the word in Latin letters, never a translation)` : ""}. Never leave grammar fields blank when required by the type and applicable to ${learningLangName}.${isDeWord ? ` ${DM_DE_FORM_RULES} ${DM_DE_SPELLING_RULES}return the same JSON with en set to a short question naming the candidates (for example "Did you mean X or Y?"), type "other", and every other field an empty string.` : ""}`;
       const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -130,7 +130,7 @@ export function WordModal({
       setPraeteritum(parsed.praeteritum || "");
       setPartizipII(parsed.partizipII || "");
       setKomparativ(parsed.komparativ || "");
-      setSuperlativ(parsed.superlativ || "");
+      setSuperlativ(mainSuperlativ(parsed.superlativ || ""));
     } catch (e) {
       setAutofillError(e.message || "Something went wrong. Try again.");
     } finally {
@@ -350,7 +350,7 @@ export function WordModal({
               className="dm-input"
               value={superlativ}
               onChange={(e) => setSuperlativ(e.target.value)}
-              placeholder="e.g. am schnellsten"
+              placeholder="e.g. schnellste"
               onKeyDown={wordFieldKeyDown}
             />
           </>
