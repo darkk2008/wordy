@@ -368,9 +368,13 @@ const IMPERATIV_SPECIAL = {
   wissen: { du: "wisse", wir: "wissen wir", ihr: "wisst", sie: "wissen Sie" },
 };
 function buildImperativ(w, praesensRows) {
+<<<<<<< HEAD
   // rows come from formRows(): ich, du, er/sie/es, wir, ihr, sie/Sie (so look them up by position)
   const POS = { du: 1, wir: 3, ihr: 4, sie: 5 };
   const get = (key) => (praesensRows[POS[key]] || {}).value || "";
+=======
+  const get = (label) => (praesensRows.find((r) => r.label === label) || {}).value || "";
+>>>>>>> 9d763cc7463ea5b405fb7e777f4976b33624c9b6
   const split = (str) => {
     const t = String(str || "").trim().split(/\s+/).filter(Boolean);
     return { head: t[0] || "", rest: t.slice(1).join(" ") };
