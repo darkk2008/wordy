@@ -10,6 +10,8 @@ import {
   Bot,
   CardsIcon,
   ChevronLeft,
+  ChevronsDownUp,
+  ChevronsUpDown,
   Gamepad2,
   MenuOrClose,
   MiniStackBtnContent,
@@ -69,6 +71,22 @@ export function StackView({
   const [formsWord, setFormsWord] = useState(undefined);
   const [showQRModal, setShowQRModal] = useState(false);
   const [multiPickMode, setMultiPickMode] = useState(false);
+  const [actionsCollapsed, setActionsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("dm-card-actions-collapsed") === "1";
+    } catch (e) {
+      return false;
+    }
+  });
+  const toggleAllActions = () => {
+    setActionsCollapsed((c) => {
+      const next = !c;
+      try {
+        localStorage.setItem("dm-card-actions-collapsed", next ? "1" : "0");
+      } catch (e) {}
+      return next;
+    });
+  };
   const [pickedIds, setPickedIds] = useState(() => new Set());
   const enterMultiPick = (w) => {
     setMultiPickMode(true);
@@ -308,10 +326,21 @@ ${lines}`;
         </IconBtn>
       </div>
       <div className="dm-stack-title-row">
+        <span className="dm-stack-title-spacer" aria-hidden="true" />
         <div className="dm-stack-title-main">
           <AnimatedIcon id={stack.emoji} size={24} className="dm-stack-title-emoji" />
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
+        <button
+          type="button"
+          className={`dm-stack-actions-toggle${actionsCollapsed ? " is-collapsed" : ""}`}
+          title={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+          aria-label={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+          aria-pressed={actionsCollapsed}
+          onClick={toggleAllActions}
+        >
+          {actionsCollapsed ? <ChevronsUpDown size={18} /> : <ChevronsDownUp size={18} />}
+        </button>
       </div>
       <div className="dm-segmented dm-display-toggle">
         {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
@@ -384,6 +413,7 @@ ${lines}`;
             onTogglePicked={() => togglePicked(w)}
             onEnterMultiPick={() => enterMultiPick(w)}
             isPremium={isPremium}
+            actionsCollapsed={actionsCollapsed}
           />
         ))}
       </div>

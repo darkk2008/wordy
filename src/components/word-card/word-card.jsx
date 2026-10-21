@@ -9,6 +9,7 @@ import { LEVEL_COLOR } from "../../core/srs-and-seed-data";
 import { FitText, IconBtn, WordMeta } from "../common/common";
 import {
   Check,
+  ChevronUp,
   LadderIcon,
   Languages,
   ListChecksIcon,
@@ -42,6 +43,7 @@ export function WordCard({
   onEnterMultiPick,
   minimalActions,
   isPremium,
+  actionsCollapsed,
 }) {
   const hideArticles = useContext(HideArticlesContext);
   const showLevelBadge = useContext(ShowLevelBadgeContext);
@@ -52,6 +54,12 @@ export function WordCard({
   const [peekTranslation, setPeekTranslation] = useState(false);
   const [peekForms, setPeekForms] = useState(false);
   const [longPressed, setLongPressed] = useState(false);
+  // Per-card override of the stack-wide "hide buttons" switch (null = follow the stack-wide one).
+  const [localCollapsed, setLocalCollapsed] = useState(null);
+  useEffect(() => {
+    setLocalCollapsed(null);
+  }, [actionsCollapsed]);
+  const collapsed = !minimalActions && (localCollapsed ?? !!actionsCollapsed);
   const longPressTimerRef = useRef(null);
   const longPressStartRef = useRef({
     x: 0,
@@ -310,8 +318,24 @@ export function WordCard({
               <WordMeta w={w} />
             ))}
         </div>
+        {!minimalActions && (
+          <button
+            type="button"
+            className={`dm-card-actions-toggle${collapsed ? " is-collapsed" : ""}`}
+            title={collapsed ? "Show buttons" : "Hide buttons"}
+            aria-label={collapsed ? "Show buttons" : "Hide buttons"}
+            aria-expanded={!collapsed}
+            style={multiPickMode ? { display: "none" } : undefined}
+            onClick={() => setLocalCollapsed(!collapsed)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <ChevronUp size={14} />
+          </button>
+        )}
         <div
-          className="dm-card-actions"
+          className={`dm-card-actions${collapsed ? " dm-actions-collapsed" : ""}`}
           style={
             multiPickMode
               ? {
@@ -321,11 +345,16 @@ export function WordCard({
               : undefined
           }
         >
-          <IconBtn title="Pronounce" onClick={() => onSpeak(w.de)}>
+          <IconBtn title="Pronounce" className="dm-act-hide" onClick={() => onSpeak(w.de)}>
             <Volume2 size={17} />
           </IconBtn>
           {!minimalActions && (
-            <IconBtn title="Favorite" active={w.favorite} onClick={() => onToggleFav(w.id)}>
+            <IconBtn
+              title="Favorite"
+              className="dm-act-hide"
+              active={w.favorite}
+              onClick={() => onToggleFav(w.id)}
+            >
               <Star
                 size={17}
                 fill={w.favorite ? "#FFB020" : "none"}
@@ -336,6 +365,7 @@ export function WordCard({
           {!isFormsMode && (w.type === "noun" || w.type === "verb" || w.type === "adj") && (
             <IconBtn
               title={isPremium ? "All forms" : "All forms (Premium)"}
+              className="dm-act-hide"
               onClick={() => onShowForms(w)}
             >
               <span className="dm-forms-btn-icon-wrap">
@@ -349,7 +379,7 @@ export function WordCard({
             </IconBtn>
           )}
           {!minimalActions && (
-            <IconBtn title="Edit" onClick={() => onEdit(w)}>
+            <IconBtn title="Edit" className="dm-act-hide" onClick={() => onEdit(w)}>
               <MoreVertical size={17} />
             </IconBtn>
           )}

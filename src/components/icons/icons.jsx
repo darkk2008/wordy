@@ -79,6 +79,23 @@ export const ChevronDown = (p) => (
     <path d="M6 9l6 6 6-6" />
   </IconBase>
 );
+export const ChevronUp = (p) => (
+  <IconBase {...p}>
+    <path d="M18 15l-6-6-6 6" />
+  </IconBase>
+);
+export const ChevronsDownUp = (p) => (
+  <IconBase {...p}>
+    <path d="M7 20l5-5 5 5" />
+    <path d="M7 4l5 5 5-5" />
+  </IconBase>
+);
+export const ChevronsUpDown = (p) => (
+  <IconBase {...p}>
+    <path d="M7 15l5 5 5-5" />
+    <path d="M7 9l5-5 5 5" />
+  </IconBase>
+);
 export const Bot = (p) => (
   <IconBase {...p}>
     <rect x="4" y="9" width="16" height="11" rx="4" />

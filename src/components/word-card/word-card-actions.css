@@ -164,3 +164,148 @@
 .dm-auth-tabs {
   margin-bottom: 14px;
 }
+
+/* ===== Collapsible card buttons =====
+   Buttons keep their normal place. A tiny pill with a chevron sits on the card's top edge,
+   right side (absolute, so it never moves anything). Collapsing animates Pronounce / Favorite / Edit
+   up toward the tab (fly up, shrink, fade, then the row closes), the Table button included. */
+.dm-card {
+  position: relative;
+}
+.dm-card .dm-card-actions {
+  /* showing: the row opens first (gap + widths), then the buttons drop back in */
+  transition: gap 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-act-hide {
+  --d: 0s;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  transition:
+    padding 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.28s ease calc(0.1s + var(--d)),
+    transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) calc(0.1s + var(--d)),
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-act-hide:nth-child(2) {
+  --d: 0.04s;
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-act-hide:nth-child(3) {
+  --d: 0.08s;
+}
+.dm-card .dm-card-actions .dm-iconbtn.dm-act-hide:nth-child(4) {
+  --d: 0.12s;
+}
+.dm-card .dm-card-actions.dm-actions-collapsed {
+  gap: 0;
+  /* hiding: the row closes after the buttons have flown up */
+  transition: gap 0.26s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+.dm-card .dm-card-actions.dm-actions-collapsed .dm-iconbtn.dm-act-hide {
+  width: 0;
+  min-width: 0;
+  flex: 0 0 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  /* fly up toward the toggle tab on the card's top edge */
+  transform: translateY(-46px) scale(0.35);
+  pointer-events: none;
+  transition:
+    padding 0.26s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+    width 0.26s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+    flex-basis 0.26s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+    opacity 0.18s ease calc(0.12s + var(--d)),
+    transform 0.34s cubic-bezier(0.45, 0, 0.75, 0.35) var(--d),
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+.dm-card .dm-card-actions-toggle {
+  position: absolute;
+  top: -8px;
+  right: 18px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg, var(--surface-strong));
+  color: var(--text-dim);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.15s ease;
+}
+.dm-card .dm-card-actions-toggle svg {
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dm-card .dm-card-actions-toggle.is-collapsed svg {
+  transform: rotate(180deg);
+}
+.dm-card .dm-card-actions-toggle:active {
+  transform: scale(0.92);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-card .dm-card-actions-toggle:hover {
+    color: var(--text);
+    border-color: rgba(var(--cyan-rgb), 0.35);
+  }
+}
+.dm-card .dm-card-actions-toggle:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-card .dm-card-actions,
+  .dm-card .dm-card-actions .dm-iconbtn.dm-act-hide,
+  .dm-card .dm-card-actions-toggle svg {
+    transition: none;
+  }
+}
+
+/* Stack-wide switch in the title row: keep the row as wide as the (capped) list on desktop */
+.dm-stack-title-row {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dm-stack-title-row .dm-stack-actions-toggle,
+.dm-stack-title-row .dm-stack-title-spacer {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+}
+.dm-stack-title-row .dm-stack-actions-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dm-stack-title-row .dm-stack-actions-toggle.is-collapsed {
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.4);
+}
+.dm-stack-title-row .dm-stack-actions-toggle:active {
+  transform: scale(0.9);
+}
