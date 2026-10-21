@@ -1,0 +1,30 @@
+/* Desktop gameplay: flat, top-aligned 520px column (no outer card frame, no vertical centring).
+ * Applies to every game screen, including the single-word quiz (lightning button).
+ * Desktop only: phones/tablets (< 900px) keep their existing layout untouched. */
+@media (min-width: 900px) {
+  .dm-game-play {
+    max-width: 520px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 0;
+    justify-content: flex-start;
+  }
+  /* cancel the auto-margins that centred the content vertically */
+  .dm-game-play:not(.dm-game-done) > .dm-topbar + * { margin-top: 12px; }
+  .dm-game-play:not(.dm-game-done) > :last-child:not(.dm-topbar) { margin-bottom: 0; }
+  .dm-flipcard { height: 220px; }
+  /* results screen: keep the group centred, but without the frame */
+  .dm-game-play.dm-game-done {
+    min-height: min(calc(100vh - 200px), 560px);
+    justify-content: center;
+    align-items: center;
+  }
+  .dm-wordquiz-stagebar + .dm-game-play { min-height: 0; }
+  .dm-wordquiz-stagebar + .dm-game-play.dm-game-done { min-height: min(calc(100vh - 240px), 520px); }
+}

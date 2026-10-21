@@ -93,6 +93,7 @@ export const VERB_TENSE_LABELS = {
   praesens: "Präsens",
   praeteritum: "Präteritum",
   perfekt: "Perfekt",
+  imperativ: "Imperativ",
 };
 export function buildFormQuestions(w) {
   const qs = [];

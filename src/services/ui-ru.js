@@ -274,7 +274,7 @@ export const UI_RU_DICT = {
   "Matching": "Пары",
   "Pair them up": "Соедини пары",
   "True or False": "Верно?",
-  "Word + translation: right or wrong?": "Слово и перевод: правильно или нет?",
+  "Right or wrong?": "Правильно или нет?",
   "Memory": "Память",
   "Flip two, find pairs": "Открой две — найди пару",
   "Word Scramble": "Анаграммы",

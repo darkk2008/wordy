@@ -24,7 +24,7 @@ import { IconBtn } from "../common/common";
 import { Check, ChevronDown, IconBase, KeyIcon, Loader2, X } from "../icons/icons";
 import { GemIcon } from "../icons/settings-icons";
 import { getLangName } from "../language-settings/language-settings";
-import { stripArticle } from "../word-forms/word-forms";
+import { mainSuperlativ, stripArticle } from "../word-forms/word-forms";
 
 export const GEM_PACKS = [
   {
@@ -774,7 +774,7 @@ export function StoreView({
         trennbar: type === "verb" ? toBool(raw.trennbar) : false,
         reflexiv: isReflexivVerb,
         komparativ: type === "adj" ? raw.komparativ || "" : "",
-        superlativ: type === "adj" ? raw.superlativ || "" : "",
+        superlativ: type === "adj" ? mainSuperlativ(raw.superlativ || "") : "",
         favorite: false,
         srs: {
           level: 0,

@@ -3,33 +3,19 @@
  */
 
 import { Fragment, useRef, useState } from "react";
-import { AdjEndingsGame } from "./adj-endings-game";
-import { CasesGame, isRealNoun } from "./cases-game";
 import { GameDone, GameTopBar } from "./game-chrome";
 import { MultipleChoiceGame } from "./multiple-choice-game";
 import { ScrambleGame } from "./scramble-game";
-import { SpeedFormsGame } from "./speed-forms-game";
 import { WriteGame } from "./write-game";
 
-function wordQuizHasForms(w) {
-  return !!(
-    w &&
-    ((w.type === "noun" && w.plural) ||
-      (w.type === "verb" && w.de) ||
-      (w.type === "adj" && (w.komparativ || w.superlativ)))
-  );
-}
 // Stages go from easy to hard on purpose (it used to be shuffled, so "Type the Word" could
 // come first, before the learner had seen the word once):
-// recognise -> assemble -> recall -> grammar forms -> reverse choice -> timed sprint.
+// assemble -> recall -> timed sprint.
+// Translation-only: no word-form stages (speed forms, adjective endings, cases).
 let stageUid = 0;
 const mkStage = (id, label, retry = false) => ({ uid: ++stageUid, id, label, retry });
 function buildWordQuizStages(w, learningLanguage) {
-  const stages = [mkStage("choose", "Recognise"), mkStage("scramble", "Word Scramble"), mkStage("write", "Type the Word")];
-  if (learningLanguage === "de" && wordQuizHasForms(w)) stages.push(mkStage("speedforms", "Speed Forms"));
-  if (learningLanguage === "de" && w && w.type === "adj" && w.de) stages.push(mkStage("adjendings", "Adjective Endings"));
-  if (learningLanguage === "de" && isRealNoun(w)) stages.push(mkStage("cases", "Case Drill"));
-  stages.push(mkStage("quiz", "Reverse Choice"));
+  const stages = [mkStage("scramble", "Word Scramble"), mkStage("write", "Type the Word")];
   stages.push(mkStage("sprint", "Sprint"));
   return stages;
 }
@@ -168,10 +154,6 @@ export function WordQuizGame({
     );
   else if (stage.id === "scramble") stageEl = <ScrambleGame {...common} words={[target]} />;
   else if (stage.id === "write") stageEl = <WriteGame {...common} words={[target]} />;
-  else if (stage.id === "speedforms") stageEl = <SpeedFormsGame {...common} words={[target]} />;
-  else if (stage.id === "adjendings")
-    stageEl = <AdjEndingsGame {...common} words={[target]} apiKey={apiKey} onOpenAI={onOpenAI} />;
-  else if (stage.id === "cases") stageEl = <CasesGame {...common} words={[target]} />;
   return (
     <Fragment key={stage.uid}>
       <div className="dm-wordquiz-stagebar">{`Stage ${stageIdx + 1}/${stages.length} • ${stage.label}`}</div>

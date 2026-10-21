@@ -43,7 +43,7 @@ import {
 import { LockIcon } from "../icons/settings-icons";
 import { getLangName } from "../language-settings/language-settings";
 import { StackPickerUp } from "../stack-select/stack-select";
-import { stripArticle } from "../word-forms/word-forms";
+import { mainSuperlativ, stripArticle } from "../word-forms/word-forms";
 
 export function AiModal({
   apiKey,
@@ -209,7 +209,7 @@ export function AiModal({
             superlativ: {
               type: "string",
               description:
-                "REQUIRED whenever type is 'adj' and the adjective is gradable. The superlative form, e.g. 'am schnellsten'.",
+                "REQUIRED whenever type is 'adj' and the adjective is gradable. The superlative form. For German give the -ste form used before a noun, WITHOUT 'am', e.g. 'schnellste', 'beste', 'wütendste'.",
             },
             ...(ROMAN_LANGS[learningLanguage || "de"]
               ? {
@@ -291,7 +291,7 @@ export function AiModal({
         : "";
       let pluralValue = stripArticle(args.plural || "");
       let komparativValue = args.komparativ || "";
-      let superlativValue = args.superlativ || "";
+      let superlativValue = mainSuperlativ(args.superlativ || "");
       let referenceNote;
       if (isLearningGerman && inferredType === "noun") {
         const ref = checkNounReference(bareDe);
@@ -305,11 +305,12 @@ export function AiModal({
         const adjRef = checkAdjReference(bareDe);
         if (
           adjRef &&
-          (adjRef.komparativ !== komparativValue || adjRef.superlativ !== superlativValue)
+          (adjRef.komparativ !== komparativValue ||
+            mainSuperlativ(adjRef.superlativ) !== superlativValue)
         ) {
           referenceNote = `Corrected against reference dictionary: ${bareDe} → ${adjRef.komparativ} / ${adjRef.superlativ} (AI had suggested ${komparativValue || "?"}/${superlativValue || "?"}).`;
           komparativValue = adjRef.komparativ;
-          superlativValue = adjRef.superlativ;
+          superlativValue = mainSuperlativ(adjRef.superlativ);
         }
       }
       const normalizedKey = bareDe.toLowerCase().replace(/^sich\s+/, "");
@@ -572,7 +573,7 @@ export function AiModal({
     setTAdded(false);
     try {
       const srcLangName = direction === "de2en" ? learnLangName : nativeLangName;
-      const sysPrompt = `You are a dictionary and translation engine built into a language-learning app. The user is learning ${learnLangName} and their native language is ${nativeLangName}. The user will give you a word or short phrase in ${srcLangName}. Respond ONLY with a single JSON object (no prose, no markdown fences) describing this word pair, with these exact keys: de (the word/phrase in ${learnLangName}, in dictionary base form — e.g. nominative singular for nouns with no article, infinitive for verbs, positive form for adjectives; for a German reflexive verb this MUST include the leading "sich ", e.g. "sich erinnern", "sich freuen", "sich interessieren" — never just the bare infinitive), en (the translation in ${nativeLangName}), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly based on real difficulty/frequency in ${learnLangName}), article (German-specific: "der"/"die"/"das" — REQUIRED if type is noun and ${learnLangName} is German, else empty string; SINGULAR gender only — plural always uses "die" regardless, don't let that bias this field), plural (REQUIRED if type is noun, else empty string; the BARE plural form with no article, if ${learnLangName} has one), praeteritum (German-specific simple past form: REQUIRED if type is verb and ${learnLangName} is German, else empty string unless ${learnLangName} has an equivalent simple-past form worth showing), partizipII (German-specific past participle: REQUIRED if type is verb and ${learnLangName} is German, else empty string unless ${learnLangName} has an equivalent worth showing), reflexiv (German-specific: true/false, whether the verb is typically used reflexively with "sich" — always false for non-German languages), komparativ (REQUIRED if type is adj and gradable, else empty string; the comparative form in ${learnLangName}), superlativ (REQUIRED if type is adj and gradable, else empty string; the superlative form in ${learnLangName}), example_de (one short natural example sentence in ${learnLangName} using the word), example_en (its translation in ${nativeLangName}). Never leave a grammar field blank when it's required by the type and applicable to ${learnLangName}. If the input is already in ${learnLangName}, still return all fields about that word.${isLearningGerman ? ` ${DM_DE_FORM_RULES} ${DM_DE_SPELLING_RULES}return the same JSON with de set to the input exactly as typed, en set to a short question naming the candidates (for example "Did you mean X or Y?"), type "other", and every other field an empty string. Apply the spelling rules to the German word whether it is the input or the translation result.` : ""}`;
+      const sysPrompt = `You are a dictionary and translation engine built into a language-learning app. The user is learning ${learnLangName} and their native language is ${nativeLangName}. The user will give you a word or short phrase in ${srcLangName}. Respond ONLY with a single JSON object (no prose, no markdown fences) describing this word pair, with these exact keys: de (the word/phrase in ${learnLangName}, in dictionary base form — e.g. nominative singular for nouns with no article, infinitive for verbs, positive form for adjectives; for a German reflexive verb this MUST include the leading "sich ", e.g. "sich erinnern", "sich freuen", "sich interessieren" — never just the bare infinitive), en (the translation in ${nativeLangName}), type (one of "noun", "verb", "adj", "other"), level (CEFR: one of "A1","A2","B1","B2","C1","C2", chosen honestly based on real difficulty/frequency in ${learnLangName}), article (German-specific: "der"/"die"/"das" — REQUIRED if type is noun and ${learnLangName} is German, else empty string; SINGULAR gender only — plural always uses "die" regardless, don't let that bias this field), plural (REQUIRED if type is noun, else empty string; the BARE plural form with no article, if ${learnLangName} has one), praeteritum (German-specific simple past form: REQUIRED if type is verb and ${learnLangName} is German, else empty string unless ${learnLangName} has an equivalent simple-past form worth showing), partizipII (German-specific past participle: REQUIRED if type is verb and ${learnLangName} is German, else empty string unless ${learnLangName} has an equivalent worth showing), reflexiv (German-specific: true/false, whether the verb is typically used reflexively with "sich" — always false for non-German languages), komparativ (REQUIRED if type is adj and gradable, else empty string; the comparative form in ${learnLangName}), superlativ (REQUIRED if type is adj and gradable, else empty string; the superlative form in ${learnLangName}; for German give the -ste form used before a noun WITHOUT \"am\", e.g. \"schnellste\"), example_de (one short natural example sentence in ${learnLangName} using the word), example_en (its translation in ${nativeLangName}). Never leave a grammar field blank when it's required by the type and applicable to ${learnLangName}. If the input is already in ${learnLangName}, still return all fields about that word.${isLearningGerman ? ` ${DM_DE_FORM_RULES} ${DM_DE_SPELLING_RULES}return the same JSON with de set to the input exactly as typed, en set to a short question naming the candidates (for example "Did you mean X or Y?"), type "other", and every other field an empty string. Apply the spelling rules to the German word whether it is the input or the translation result.` : ""}`;
       const res = await dmGroqFetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -646,7 +647,7 @@ export function AiModal({
       partizipII: tResult.partizipII,
       reflexiv: tResult.reflexiv,
       komparativ: tResult.komparativ,
-      superlativ: tResult.superlativ,
+      superlativ: mainSuperlativ(tResult.superlativ),
     });
     setTAdded(true);
   };

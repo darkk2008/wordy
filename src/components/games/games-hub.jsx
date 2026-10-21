@@ -18,7 +18,13 @@ import {
   getGameCooldownUntil,
 } from "../stack-select/stack-select";
 import { isRealNoun, isRealVerb } from "./cases-game";
-import { DIRECTION_GAMES, FORMS_ONLY_GAMES, GAME_LIST, LEVEL_GAMES } from "./games-config";
+import {
+  DIRECTION_GAMES,
+  FORMS_ONLY_GAMES,
+  FORMS_REQUIRED_GAMES,
+  GAME_LIST,
+  LEVEL_GAMES,
+} from "./games-config";
 import { FormsToggle } from "./setup-controls";
 
 export function GamesHub({
@@ -316,6 +322,7 @@ export function ReviewGamePicker({
   nativeLanguage,
   isPremium,
   onOpenPremium,
+  translationsOnly = false,
 }) {
   const [pendingGame, setPendingGame] = useState(null);
   const [pendingLevelGame, setPendingLevelGame] = useState(null);
@@ -342,7 +349,8 @@ export function ReviewGamePicker({
   const visibleGames = GAME_LIST.filter(
     (g) =>
       (!g.germanOnly || learningLanguage === "de") &&
-      (!g.nonGermanOnly || learningLanguage !== "de")
+      (!g.nonGermanOnly || learningLanguage !== "de") &&
+      !(translationsOnly && FORMS_REQUIRED_GAMES.includes(g.id))
   );
   const isGameUnavailable = (g) => !!g.soon || !isPlayable(g);
   const orderedGames = [
