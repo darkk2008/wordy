@@ -79,9 +79,8 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 4px;
-  min-height: 148px;
-  padding: 14px;
+  gap: 2px;
+  padding: 13px 14px;
   text-align: left;
   color: var(--text);
   cursor: pointer;
@@ -137,18 +136,18 @@
 /* icon tile: the icon sits on a tinted square so every card has the same anchor point */
 .dm-stack-emoji {
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: auto; /* pushes name + meta to the bottom edge, so cards align across a row */
-  border-radius: 14px;
+  margin-bottom: auto; /* when a row is taller, name + meta stay on the bottom edge */
+  border-radius: 11px;
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 .dm-stack-name {
-  margin-top: 14px;
+  margin-top: 9px;
   font-family: "Sora", sans-serif;
   font-weight: 600;
   font-size: 15px;
@@ -157,16 +156,19 @@
   color: var(--text);
 }
 .dm-stack-count {
+  flex-shrink: 0;
   font-size: 12.5px;
-  line-height: 20px;
+  line-height: 18px;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
+/* one line: count, pin and family chip. A long family name shortens with an ellipsis instead of
+   wrapping, so every card keeps the same compact height. */
 .dm-stack-meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 4px 8px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -753,10 +755,11 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  flex: 0 1 auto;
   max-width: 100%;
   min-width: 0;
-  height: 20px;
-  padding: 0 8px;
+  height: 18px;
+  padding: 0 7px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
@@ -782,8 +785,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
   color: var(--gold);
   background: rgba(var(--gold-rgb), 0.14);

@@ -220,6 +220,14 @@
     padding: 18px;
     min-height: 156px;
   }
+  .dm-stack-emoji {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+  .dm-stack-name {
+    margin-top: 14px;
+  }
   .dm-stack-name {
     font-size: 16px;
   }
