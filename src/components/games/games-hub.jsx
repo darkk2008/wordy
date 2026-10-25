@@ -230,6 +230,7 @@ export function GamesHub({
           return (
             <button
               key={g.id}
+              data-game={g.id}
               className={`dm-game-card ${locked || cooldownLocked ? "dm-game-card-locked" : ""}${g.soon || !isPlayable(g) ? " dm-game-card-unavailable" : ""}`}
               aria-disabled={g.soon || !isPlayable(g) ? "true" : undefined}
               onClick={() =>
@@ -252,7 +253,7 @@ export function GamesHub({
             >
               {g.soon && <div className="dm-game-soon">Soon</div>}
               {locked && (
-                <div className="dm-game-lock-badge">
+                <div className="dm-game-lock-badge" title="Premium">
                   <LockIcon size={12} />
                   {" Premium"}
                 </div>
@@ -372,6 +373,7 @@ export function ReviewGamePicker({
             return (
               <button
                 key={g.id}
+                data-game={g.id}
                 className={`dm-game-card ${locked ? "dm-game-card-locked" : ""}${g.soon || !isPlayable(g) ? " dm-game-card-unavailable" : ""}`}
                 aria-disabled={g.soon || !isPlayable(g) ? "true" : undefined}
                 onClick={() =>
@@ -388,7 +390,7 @@ export function ReviewGamePicker({
               >
                 {g.soon && <div className="dm-game-soon">Soon</div>}
                 {locked && (
-                  <div className="dm-game-lock-badge">
+                  <div className="dm-game-lock-badge" title="Premium">
                     <LockIcon size={12} />
                     {" Premium"}
                   </div>

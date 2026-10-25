@@ -2,7 +2,7 @@
  * Sentence practice game.
  */
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useRef } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { dmGroqFetch, dmParseJson } from "../../services/ai-groq";
 import { ArrowRight, Check, Loader2 } from "../icons/icons";
@@ -78,6 +78,24 @@ export function SentencePracticeGame({
   const [error, setError] = useState("");
   const q = deck[idx];
   const done = idx >= deck.length;
+  const taRef = useRef(null);
+  const nextRef = useRef(null);
+  // keep the cursor in the box for every new question (the box is disabled while a result shows)
+  useEffect(() => {
+    if (!result) taRef.current?.focus();
+  }, [idx, result]);
+  // once a result is showing, Enter goes to the next question
+  useEffect(() => {
+    if (!result) return undefined;
+    const onKey = (e) => {
+      if (e.key !== "Enter" || e.repeat || e.isComposing) return;
+      if (e.target && e.target.closest && e.target.closest("button")) return; // a focused button handles Enter itself
+      e.preventDefault();
+      nextRef.current?.();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [result]);
   if (!deck.length) {
     return (
       <div className="dm-game-play">
@@ -166,6 +184,7 @@ export function SentencePracticeGame({
     setError("");
     setIdx((i) => i + 1);
   };
+  nextRef.current = next;
   const gradeClass = result
     ? result.score < 60
       ? "dm-grade-red"
@@ -190,11 +209,13 @@ export function SentencePracticeGame({
         onChange={(e) => setVal(e.target.value)}
         placeholder="Schreib einen Satz auf Deutsch…"
         disabled={!!result}
+        ref={taRef}
         autoFocus
         onKeyDown={(e) => {
-          if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && val.trim() && !loading) {
+          // Enter submits (a sentence is one line); Shift+Enter still inserts a line break
+          if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
             e.preventDefault();
-            submit();
+            if (val.trim() && !loading) submit();
           }
         }}
       />

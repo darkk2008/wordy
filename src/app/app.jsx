@@ -24,7 +24,6 @@ import { FAMILY_ICON_IDS, MINISTACK_ICON_IDS } from "../core/icon-registry";
 import { currentLearningLangCode, setSpeechLanguage, speak } from "../core/speech-voices";
 import {
   bumpSrs,
-  isHardWord,
   loadData,
   migrateMiniStacks,
   saveData,
@@ -1007,27 +1006,6 @@ export function App() {
         : activeStacks,
     [favoriteWords, activeStacks]
   );
-  const hardWords = useMemo(() => {
-    const list = [];
-    activeStacks.forEach((s) =>
-      s.words.forEach((w) => {
-        if (isHardWord(w))
-          list.push({
-            ...w,
-            _stackId: s.id,
-          });
-      })
-    );
-    return list;
-  }, [activeStacks]);
-  const startHardPractice = () => {
-    if (!hardWords.length) return;
-    setStackPlayPick({
-      stackId: "__hard__",
-      name: "Hard words",
-      words: hardWords,
-    });
-  };
   const dueWords = useMemo(() => {
     const now = Date.now();
     const list = [];
@@ -1661,8 +1639,6 @@ export function App() {
         todayReviews={todayReviews}
         dailyGoal={dailyGoal}
         onStartReview={startReview}
-        hardCount={hardWords.length}
-        onStartHard={startHardPractice}
         onStartFamilyReview={startFamilyReview}
         onPlayFamilyGames={startFamilyPlay}
         showFamilyStats={showFamilyStats}

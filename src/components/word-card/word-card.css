@@ -212,7 +212,7 @@
   border-radius: 16px;
 }
 .dm-stack-grid .dm-swipe-content {
-  border-radius: 20px;
+  border-radius: var(--card-radius, 18px);
   background: var(--bg);
 }
 .dm-stack-grid .dm-swipe-actions {

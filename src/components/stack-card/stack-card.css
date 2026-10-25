@@ -64,34 +64,63 @@
     transform: scale(0.82);
   }
 }
+/* ===== Card system: stacks and games share one surface, radius and hover =====
+   One quiet surface (token fill + hairline border), a soft wash in the card's accent colour,
+   and a single lift on hover. The accent comes from the icon (stacks) or the category (games). */
+.dm-app {
+  --card-radius: 18px;
+  --violet: #a78bfa;
+  --pink: #ff6b9d;
+  --orange: #ff8a3d;
+}
 .dm-stack-card {
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 18px 14px;
+  --accent: var(--cyan);
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: stretch;
+  gap: 4px;
+  min-height: 148px;
+  padding: 14px;
   text-align: left;
+  color: var(--text);
   cursor: pointer;
-  backdrop-filter: blur(14px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  background:
+    radial-gradient(
+      130% 100% at 0% 0%,
+      color-mix(in srgb, var(--accent) 13%, transparent),
+      transparent 60%
+    ),
+    var(--surface);
+  box-shadow: var(--shadow-xs);
   transition:
     transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.2s ease,
     box-shadow 0.25s ease,
-    background 0.2s ease;
-  color: var(--text);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+    background-color 0.4s ease;
 }
+/* accent follows the stack's icon colour (the icon SVGs carry fixed colours) */
+.dm-stack-card:has([data-icon="sprout"]),
+.dm-stack-card:has([data-icon="tree"]),
+.dm-stack-card:has([data-icon="family"]) { --accent: var(--green); }
+.dm-stack-card:has([data-icon="bolt"]),
+.dm-stack-card:has([data-icon="target"]),
+.dm-stack-card:has([data-icon="crown"]),
+.dm-stack-card:has([data-icon="orbit"]),
+.dm-stack-card:has([data-icon="puzzle"]),
+.dm-stack-card:has([data-icon="star"]) { --accent: var(--gold); }
+.dm-stack-card:has([data-icon="book"]),
+.dm-stack-card:has([data-icon="home"]),
+.dm-stack-card:has([data-icon="gem"]) { --accent: var(--violet); }
+.dm-stack-card:has([data-icon="school"]),
+.dm-stack-card:has([data-icon="nest"]) { --accent: var(--orange); }
+.dm-stack-card:has([data-icon="food"]),
+.dm-stack-card:has([data-icon="heart"]) { --accent: var(--red); }
 .dm-stack-card:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 .dm-stack-card:has(.dm-stack-dots:active),
 .dm-stack-card:has(.dm-dots-menu:active),
@@ -100,53 +129,45 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .dm-stack-card:hover {
-    border-color: rgba(var(--cyan-rgb), 0.45);
-    box-shadow:
-      0 14px 32px -8px rgba(0, 0, 0, 0.35),
-      0 0 26px rgba(var(--cyan-rgb), 0.15),
-      0 1px 0 rgba(255, 255, 255, 0.06) inset;
-    transform: translateY(-3px);
-    background: linear-gradient(
-      160deg,
-      rgba(var(--cyan-rgb), 0.08),
-      rgba(255, 255, 255, 0.03)
-    );
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
   }
 }
+/* icon tile: the icon sits on a tinted square so every card has the same anchor point */
 .dm-stack-emoji {
-  font-size: 26px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: auto; /* pushes name + meta to the bottom edge, so cards align across a row */
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 .dm-stack-name {
+  margin-top: 14px;
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
   color: var(--text);
 }
 .dm-stack-count {
-  font-size: 13px;
+  font-size: 12.5px;
+  line-height: 20px;
   color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
-.dm-stack-new {
-  flex-direction: row;
+.dm-stack-meta {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  color: var(--cyan);
-  border-style: solid;
-  border-color: rgba(var(--cyan-rgb), 0.35);
-  background: rgba(var(--cyan-rgb), 0.1);
-}
-.dm-stack-new .dm-stack-name {
-  color: var(--cyan);
-  font-weight: 700;
-}
-@media (hover: hover) and (pointer: fine) {
-  .dm-stack-new:hover {
-    background: rgba(var(--cyan-rgb), 0.16);
-    border-color: rgba(var(--cyan-rgb), 0.55);
-  }
+  gap: 4px 8px;
+  min-width: 0;
 }
 
 .dm-family-filter-row {
@@ -729,28 +750,24 @@
   flex: 1;
 }
 .dm-stack-family-badge {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  max-width: calc(100% - 24px);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: 19px;
-  line-height: 1;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--cyan);
-  background: rgba(var(--cyan-rgb), 0.14);
-  border: 1px solid rgba(var(--cyan-rgb), 0.3);
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+  height: 20px;
   padding: 0 8px;
   border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.1);
+  border: 1px solid rgba(var(--cyan-rgb), 0.24);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
-  backdrop-filter: blur(6px);
 }
 .dm-stack-family-badge::before {
   content: "";
@@ -760,45 +777,22 @@
   background: var(--cyan);
   flex-shrink: 0;
 }
-.dm-stack-family-badge:has(.dm-stack-pin-icon)::before {
-  display: none;
-}
-.dm-stack-badge-row {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  max-width: calc(100% - 24px);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  pointer-events: none;
-}
-.dm-stack-badge-row .dm-stack-family-badge {
-  position: static;
-  bottom: auto;
-  right: auto;
-  max-width: none;
-  flex: 0 1 auto;
-  min-width: 0;
-}
 .dm-stack-pin-icon-badge {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 19px;
-  height: 19px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
-  color: #ffb020;
-  background: rgba(255, 176, 32, 0.16);
-  border: 1px solid rgba(255, 176, 32, 0.35);
-  backdrop-filter: blur(6px);
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.14);
+  border: 1px solid rgba(var(--gold-rgb), 0.32);
+  pointer-events: none;
 }
+/* pinned: a gold edge instead of a glow */
 .dm-stack-card-pinned {
-  border-color: #ffb02088 !important;
-  box-shadow:
-    0 3px 16px -4px rgba(255, 176, 32, 0.32),
-    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  border-color: color-mix(in srgb, var(--gold) 50%, var(--border));
 }
 .dm-stack-card-menu-open {
   overflow: visible;
@@ -806,6 +800,6 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .dm-stack-card-pinned:hover {
-    border-color: #ffb020cc !important;
+    border-color: color-mix(in srgb, var(--gold) 78%, var(--border));
   }
 }

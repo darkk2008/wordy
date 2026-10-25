@@ -246,13 +246,6 @@ export const Flame = (p) => (
     <path d="M12 22c4 0 6.5-2.5 6.5-6 0-3-2-4.5-2.5-7-1 1.5-2 2-2 2 .5-3-1.5-6-3.5-7 .5 3-1 5-2.5 6.5C6.5 12 6 13.5 6 16c0 3.5 2.5 6 6 6z" />
   </IconBase>
 );
-export const HardTargetIcon = (p) => (
-  <IconBase {...p}>
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="6" />
-    <circle cx="12" cy="12" r="2" />
-  </IconBase>
-);
 export const Layers = (p) => (
   <IconBase {...p}>
     <polygon points="12 2 22 8 12 14 2 8 12 2" />

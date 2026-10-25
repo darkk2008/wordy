@@ -7,11 +7,7 @@
 .dm-home-view > .dm-due-banner {
   --banner-accent: var(--gold);
 }
-.dm-home-view > .dm-hard-banner {
-  --banner-accent: var(--red);
-}
-.dm-home-view > .dm-due-banner,
-.dm-home-view > .dm-hard-banner {
+.dm-home-view > .dm-due-banner {
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow:
@@ -19,8 +15,7 @@
     var(--shadow-sm);
 }
 @media (hover: hover) and (pointer: fine) {
-  .dm-home-view > .dm-due-banner:hover,
-  .dm-home-view > .dm-hard-banner:hover {
+  .dm-home-view > .dm-due-banner:hover {
     border-color: color-mix(in srgb, var(--banner-accent) 45%, var(--border));
     box-shadow:
       inset 2px 0 0 var(--banner-accent),
@@ -37,7 +32,6 @@
 .dm-eyebrow {
   font-size: 12.5px;
 }
-.dm-game-lock-badge,
 .dm-level-badge,
 .dm-direction-badge {
   font-size: 11px;
@@ -55,9 +49,6 @@
 .dm-premium-plan-sub,
 .dm-settings-section-label {
   font-size: 13px;
-}
-.dm-game-desc {
-  font-size: 12px;
 }
 
 /* 3. Settings: grouped, one neutral card style, a single accent colour */
@@ -151,10 +142,6 @@
   margin-bottom: 16px;
 }
 .dm-home-view > .dm-due-banner {
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-.dm-home-view > .dm-hard-banner {
   margin-top: 0;
   margin-bottom: 12px;
 }

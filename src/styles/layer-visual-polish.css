@@ -18,8 +18,7 @@
   border-radius: 8px;
 }
 
-/* Card grids get a perspective stage so hovered/tapped cards can tilt in 3D */
-.dm-stack-grid,
+/* Settings cards still tilt in 3D, so their grid keeps a perspective stage */
 .dm-settings-grid,
 .dm-stats-row {
   perspective: 1200px;
@@ -27,8 +26,6 @@
 
 /* Glass surfaces: a touch more blur + saturation so panels feel like frosted glass */
 .dm-card,
-.dm-stack-card,
-.dm-game-card,
 .dm-settings-card,
 .dm-stackselect-trigger,
 .dm-tr-stackpick-trigger,
@@ -40,9 +37,8 @@
   -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
 
-/* Stack / game cards: glossy top sheen + genuine 3D tilt on hover, satisfying press on tap */
-.dm-stack-card,
-.dm-game-card,
+/* Settings cards: glossy top sheen + 3D tilt on hover, satisfying press on tap.
+   (Stack and game cards use the flat card system defined in stack-card.css.) */
 .dm-settings-card {
   transform-style: preserve-3d;
   will-change: transform;
@@ -52,8 +48,6 @@
     border-color 0.2s ease,
     background 0.2s ease;
 }
-.dm-stack-card::before,
-.dm-game-card::before,
 .dm-settings-card::before {
   content: "";
   position: absolute;
@@ -65,13 +59,10 @@
   mix-blend-mode: overlay;
 }
 @media (hover: hover) and (pointer: fine) {
-  .dm-stack-card:hover,
   .dm-settings-card:hover:not(:disabled) {
     transform: translateY(-5px) rotateX(3deg) rotateY(-3deg) scale(1.015);
   }
 }
-.dm-stack-card:active,
-.dm-game-card:active:not(:disabled),
 .dm-settings-card:active:not(:disabled) {
   transform: translateY(-1px) scale(0.965) !important;
   box-shadow: var(--shadow-press) !important;
@@ -84,8 +75,7 @@
 .dm-stack-card:has(.dm-stack-dots:active),
 .dm-stack-card:has(.dm-dots-menu:active),
 .dm-stack-card:has(.dm-dots-menu-item:active) {
-  transform: none !important;
-  box-shadow: var(--shadow-card, none) !important;
+  transform: none;
   transition-duration: 0.15s;
 }
 
@@ -230,11 +220,9 @@
 }
 
 /* Emoji / icon depth */
-.dm-stack-emoji,
 .dm-emoji {
   filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
 }
-.dm-app.dm-light .dm-stack-emoji,
 .dm-app.dm-light .dm-emoji {
   filter: drop-shadow(0 3px 6px rgba(30, 34, 50, 0.2));
 }
@@ -401,7 +389,6 @@
   }
 }
 @media (min-width: 431px) and (hover: hover) and (pointer: fine) {
-  .dm-stack-card:hover,
   .dm-settings-card:hover:not(:disabled) {
     transform: translateY(-6px) rotateX(4deg) rotateY(-4deg) scale(1.02);
   }

@@ -76,8 +76,7 @@
   max-width: 100%;
 }
 /* Tablets: Home banners span the same width as the header and the stack grid */
-.dm-home-view > .dm-due-banner,
-.dm-home-view > .dm-hard-banner {
+.dm-home-view > .dm-due-banner {
   max-width: none;
   margin-left: 0;
   margin-right: 0;

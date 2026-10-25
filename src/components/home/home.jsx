@@ -15,7 +15,6 @@ import {
   ChevronRight,
   Clock,
   Flame,
-  HardTargetIcon,
   Moon,
   Plus,
   Search,
@@ -49,8 +48,6 @@ export function HomeView({
   todayReviews,
   dailyGoal,
   onStartReview,
-  hardCount,
-  onStartHard,
   onStartFamilyReview,
   onPlayFamilyGames,
   showFamilyStats,
@@ -585,23 +582,6 @@ export function HomeView({
             <div className="dm-due-banner-sub">Tap to review now</div>
           </div>
           <ChevronRight size={18} />
-        </button>
-      )}
-      {hardCount > 0 && (
-        <button
-          className={"dm-hard-banner" + (dueCount > 0 ? " dm-hard-banner-tight" : "")}
-          onClick={onStartHard}
-          type="button"
-        >
-          <div className="dm-hard-banner-icon">
-            <HardTargetIcon size={18} />
-          </div>
-          <div className="dm-hard-banner-text">
-            <span className="dm-hard-banner-title">Hard words</span>
-            <span className="dm-hard-banner-sub">Words you keep missing</span>
-          </div>
-          <span className="dm-hard-banner-count">{hardCount}</span>
-          <ChevronRight size={16} />
         </button>
       )}
       {searchOpen && (

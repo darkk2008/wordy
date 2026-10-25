@@ -52,6 +52,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Bars that are just "back button + title": an invisible spacer the size of the button on the
+   right keeps the title truly centred over the page instead of centred in the leftover space. */
+.dm-topbar:has(> .dm-topbar-title:last-child:nth-child(2))::after {
+  content: "";
+  flex: 0 1 44px;
+  aspect-ratio: 1 / 1;
+  min-width: 26px;
+}
 
 /* Premium upgrade CTA: fixed-width pill so it doesn't resize when sibling
    icons come and go (e.g. toggling the stack topbar's "more options" menu).

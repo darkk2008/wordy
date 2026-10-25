@@ -180,23 +180,21 @@ export function StackCard({
               <AnimatedIcon id={s.emoji} size={30} />
             </div>
             <div className="dm-stack-name">{s.name}</div>
-            <div className="dm-stack-count">
-              {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
+            <div className="dm-stack-meta">
+              <span className="dm-stack-count">
+                {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
+              </span>
+              {isPinned && (
+                <span className="dm-stack-pin-icon-badge" title="Pinned">
+                  <PinIcon size={11} />
+                </span>
+              )}
+              {familyName && (
+                <span className="dm-stack-family-badge" title={familyName}>
+                  {familyName}
+                </span>
+              )}
             </div>
-            {(isPinned || familyName) && (
-              <div className="dm-stack-badge-row">
-                {isPinned && (
-                  <span className="dm-stack-pin-icon-badge" title="Pinned">
-                    <PinIcon size={11} />
-                  </span>
-                )}
-                {familyName && (
-                  <div className="dm-stack-family-badge" title={familyName}>
-                    {familyName}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </SwipeableRow>
       </div>

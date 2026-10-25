@@ -17,6 +17,7 @@ export function AnimatedIcon({ id, size = 24, className = "" }) {
   return (
     <span
       className={`dm-aicon ${className}`}
+      data-icon={resolved}
       style={{
         width: size,
         height: size,

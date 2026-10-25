@@ -217,13 +217,8 @@
     gap: 16px;
   }
   .dm-stack-card {
-    padding: 22px 20px;
-    min-height: 128px;
-    justify-content: center;
-    gap: 8px;
-  }
-  .dm-stack-emoji {
-    font-size: 30px;
+    padding: 18px;
+    min-height: 156px;
   }
   .dm-stack-name {
     font-size: 16px;
@@ -231,10 +226,10 @@
   .dm-stack-count {
     font-size: 13px;
   }
+  /* Full column width (same as the progress cards below) in 4 even columns: 8 stats = 2 tidy rows */
   .dm-stat-grid {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
-    max-width: 980px;
   }
 
   /* Word lists (stack detail, favorites) stay one word per row — full-width

@@ -2,13 +2,35 @@
  * Game screens: flashcards, quiz, true/false, matching, memory, scramble, write, results.
  */
 .dm-game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-.dm-game-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px 14px; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition: transform 0.24s cubic-bezier(.2,.8,.2,1), box-shadow 0.24s ease, border-color 0.2s ease; color: var(--text); box-shadow: var(--shadow-sm); }
-.dm-game-soon { position: absolute; top: 10px; right: 10px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; }
-.dm-game-card-locked { opacity: 0.75; }
-.dm-game-lock-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #f0b429; background: rgba(240,180,41,0.14); border: 1px solid rgba(240,180,41,0.35); border-radius: 999px; padding: 2px 8px; }
+/* Game cards use the same card system as stacks (see stack-card.css): flat surface, accent wash,
+   one lift on hover. All games share one accent (gold). */
+.dm-game-card {
+  --accent: var(--gold);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  min-height: 132px;
+  padding: 14px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius, 18px);
+  background:
+    radial-gradient(130% 100% at 0% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    var(--surface);
+  box-shadow: var(--shadow-xs);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease, box-shadow 0.25s ease, background-color 0.4s ease;
+}
+.dm-game-card-locked { opacity: 0.8; }
+/* premium: a small lock chip instead of a "PREMIUM" pill on every locked card (title carries the word) */
+.dm-game-lock-badge { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; padding: 0; font-size: 0; border-radius: 999px; color: var(--gold); background: rgba(var(--gold-rgb), 0.14); border: 1px solid rgba(var(--gold-rgb), 0.3); }
+.dm-game-lock-badge svg { width: 12px; height: 12px; }
 .dm-game-cooldown-timer { position: absolute; bottom: 10px; right: 10px; display: flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-dim); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; pointer-events: none; }
-@media (hover: hover) and (pointer: fine) { .dm-game-card:hover:not(:disabled) { border-color: rgba(var(--gold-rgb),0.45); box-shadow: 0 18px 38px -16px rgba(0,0,0,0.5), 0 6px 20px -6px rgba(var(--gold-rgb),0.2), 0 1px 0 rgba(255,255,255,0.06) inset; transform: translateY(-5px) scale(1.014); } }
-.dm-game-card:active:not(:disabled) { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .dm-game-card:hover:not(:disabled) { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow: var(--shadow-md); transform: translateY(-2px); } }
+.dm-game-card:active:not(:disabled) { transform: scale(0.98); }
 .dm-game-card:disabled { opacity: 0.35; cursor: not-allowed; }
 .dm-app button:focus-visible,
 .dm-app a:focus-visible,
@@ -17,9 +39,9 @@
   outline-offset: 2px;
   border-radius: 8px;
 }
-.dm-game-icon { color: var(--gold); }
-.dm-game-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
-.dm-game-desc { font-size: 11.5px; color: var(--text-dim); }
+.dm-game-icon { flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: auto; border-radius: 12px; color: color-mix(in srgb, var(--accent) 80%, var(--text)); background: color-mix(in srgb, var(--accent) 15%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent); }
+.dm-game-name { margin-top: 12px; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14.5px; line-height: 1.25; letter-spacing: -0.005em; color: var(--text); }
+.dm-game-desc { font-size: 12.5px; line-height: 1.4; color: var(--text-dim); }
 
 .dm-game-play { display: flex; flex-direction: column; gap: 18px; min-height: 60vh; animation: dm-fadein 0.25s ease; }
 .dm-progress-pill { background: var(--surface); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; box-shadow: var(--shadow-xs); }
@@ -169,6 +191,29 @@
 .dm-letter-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 42px; height: 42px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 17px; cursor: pointer; color: var(--text); box-shadow: var(--shadow-sm); transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .dm-letter-tile:active { transform: scale(0.94); box-shadow: var(--shadow-xs); }
 .dm-letter-used { opacity: 0.2; pointer-events: none; }
+.dm-letter-chip { color: var(--text); }
+.dm-letter-chip:disabled { cursor: default; }
+.dm-letter-slot { width: 34px; height: 38px; border: 1.5px dashed var(--border); border-radius: 9px; opacity: 0.7; flex-shrink: 0; }
+.dm-scramble-gap { width: 14px; flex-shrink: 0; }
+.dm-scramble-feedback { min-height: 20px; text-align: center; }
+.dm-letter-pop { animation: dm-letter-pop 0.16s ease-out; }
+@keyframes dm-letter-pop { 0% { transform: scale(0.7); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+/* two identical shakes under different names so the animation restarts on every wrong arrangement */
+.dm-scramble-shake-0 { animation: dm-scramble-shake 0.4s ease; }
+.dm-scramble-shake-1 { animation: dm-scramble-shake2 0.4s ease; }
+@keyframes dm-scramble-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@keyframes dm-scramble-shake2 { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+/* drag and drop */
+.dm-letter-tile, .dm-letter-chip { touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.dm-letter-used { cursor: default; }
+.dm-letter-tile.dm-dragging, .dm-letter-chip.dm-dragging { opacity: 0.3; }
+.dm-drag-ghost { position: fixed; z-index: 2000; transform: translate(-50%, -60%) scale(1.15); pointer-events: none; cursor: grabbing; box-shadow: var(--shadow-md); animation: none; }
+.dm-slot-hover { border-color: var(--cyan, var(--text-dim)); background: color-mix(in srgb, var(--cyan, var(--text-dim)) 14%, transparent); border-style: solid; opacity: 1; }
+.dm-pool-hover { outline: 2px dashed var(--border); outline-offset: 8px; border-radius: 14px; }
+.dm-scramble-long .dm-letter-tile { width: 36px; height: 36px; font-size: 15px; }
+.dm-scramble-long .dm-letter-chip { padding: 6px 9px; font-size: 14px; }
+.dm-scramble-long .dm-letter-slot { width: 28px; height: 32px; }
+@media (prefers-reduced-motion: reduce) { .dm-letter-pop, .dm-scramble-shake-0, .dm-scramble-shake-1 { animation: none; } }
 .dm-word-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14.5px; cursor: pointer; color: var(--text); height: auto; width: auto; box-shadow: var(--shadow-sm); transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .dm-word-tile:active { transform: scale(0.96); box-shadow: var(--shadow-xs); }
 .dm-word-tile-built { background: linear-gradient(180deg, var(--surface-strong), var(--surface)); border-color: rgba(var(--cyan-rgb),0.4); }
