@@ -6,7 +6,7 @@ import { Fragment, useMemo, useState } from "react";
 import { ONBOARDING_LOGO_SRC } from "../../assets/inline-images";
 import { speak } from "../../core/speech-voices";
 import { seedWord } from "../../core/srs-and-seed-data";
-import { FREE_THEME_LIMIT } from "../../services/premium-gems-store";
+import { FREE_THEME_LIMIT } from "../../services/premium-status";
 import { uiStaticText } from "../../services/ui-translation";
 import { THEMES } from "../appearance-settings/appearance-settings";
 import { AppLogo } from "../common/common";

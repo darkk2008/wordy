@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Clock,
   Flame,
+  Layers,
   Moon,
   Plus,
   Search,
@@ -22,14 +23,14 @@ import {
   Star,
   Sun,
   Trash2,
+  Type,
   UserIcon,
   X,
 } from "../icons/icons";
-import { ArchiveIcon, GemIcon } from "../icons/settings-icons";
+import { ArchiveIcon } from "../icons/settings-icons";
 import { StreakModal } from "../pickers/pickers";
 import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 import { StackCard } from "../stack-card/stack-card";
-import { StoreIcon } from "../store/store";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 export function HomeView({
@@ -59,11 +60,10 @@ export function HomeView({
   learningLanguage,
   onOpenPremium,
   isPremium,
-  gemsBalance,
-  onOpenStore,
   account,
   onOpenAccount,
 }) {
+  const totalWords = stacks.reduce((n, st) => n + ((st.words && st.words.length) || 0), 0);
   const [creating, setCreating] = useState(false);
   const [streakOpen, setStreakOpen] = useState(false);
   const [name, setName] = useState("");
@@ -316,7 +316,7 @@ export function HomeView({
       if (ro) ro.disconnect();
       window.removeEventListener("resize", fit);
     };
-  }, [gemsBalance, learningLanguage, theme]);
+  }, [stacks.length, totalWords, learningLanguage, theme]);
   useLayoutEffect(() => {
     const pending = pendingFlipRef.current;
     pendingFlipRef.current = null;
@@ -379,7 +379,6 @@ export function HomeView({
     },
     []
   );
-  const totalWords = stacks.reduce((s, st) => s + st.words.length, 0);
   const assigningStack = stacks.find((s) => s.id === assigningStackId) || null;
   const confirmDeleteStack = stacks.find((s) => s.id === confirmDeleteStackId) || null;
   const confirmArchiveStack = stacks.find((s) => s.id === confirmArchiveStackId) || null;
@@ -457,15 +456,6 @@ export function HomeView({
           <h1 className="dm-h1 dm-home-hero-title">
             <span className="dm-brand-ww">ww</span>ordy
           </h1>
-          <div className="dm-home-hero-sub">
-            {`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}`}
-            {" · "}
-            {`${stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0)} ${
-              stacks.reduce((n, s) => n + ((s.words && s.words.length) || 0), 0) === 1
-                ? "word"
-                : "words"
-            }`}
-          </div>
         </div>
         <div className="dm-header-actions">
           {!isPremium && (
@@ -532,24 +522,23 @@ export function HomeView({
       </div>
       <div className="dm-stats-row" ref={statsRowRef}>
         <div className="dm-stats-group">
-          <button
-            type="button"
-            className="dm-gems dm-gems-inline"
-            title="Gems — buy more in Premium"
-            onClick={() => onOpenPremium && onOpenPremium()}
+          <div
+            className="dm-count-pill"
+            role="group"
+            aria-label={`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}, ${totalWords} ${totalWords === 1 ? "word" : "words"}`}
           >
-            <GemIcon size={16} />
-            <span>{(gemsBalance || 0).toLocaleString()}</span>
-          </button>
-          <button
-            type="button"
-            className="dm-store-entry-btn"
-            title="Store — buy word packs with gems"
-            onClick={() => onOpenStore && onOpenStore()}
-          >
-            <StoreIcon size={13} />
-            {" Store"}
-          </button>
+            <span className="dm-count-item">
+              <Layers size={14} />
+              <b>{stacks.length.toLocaleString()}</b>
+              <span className="dm-count-label">{stacks.length === 1 ? "stack" : "stacks"}</span>
+            </span>
+            <span className="dm-count-sep" aria-hidden="true" />
+            <span className="dm-count-item">
+              <Type size={14} />
+              <b>{totalWords.toLocaleString()}</b>
+              <span className="dm-count-label">{totalWords === 1 ? "word" : "words"}</span>
+            </span>
+          </div>
           <button
             className="dm-theme-toggle"
             onClick={onToggleTheme}

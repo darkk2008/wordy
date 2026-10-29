@@ -181,7 +181,7 @@ export function FlashcardsGame({
       />
       <div className="dm-forms-toggle-row">
         {isFormCard ? (
-          <span className="dm-case-pill">WORD FORM</span>
+          <span className="dm-case-pill">{w.formBadge || "WORD FORM"}</span>
         ) : (
           <FormsToggle checked={showForms} onChange={setShowForms} />
         )}

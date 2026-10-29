@@ -9,7 +9,7 @@ import {
   downloadTextAsFile,
   safeFileBase,
 } from "../../core/sharing-and-export";
-import { FREE_FAMILY_LIMIT } from "../../services/premium-gems-store";
+import { FREE_FAMILY_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import {

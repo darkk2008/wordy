@@ -70,8 +70,6 @@ export function SettingsView({
   isPremium,
   onPremiumChange,
   onExitToPreviousTab,
-  gemsBalance,
-  onAddGems,
   account,
   onOpenAuth,
   onSignOut,
@@ -98,7 +96,7 @@ export function SettingsView({
   };
   if (section === "premium")
     return (
-      <PremiumSettings onBack={backAndRefresh} gemsBalance={gemsBalance} onAddGems={onAddGems} />
+      <PremiumSettings onBack={backAndRefresh} />
     );
   if (section === "appearance")
     return (

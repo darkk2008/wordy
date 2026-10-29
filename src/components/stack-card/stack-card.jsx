@@ -206,7 +206,6 @@ export const PROMO_TYPE_LABELS = {
   yearly: "Yearly",
   permanent: "Permanent",
   discount: "Discount",
-  gems: "Gems",
 };
 export function formatAdminDate(ts) {
   if (!ts) return "—";

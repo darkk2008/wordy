@@ -21,7 +21,6 @@ import {
 } from "../icons/icons";
 import {
   BellIcon,
-  GemIcon,
   GlobeIcon,
   GraduationCap,
   LockIcon,
@@ -374,7 +373,7 @@ export function AppAboutSettings({ onBack }) {
       id: "stack",
       icon: <Layers size={20} />,
       q: "What is a stack?",
-      a: "A stack is a themed set of words, like “Kitchen” or “Travel.” Add words yourself, import them, pick up a ready-made word pack in the Store, or ask the AI Tutor to build one for you. Every stack can be studied on its own with flashcards, games, and quizzes.",
+      a: "A stack is a themed set of words, like “Kitchen” or “Travel.” Add words yourself, import them, or ask the AI Tutor to build one for you. Every stack can be studied on its own with flashcards, games, and quizzes.",
     },
     {
       id: "family",
@@ -411,12 +410,6 @@ export function AppAboutSettings({ onBack }) {
       icon: <Flame size={20} />,
       q: "What is a streak?",
       a: "Your streak counts the consecutive days you've completed at least one review. It resets if you miss a day, and your best streak is saved separately so you can see your longest run. Set a daily review goal and reminder times in Settings > Notifications & Goals to keep it going.",
-    },
-    {
-      id: "gems",
-      icon: <GemIcon size={20} />,
-      q: "What are gems and the Store?",
-      a: "Gems are the in-app currency. You earn a daily bonus just for showing up, and you can buy more in the Store. Spend them on hint reveals, streak freezes, unlockable themes, and ready-made word packs on topics like travel, food, business, and technology.",
     },
     {
       id: "premium",

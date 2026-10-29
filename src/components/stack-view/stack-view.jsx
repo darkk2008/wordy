@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import { FREE_FAVORITE_LIMIT } from "../../services/premium-gems-store";
+import { FREE_FAVORITE_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { FormsAudioToggle } from "../games/setup-controls";
 import {

@@ -279,6 +279,7 @@ function buildFormFlashcards(w) {
       id: `${w.id}__formcard${i}`,
       de: q.answer,
       en: q.prompt,
+      formBadge: q.badge,
       isFormCard: true,
       favorite: false,
       level: w.level,

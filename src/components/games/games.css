@@ -282,3 +282,12 @@
   88% { opacity: 0.9; }
   100% { transform: translate3d(var(--drift), 112vh, 0) rotate(var(--rot1)); opacity: 0; }
 }
+
+/* Word quiz (single word): look card, hint line, feedback */
+.dm-wq-meta { display: flex; justify-content: center; margin: 6px 0 2px; }
+.dm-wq-tip { text-align: center; color: var(--text-dim); font-size: 13px; line-height: 1.45; margin: 10px 20px 18px; }
+.dm-wq-hintline { text-align: center; font-family: 'Sora', monospace; font-weight: 700; font-size: 22px; letter-spacing: 0.12em; color: var(--gold); margin: 4px 0 10px; }
+.dm-wq-feedback { text-align: center; font-size: 13px; line-height: 1.4; color: var(--text-dim); margin: 8px 12px 0; }
+.dm-wq-feedback-ok { color: var(--green); font-weight: 700; }
+.dm-wq-actions { display: flex; gap: 10px; align-items: stretch; justify-content: center; flex-wrap: wrap; }
+.dm-wq-actions .dm-btn-secondary { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; }
