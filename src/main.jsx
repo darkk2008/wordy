@@ -10,6 +10,7 @@ import "./boot/config.js";
 import "./services/cloud-sync.js"; // sets window.wwordyCloud (needs the Supabase CDN script from index.html)
 
 // 2) Styles
+import "./styles/fonts.js";
 import "./styles/index.css";
 
 // 3) App
