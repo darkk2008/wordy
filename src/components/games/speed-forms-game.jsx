@@ -92,6 +92,7 @@ export function SpeedFormsGame({
           }}
         />
       </div>
+      {q.badge && <div className="dm-mix-badge">{q.badge}</div>}
       <div className="dm-write-hint">{q.prompt}</div>
       <Input
         className={`dm-input dm-write-input ${status === "correct" ? "dm-ok" : status === "wrong" ? "dm-bad" : ""}`}

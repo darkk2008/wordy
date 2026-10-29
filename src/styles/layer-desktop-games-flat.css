@@ -28,3 +28,61 @@
   .dm-wordquiz-stagebar + .dm-game-play { min-height: 0; }
   .dm-wordquiz-stagebar + .dm-game-play.dm-game-done { min-height: min(calc(100vh - 240px), 520px); }
 }
+
+/* ===== Home toolbar: stack + word counter (replaces the old gems/store chips) ===== */
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill {
+  gap: 0;
+  padding: 0 4px;
+  overflow: visible;
+  cursor: default;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill:hover,
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill:active {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 0 8px;
+  line-height: 1;
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item svg {
+  align-self: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--cyan);
+  filter: none;
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item:last-child svg {
+  color: var(--gold);
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item b {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+@media (max-width: 400px) {
+  .dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-label {
+    display: none;
+  }
+  .dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item {
+    padding: 0 6px;
+  }
+}

@@ -5,7 +5,6 @@
 import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BottomNav } from "../components/bottom-nav/bottom-nav";
 import { AppLogo } from "../components/common/common";
-import { DailyBonusToast } from "../components/daily-bonus-toast/daily-bonus-toast";
 import { FavoritesView } from "../components/favorites/favorites";
 import { FORMS_ONLY_GAMES } from "../components/games/games-config";
 import { GamesHub, ReviewGamePicker } from "../components/games/games-hub";
@@ -45,14 +44,11 @@ import { GameBackLabelContext } from "../components/games/game-chrome";
 import { dmSanitizeBackup } from "../services/config-and-validation";
 import {
   FREE_FAVORITE_LIMIT,
-  addGemsToBalance,
-  loadGemsBalance,
   applySyncedPremium,
   applyServerPremium,
   loadPremiumStatus,
   premiumForSync,
-  spendGemsFromBalance,
-} from "../services/premium-gems-store";
+} from "../services/premium-status";
 import {
   UI_LANG_NAMES,
   preloadUiTranslations,
@@ -84,18 +80,16 @@ const WordRainGame = lazyNamed(() => import("../components/games/word-rain-game"
 const AuthModal = lazyNamed(() => import("../components/account/account"), "AuthModal");
 const AiModal = lazyNamed(() => import("../components/ai-modal/ai-modal"), "AiModal");
 const SettingsView = lazyNamed(() => import("../components/settings-view/settings-view"), "SettingsView");
-const StoreView = lazyNamed(() => import("../components/store/store"), "StoreView");
 const AdminPage = lazyNamed(() => import("../components/admin-panel/admin-panel"), "AdminPage");
 const OnboardingFlow = lazyNamed(() => import("../components/onboarding/onboarding"), "OnboardingFlow");
 
-// Warm the on-demand chunks (modals, settings, store) once the app is idle, so the first
+// Warm the on-demand chunks (modals, settings) once the app is idle, so the first
 // click opens instantly instead of waiting for the chunk to download and parse.
 const preloadLazyScreens = () => {
   [
     () => import("../components/account/account"),
     () => import("../components/ai-modal/ai-modal"),
     () => import("../components/settings-view/settings-view"),
-    () => import("../components/store/store"),
   ].forEach((load) => load().catch(() => {}));
 };
 if (typeof window !== "undefined") {
@@ -250,14 +244,6 @@ export function App() {
   const [families, setFamilies] = useState([]);
   const [streak, setStreak] = useState(1);
   const [bestStreak, setBestStreak] = useState(1);
-  const [dailyBonus, setDailyBonus] = useState(null);
-  const [gemsBalance, setGemsBalance] = useState(() => loadGemsBalance());
-  const addGems = (amount) => setGemsBalance(addGemsToBalance(amount));
-  const spendGems = (amount) => {
-    const result = spendGemsFromBalance(amount);
-    if (result.ok) setGemsBalance(result.balance);
-    return result.ok;
-  };
   const [todayReviews, setTodayReviews] = useState(0);
   const [tab, setTab] = useState("home");
   const [settingsInitialSection, setSettingsInitialSection] = useState(null);
@@ -307,8 +293,6 @@ export function App() {
   });
   const [aiOpen, setAiOpen] = useState(false);
   const openAI = () => setAiOpen(true);
-  const [storeOpen, setStoreOpen] = useState(false);
-  const openStore = () => setStoreOpen(true);
   const [familyReviewPick, setFamilyReviewPick] = useState(null);
   const [familyPlayPick, setFamilyPlayPick] = useState(null);
   const [archivedPlayPick, setArchivedPlayPick] = useState(null);
@@ -586,7 +570,6 @@ export function App() {
         return;
       }
       const today = todayStr();
-      let awardedBonus = null;
       if (data.lastActive !== today) {
         const yesterday = new Date(Date.now() - DAY).toISOString().slice(0, 10);
         data.streak = data.lastActive === yesterday ? (data.streak || 0) + 1 : 1;
@@ -594,12 +577,6 @@ export function App() {
         data.todayReviews = {
           date: today,
           count: 0,
-        };
-        const bonusAmount = Math.min(60, 10 + (data.streak - 1) * 3);
-        addGems(bonusAmount);
-        awardedBonus = {
-          amount: bonusAmount,
-          streak: data.streak,
         };
       }
       if (!data.todayReviews || data.todayReviews.date !== today) {
@@ -616,7 +593,6 @@ export function App() {
       setStreak(data.streak || 1);
       setBestStreak(data.bestStreak);
       setTodayReviews(data.todayReviews.count || 0);
-      if (awardedBonus) setDailyBonus(awardedBonus);
       setLoaded(true);
     })();
   }, []);
@@ -1650,8 +1626,6 @@ export function App() {
         learningLanguage={learningLanguage}
         onOpenPremium={openPremium}
         isPremium={isPremium}
-        gemsBalance={gemsBalance}
-        onOpenStore={openStore}
         account={account}
         onOpenAccount={openAccountEntry}
       />
@@ -1752,8 +1726,6 @@ export function App() {
         isPremium={isPremium}
         onPremiumChange={() => setPremiumRefreshTick((n) => n + 1)}
         onExitToPreviousTab={exitPremiumToPreviousTab}
-        gemsBalance={gemsBalance}
-        onAddGems={addGems}
         account={account}
         onOpenAuth={openAuth}
         onSignOut={handleSignOut}
@@ -1825,37 +1797,8 @@ export function App() {
               nativeLanguage={nativeLanguage}
             />
           )}
-          {storeOpen && (
-            <StoreView
-              onClose={() => setStoreOpen(false)}
-              stacks={activeStacks}
-              onCreateStack={createStack}
-              onAddWordsToStack={addWordsToStack}
-              gemsBalance={gemsBalance}
-              onSpendGems={spendGems}
-              onAddGems={addGems}
-              apiKey={apiKey}
-              onOpenAI={() => {
-                setStoreOpen(false);
-                openAI();
-              }}
-              nativeLanguage={nativeLanguage}
-              learningLanguage={learningLanguage}
-              onOpenPremium={() => {
-                setStoreOpen(false);
-                openPremium();
-              }}
-            />
-          )}
           {authOpen && (
             <AuthModal mode={authMode} onClose={closeAuth} onSuccess={handleAuthSuccess} />
-          )}
-          {dailyBonus && (
-            <DailyBonusToast
-              amount={dailyBonus.amount}
-              streak={dailyBonus.streak}
-              onDismiss={() => setDailyBonus(null)}
-            />
           )}
           {familyReviewPick && (
             <ReviewGamePicker

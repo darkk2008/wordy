@@ -8,6 +8,8 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { Input } from "../common/Input";
 import { Check, Volume2 } from "../icons/icons";
 import { computeAdjForms, computeNounForms, computeVerbForms } from "../word-forms/word-forms";
+import { uiTranslationLangCode } from "../../services/ui-translation";
+import { nativeFormPhrase } from "./english-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
 
 export function WriteGame({
@@ -95,6 +97,19 @@ export const VERB_TENSE_LABELS = {
   perfekt: "Perfekt",
   imperativ: "Imperativ",
 };
+// Builds one form question. The prompt is the English meaning of the
+// form in the user's native language (e.g. "more patient"); the grammar label goes in `badge`
+// (e.g. "Comparative of adj"). Falls back to the old "<label> of <word>"
+// text when the word has no English translation to build from.
+function formQ(w, kind, badge, fallbackLabel, answer) {
+  const phrase = nativeFormPhrase(kind, w.en, uiTranslationLangCode);
+  return {
+    wordId: w.id,
+    prompt: phrase || `${fallbackLabel} of “${w.de}”`,
+    badge,
+    answer,
+  };
+}
 export function buildFormQuestions(w) {
   const qs = [];
   if (w.type === "noun") {
@@ -107,27 +122,15 @@ export function buildFormQuestions(w) {
       const genitivSingular = forms.singular.find((r) => r.label === "Genitiv");
       const nominativPlural = forms.plural.find((r) => r.label === "Nominativ");
       if (genitivSingular)
-        qs.push({
-          wordId: w.id,
-          prompt: `Genitiv singular of “${w.de}”`,
-          answer: genitivSingular.value,
-        });
+        qs.push(formQ(w, "genitive", "Genitive of noun", "Genitiv singular", genitivSingular.value));
       if (nominativPlural)
-        qs.push({
-          wordId: w.id,
-          prompt: `Plural of “${w.de}”`,
-          answer: nominativPlural.value,
-        });
+        qs.push(formQ(w, "plural", "Plural of noun", "Plural", nominativPlural.value));
     } else {
       // No case system outside German — the singular is the word as
       // saved, so only the plural is a "form" worth quizzing.
       const plural = forms.plural[0];
       if (plural && plural.value && plural.value !== "—") {
-        qs.push({
-          wordId: w.id,
-          prompt: `Plural of “${w.de}”`,
-          answer: plural.value,
-        });
+        qs.push(formQ(w, "plural", "Plural of noun", "Plural", plural.value));
       }
     }
   } else if (w.type === "verb") {
@@ -136,17 +139,9 @@ export function buildFormQuestions(w) {
     const perfektIch = (forms.perfekt.find((r) => r.label === "ich") || {}).value || "";
     const partizipForm = perfektIch.replace(/^habe\s+/, "").replace(/^bin\s+/, "");
     if (praeteritumForm)
-      qs.push({
-        wordId: w.id,
-        prompt: `Präteritum of “${w.de}”`,
-        answer: praeteritumForm,
-      });
+      qs.push(formQ(w, "past", "Past tense of verb", "Präteritum", praeteritumForm));
     if (partizipForm)
-      qs.push({
-        wordId: w.id,
-        prompt: `Partizip II of “${w.de}”`,
-        answer: partizipForm,
-      });
+      qs.push(formQ(w, "participle", "Past participle of verb", "Partizip II", partizipForm));
   } else if (w.type === "adj") {
     // The 3 main forms of an adjective are Positiv/Komparativ/Superlativ
     // (schön, schöner, am schönsten) — row 0 is always the base form as
@@ -155,11 +150,13 @@ export function buildFormQuestions(w) {
     const rows = computeAdjForms(w);
     rows.forEach((r, i) => {
       if (i === 0) return;
-      qs.push({
-        wordId: w.id,
-        prompt: `${r.label} of “${w.de}”`,
-        answer: r.value,
-      });
+      const isComp = i === 1;
+      const badge = isComp
+        ? "Comparative of adj"
+        : i === 3
+          ? "Superlative (before noun) of adj"
+          : "Superlative of adj";
+      qs.push(formQ(w, isComp ? "comparative" : "superlative", badge, r.label, r.value));
     });
   }
   return qs;
@@ -171,6 +168,7 @@ export function buildFormWordPool(words) {
       baseWordId: w.id,
       de: q.answer,
       en: q.prompt,
+      formBadge: q.badge,
       favorite: false,
       level: w.level,
       isFormCard: true,

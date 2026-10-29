@@ -41,26 +41,25 @@
 .dm-nav-collapse-btn {
   display: none;
 }
-@media (min-width: 900px) {
-  .dm-app {
+@media (min-width: 900px){.dm-app {
     --nav-w: 264px;
   }
-  .dm-app.dm-nav-collapsed {
+.dm-app.dm-nav-collapsed {
     --nav-w: 76px;
   }
-  .dm-bottomnav {
+.dm-bottomnav {
     overflow: hidden;
   }
-  .dm-navbtn {
+.dm-navbtn {
     white-space: nowrap;
     overflow: hidden;
   }
-  .dm-navbtn svg,
-  .dm-nav-collapse-btn svg {
+.dm-navbtn svg,
+.dm-nav-collapse-btn svg {
     flex-shrink: 0;
   }
-  .dm-navbtn-label,
-  .dm-nav-brand-text {
+.dm-navbtn-label,
+.dm-nav-brand-text {
     display: inline-block;
     max-width: 160px;
     opacity: 1;
@@ -71,12 +70,12 @@
       max-width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       opacity 0.2s ease 0.1s;
   }
-  .dm-nav-brand {
+.dm-nav-brand {
     transition:
       margin 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       gap 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .dm-navbtn {
+.dm-navbtn {
     transition:
       background-color 0.16s ease,
       color 0.16s ease,
@@ -84,7 +83,7 @@
       padding 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       gap 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .dm-nav-collapse-btn {
+.dm-nav-collapse-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,75 +108,73 @@
       width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       height 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .dm-nav-collapse-btn:hover {
+.dm-nav-collapse-btn:hover {
     background: var(--surface-strong);
     color: var(--text);
   }
-  .dm-nav-collapse-icon {
+.dm-nav-collapse-icon {
     transition: transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .dm-nav-collapsed .dm-nav-collapse-icon {
+.dm-nav-collapsed .dm-nav-collapse-icon {
     transform: rotate(180deg);
   }
-  .dm-nav-collapsed .dm-navbtn-label,
-  .dm-nav-collapsed .dm-nav-brand-text {
+.dm-nav-collapsed .dm-navbtn-label,
+.dm-nav-collapsed .dm-nav-brand-text {
     max-width: 0;
     opacity: 0;
     transition:
       max-width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       opacity 0.12s ease;
   }
-  .dm-nav-collapsed .dm-bottomnav {
+.dm-nav-collapsed .dm-bottomnav {
     padding-left: 12px;
     padding-right: 12px;
   }
-  .dm-nav-brand-logo {
+.dm-nav-brand-logo {
     transition: opacity 0.2s ease 0.1s;
   }
-  .dm-nav-collapsed .dm-nav-brand-logo {
+.dm-nav-collapsed .dm-nav-brand-logo {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.12s ease;
   }
-  .dm-nav-collapsed .dm-nav-collapse-btn {
+.dm-nav-collapsed .dm-nav-collapse-btn {
     top: 31px;
     right: 24px;
     width: 28px;
     height: 28px;
   }
-  .dm-nav-collapsed .dm-navbtn {
+.dm-nav-collapsed .dm-navbtn {
     gap: 0;
     padding-left: 0;
     padding-right: 0;
     justify-content: center;
   }
-  .dm-nav-collapsed .dm-nav-brand {
+.dm-nav-collapsed .dm-nav-brand {
     margin-left: 0;
     margin-right: 0;
     gap: 0;
     justify-content: center;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .dm-app,
-    .dm-bottomnav,
-    .dm-navbtn-label,
-    .dm-nav-brand-text,
-    .dm-navbtn,
-    .dm-nav-collapse-icon,
-    .dm-modal-backdrop {
+@media (prefers-reduced-motion: reduce){.dm-app,
+.dm-bottomnav,
+.dm-navbtn-label,
+.dm-nav-brand-text,
+.dm-navbtn,
+.dm-nav-collapse-icon,
+.dm-modal-backdrop {
       transition: none !important;
     }
-  }
 }
-@media (min-width: 900px) {
-  /* Sidebar styled like the home header: floating frosted-glass card */
-  .dm-app {
+}
+@media (min-width: 900px){/* Sidebar styled like the home header: floating frosted-glass card */
+.dm-app {
     --nav-w: 264px;
   }
-  .dm-app.dm-nav-collapsed {
+.dm-app.dm-nav-collapsed {
     --nav-w: 92px;
   }
-  .dm-bottomnav {
+.dm-bottomnav {
     top: 14px;
     left: 14px;
     height: fit-content;
@@ -202,20 +199,20 @@
       max-width 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
       flex-basis 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .dm-nav-collapsed .dm-bottomnav {
+.dm-nav-collapsed .dm-bottomnav {
     padding-left: 8px;
     padding-right: 8px;
   }
-  .dm-nav-collapsed .dm-nav-collapse-btn {
+.dm-nav-collapsed .dm-nav-collapse-btn {
     right: 18px;
   }
-  .dm-bottomnav::before {
+.dm-bottomnav::before {
     left: 12%;
     right: 12%;
     border-radius: 1px;
     opacity: 0.8;
   }
-  .dm-bottomnav::after {
+.dm-bottomnav::after {
     content: "";
     position: absolute;
     bottom: -110px;
@@ -230,33 +227,30 @@
     pointer-events: none;
     z-index: 0;
   }
-  .dm-bottomnav > * {
+.dm-bottomnav > * {
     position: relative;
     z-index: 1;
   }
-  .dm-bottomnav > .dm-nav-collapse-btn {
+.dm-bottomnav > .dm-nav-collapse-btn {
     position: absolute;
     z-index: 2;
   }
-  /* Align the sidebar card's top edge with the header card, which starts
+/* Align the sidebar card's top edge with the header card, which starts
      44px down (.dm-content's top padding). */
-  .dm-bottomnav {
+.dm-bottomnav {
     top: 44px;
     max-height: calc(100vh - 58px);
   }
 }
-
 /* ===== Round 3: sidebar without brand, calmer Premium, phone wordmark, bigger tap targets ===== */
-
 /* -- Sidebar: no brand block; the collapse button becomes the first row -- */
 .dm-nav-brand {
   display: none !important;
 }
-@media (min-width: 900px) {
-  .dm-bottomnav {
+@media (min-width: 900px){.dm-bottomnav {
     padding-top: 14px;
   }
-  .dm-bottomnav > .dm-nav-collapse-btn {
+.dm-bottomnav > .dm-nav-collapse-btn {
     position: static;
     order: -1;
     align-self: flex-end;
@@ -264,12 +258,11 @@
     height: 28px;
     margin: 0 2px 8px 0;
   }
-  .dm-nav-collapsed .dm-bottomnav > .dm-nav-collapse-btn {
+.dm-nav-collapsed .dm-bottomnav > .dm-nav-collapse-btn {
     align-self: center;
     margin: 0 0 8px 0;
   }
 }
-
 /* -- Premium star in the home header: quiet, no gradient fill or shine -- */
 .dm-home-view > .dm-header .dm-header-actions > .dm-home-premium-btn {
   background: rgba(var(--gold-rgb), 0.12);
@@ -284,18 +277,15 @@
   animation: none;
   fill: rgba(var(--gold-rgb), 0.28);
 }
-@media (hover: hover) and (pointer: fine) {
-  .dm-home-view > .dm-header .dm-header-actions > .dm-home-premium-btn:hover {
+@media (hover: hover) and (pointer: fine){.dm-home-view > .dm-header .dm-header-actions > .dm-home-premium-btn:hover {
     background: rgba(var(--gold-rgb), 0.2);
   }
 }
-
 /* -- Phone wordmark above the header (hidden where the header already shows the name) -- */
 .dm-mobile-brand {
   display: none;
 }
-@media (max-width: 899px) {
-  .dm-mobile-brand {
+@media (max-width: 899px){.dm-mobile-brand {
     display: block;
     text-align: center;
     line-height: 1;
@@ -309,80 +299,74 @@
     color: var(--green);
   }
 }
-@container dm-shell (min-width: 581px) {
-  .dm-mobile-brand {
+@container dm-shell (min-width: 581px){.dm-mobile-brand {
     display: none;
   }
 }
-
 /* -- Touch targets: real 44px for the header row, invisible 44px hit areas elsewhere -- */
-@media (max-width: 899px) {
-  .dm-home-view > .dm-header {
+@media (max-width: 899px){.dm-home-view > .dm-header {
     flex-wrap: nowrap;
   }
-  .dm-home-view > .dm-header .dm-header-brand {
+.dm-home-view > .dm-header .dm-header-brand {
     flex: 0 1 auto;
     min-width: 0;
   }
-  .dm-home-view > .dm-header .dm-header-logo {
+.dm-home-view > .dm-header .dm-header-logo {
     width: clamp(40px, 12vw, 64px) !important;
     height: clamp(40px, 12vw, 64px) !important;
   }
-  .dm-home-view > .dm-header .dm-header-actions {
+.dm-home-view > .dm-header .dm-header-actions {
     flex: 0 0 auto;
     margin-left: auto;
     gap: 4px;
     padding: 4px;
   }
-  .dm-home-view > .dm-header .dm-header-actions > .dm-iconbtn,
-  .dm-home-view > .dm-header .dm-header-actions > .dm-home-premium-btn {
+.dm-home-view > .dm-header .dm-header-actions > .dm-iconbtn,
+.dm-home-view > .dm-header .dm-header-actions > .dm-home-premium-btn {
     width: 44px;
     height: 44px;
     flex: 0 0 44px;
   }
-  .dm-home-view > .dm-header .dm-header-actions > .dm-streak {
+.dm-home-view > .dm-header .dm-header-actions > .dm-streak {
     height: 44px;
     padding: 0 12px;
     margin-left: 0;
   }
-  .dm-home-view > .dm-stats-row > .dm-stat-newstack {
+.dm-home-view > .dm-stats-row > .dm-stat-newstack {
     height: 44px;
     min-height: 44px;
   }
-
-  /* chips keep their size; only the tappable area grows */
-  .dm-home-view
+/* chips keep their size; only the tappable area grows */
+.dm-home-view
     > .dm-stats-row
     > .dm-stats-group
-    > :is(.dm-gems-inline, .dm-store-entry-btn, .dm-theme-toggle) {
+    > :is(.dm-count-pill, .dm-theme-toggle) {
     overflow: visible;
     position: relative;
   }
-  .dm-home-view
+.dm-home-view
     > .dm-stats-row
     > .dm-stats-group
-    > :is(.dm-gems-inline, .dm-store-entry-btn)::after {
+    > :is(.dm-count-pill)::after {
     content: "";
     position: absolute;
     inset: -5px 0;
   }
-  .dm-home-view > .dm-stats-row > .dm-stats-group > .dm-theme-toggle::after {
+.dm-home-view > .dm-stats-row > .dm-stats-group > .dm-theme-toggle::after {
     content: "";
     position: absolute;
     inset: -5px;
   }
 }
-@media (max-width: 380px) {
-  .dm-home-view > .dm-header .dm-header-actions {
+@media (max-width: 380px){.dm-home-view > .dm-header .dm-header-actions {
     gap: 2px;
     padding: 3px;
   }
-  .dm-home-view > .dm-header .dm-header-actions > .dm-streak {
+.dm-home-view > .dm-header .dm-header-actions > .dm-streak {
     padding: 0 9px;
   }
 }
-@media (max-width: 350px) {
-  .dm-home-view > .dm-header .dm-header-brand {
+@media (max-width: 350px){.dm-home-view > .dm-header .dm-header-brand {
     display: none;
   }
 }

@@ -100,41 +100,6 @@ export const CrownIcon = (p) => (
     <path d="M5.5 21.5h13" />
   </IconBase>
 );
-export const GemIcon = ({ size = 18, className, style }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    className={className}
-    style={style}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <linearGradient id="dmGemFace" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#8BF3FF" />
-        <stop offset="55%" stopColor="#43D9A3" />
-        <stop offset="100%" stopColor="#1FA97D" />
-      </linearGradient>
-    </defs>
-    <path
-      d="M4.5 9 L9 3.5 H15 L19.5 9 L12 21 Z"
-      fill="url(#dmGemFace)"
-      stroke="#0f7a5c"
-      strokeWidth="0.6"
-      strokeLinejoin="round"
-    />
-    <path d="M9 3.5 L12 9 L15 3.5 Z" fill="#ffffff" fillOpacity="0.55" />
-    <path d="M4.5 9 L9 3.5 L12 9 Z" fill="#ffffff" fillOpacity="0.28" />
-    <path d="M15 3.5 L19.5 9 L12 9 Z" fill="#000000" fillOpacity="0.15" />
-    <path
-      d="M4.5 9 H19.5 M9 3.5 L12 9 M15 3.5 L12 9 M12 9 L12 21 M4.5 9 L12 21 M19.5 9 L12 21"
-      stroke="#ffffff"
-      strokeOpacity="0.3"
-      strokeWidth="0.4"
-      fill="none"
-    />
-  </svg>
-);
 export const TagIcon = (p) => (
   <IconBase {...p}>
     <path d="M20.6 12.3 12.3 20.6a1.9 1.9 0 0 1-2.7 0l-7-7A1.9 1.9 0 0 1 2 12.2V4.4C2 3.1 3.1 2 4.4 2h7.8c.5 0 1 .2 1.35.55l7 7c.75.75.75 1.95.05 2.75z" />

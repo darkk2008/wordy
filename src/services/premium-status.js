@@ -1,5 +1,5 @@
-/* services/premium-gems-store.js
- * Premium status, gems balance, owned store packs, free-tier limits, promo redemption.
+/* services/premium-status.js
+ * Premium status, free-tier limits, promo redemption.
  */
 
 import { ADMIN_PREMIUM_KEY, PROMO_DURATIONS } from "../core/srs-and-seed-data";
@@ -94,85 +94,6 @@ export function applySyncedPremium(remote) {
   if (premiumRank(incoming) <= premiumRank(local)) return false;
   savePremiumStatus(incoming);
   return true;
-}
-const GEMS_BALANCE_KEY = "deutschmaster-gems-balance";
-const GEMS_STARTER_AMOUNT = 50;
-export function loadGemsBalance() {
-  try {
-    const raw = window.localStorage.getItem(GEMS_BALANCE_KEY);
-    if (raw !== null) return Math.max(0, parseInt(raw, 10) || 0);
-  } catch (e) {}
-  saveGemsBalance(GEMS_STARTER_AMOUNT);
-  return GEMS_STARTER_AMOUNT;
-}
-function saveGemsBalance(amount) {
-  try {
-    window.localStorage.setItem(GEMS_BALANCE_KEY, String(Math.max(0, Math.round(amount || 0))));
-  } catch (e) {}
-}
-export function addGemsToBalance(amount) {
-  const next = loadGemsBalance() + Math.max(0, Math.round(amount || 0));
-  saveGemsBalance(next);
-  return next;
-}
-export function spendGemsFromBalance(amount) {
-  const current = loadGemsBalance();
-  const cost = Math.max(0, Math.round(amount || 0));
-  if (current < cost)
-    return {
-      ok: false,
-      balance: current,
-    };
-  const next = current - cost;
-  saveGemsBalance(next);
-  return {
-    ok: true,
-    balance: next,
-  };
-}
-function storeOwnedPacksKey(learningLanguage, nativeLanguage) {
-  return `deutschmaster-store-owned-${learningLanguage || "de"}-${nativeLanguage || "en"}`;
-}
-export function loadOwnedStorePacks(learningLanguage, nativeLanguage) {
-  try {
-    const raw = window.localStorage.getItem(storeOwnedPacksKey(learningLanguage, nativeLanguage));
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch (e) {}
-  return [];
-}
-export function saveOwnedStorePacks(learningLanguage, nativeLanguage, ids) {
-  try {
-    window.localStorage.setItem(
-      storeOwnedPacksKey(learningLanguage, nativeLanguage),
-      JSON.stringify(ids || [])
-    );
-  } catch (e) {}
-}
-function storePreviewKey(packId, learningLanguage, nativeLanguage) {
-  return `deutschmaster-store-preview-${learningLanguage || "de"}-${nativeLanguage || "en"}-${packId}`;
-}
-export function loadStorePreview(packId, learningLanguage, nativeLanguage) {
-  try {
-    const raw = window.localStorage.getItem(
-      storePreviewKey(packId, learningLanguage, nativeLanguage)
-    );
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch (e) {}
-  return null;
-}
-export function saveStorePreview(packId, learningLanguage, nativeLanguage, words) {
-  try {
-    window.localStorage.setItem(
-      storePreviewKey(packId, learningLanguage, nativeLanguage),
-      JSON.stringify(words || [])
-    );
-  } catch (e) {}
 }
 // Free tier, simplified: everything that costs us nothing is free. The only real limit is on
 // things that cost money (AI translation), and it resets every day instead of running out forever.
@@ -276,7 +197,7 @@ export async function redeemPromoCode(rawCode) {
       message: (data && data.message) || "That code isn't valid.",
     };
   // The server only validates and consumes the code; applying its effect
-  // to this device's local premium/gems/discount state still happens here.
+  // to this device's local premium/discount state still happens here.
   if (data.kind === "discount") {
     const discount = {
       percent: data.percent,
@@ -293,9 +214,8 @@ export async function redeemPromoCode(rawCode) {
   }
   if (data.kind === "gems") {
     return {
-      ok: true,
-      message: data.message,
-      gemsAmount: data.amount,
+      ok: false,
+      message: "This code type is no longer supported.",
     };
   }
   if (data.kind === "premium") {

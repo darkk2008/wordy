@@ -43,6 +43,7 @@ function buildFormMCQuestions(words, w) {
       kind: "form",
       wordId: w.id,
       prompt: q.prompt,
+      badge: q.badge,
       correct: q.answer,
       options,
     };
@@ -137,7 +138,10 @@ export function MultipleChoiceGame({
         </div>
       )}
       {isForm ? (
-        <div className="dm-write-hint">{q.prompt}</div>
+        <>
+          {q.badge && <div className="dm-mix-badge">{q.badge}</div>}
+          <div className="dm-write-hint">{q.prompt}</div>
+        </>
       ) : (
         <div className="dm-quiz-word">
           {isDE2EN ? q.word.de : q.word.en}

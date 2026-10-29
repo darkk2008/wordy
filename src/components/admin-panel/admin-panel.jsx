@@ -15,7 +15,7 @@ import {
   setAdminSecret,
 } from "../../services/admin-promo";
 import { fetchOnlineCount, getAnalyticsSnapshot } from "../../services/analytics-presence";
-import { grantPremium, loadPremiumStatus, revokePremium } from "../../services/premium-gems-store";
+import { grantPremium, loadPremiumStatus, revokePremium } from "../../services/premium-status";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import { Check, ChevronLeft, Eye, Sparkles, Trash2, X } from "../icons/icons";
@@ -137,7 +137,6 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
   const [adminSecretInput, setAdminSecretInput] = useState(() => getAdminSecret());
   const [premium, setPremium] = useState(() => loadPremiumStatus());
   const [newType, setNewType] = useState("monthly");
-  const [newGemsAmount, setNewGemsAmount] = useState("50");
   const [copiedCode, setCopiedCode] = useState(null);
   const [copyFailedCode, setCopyFailedCode] = useState(null);
   const [analytics, setAnalytics] = useState(() => getAnalyticsSnapshot());
@@ -202,17 +201,8 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
     setAdminSecret(adminSecretInput.trim());
     refreshCodes();
   };
-  const isGemsValid = newType !== "gems" || Number(newGemsAmount) >= 1;
   const handleGenerate = async () => {
-    let result;
-    if (newType === "gems") {
-      if (!isGemsValid) return;
-      result = await adminCreatePromoCode("gems", {
-        amount: newGemsAmount,
-      });
-    } else {
-      result = await adminCreatePromoCode(newType);
-    }
+    const result = await adminCreatePromoCode(newType);
     if (!result.ok) {
       setCodesError(result.message || "Couldn't create the code.");
       return;
@@ -348,7 +338,7 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
         <AdminSectionHead icon={<Sparkles size={13} />}>Create promo code</AdminSectionHead>
         <div className="dm-admin-promo-create">
           <div className="dm-segmented">
-            {["monthly", "yearly", "gems", "permanent"].map((t) => (
+            {["monthly", "yearly", "permanent"].map((t) => (
               <button
                 key={t}
                 type="button"
@@ -359,25 +349,9 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
               </button>
             ))}
           </div>
-          {newType === "gems" && (
-            <div className="dm-admin-discount-fields">
-              <label className="dm-admin-discount-field">
-                <span className="dm-admin-discount-field-label">Gems amount</span>
-                <Input
-                  type="number"
-                  min={1}
-                  className="dm-input dm-admin-discount-input"
-                  value={newGemsAmount}
-                  onChange={(e) => setNewGemsAmount(e.target.value)}
-                  placeholder="50"
-                />
-              </label>
-            </div>
-          )}
           <button
             type="button"
             className="dm-btn-primary"
-            disabled={!isGemsValid}
             onClick={handleGenerate}
           >
             <TagIcon size={15} />
@@ -417,9 +391,7 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
                     <span className="dm-admin-code-type">
                       {c.type === "discount"
                         ? `${c.percent}% off`
-                        : c.type === "gems"
-                          ? `${c.amount} gems`
-                          : PROMO_TYPE_LABELS[c.type] || c.type}
+                        : PROMO_TYPE_LABELS[c.type] || c.type}
                     </span>
                   </div>
                   <div className="dm-admin-code-meta">

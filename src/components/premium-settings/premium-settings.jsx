@@ -8,15 +8,14 @@ import {
   loadActiveDiscount,
   loadPremiumStatus,
   redeemPromoCode,
-} from "../../services/premium-gems-store";
+} from "../../services/premium-status";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import { openTelegramPurchase } from "../contacts-settings/contacts-settings";
 import { Check, ChevronLeft } from "../icons/icons";
-import { CrownIcon, GemIcon, TagIcon } from "../icons/settings-icons";
+import { CrownIcon, TagIcon } from "../icons/settings-icons";
 import { celebratePremiumUnlock } from "../premium-celebration/premium-celebration";
 import { PROMO_TYPE_LABELS, formatAdminDate } from "../stack-card/stack-card";
-import { GEM_PACKS } from "../store/store";
 
 const PREMIUM_PLANS = [
   {
@@ -52,9 +51,8 @@ const PREMIUM_FEATURES = [
   "Priority cloud backup & sync",
   "Early access to new games and features",
 ];
-export function PremiumSettings({ onBack, gemsBalance, onAddGems }) {
+export function PremiumSettings({ onBack }) {
   const [selectedPlan, setSelectedPlan] = useState("yearly");
-  const [selectedGemPack, setSelectedGemPack] = useState("pack_medium");
   const [promoCode, setPromoCode] = useState("");
   const [notice, setNotice] = useState("");
   const [premiumStatus, setPremiumStatus] = useState(() => loadPremiumStatus());
@@ -91,9 +89,6 @@ export function PremiumSettings({ onBack, gemsBalance, onAddGems }) {
       if (result.discount) {
         setActiveDiscount(result.discount);
       }
-      if (result.gemsAmount) {
-        onAddGems && onAddGems(result.gemsAmount);
-      }
     }
   };
   const discountPercent = activeDiscount ? activeDiscount.percent : 0;
@@ -110,7 +105,6 @@ export function PremiumSettings({ onBack, gemsBalance, onAddGems }) {
     );
   };
   const plan = PREMIUM_PLANS.find((p) => p.id === selectedPlan) || PREMIUM_PLANS[0];
-  const gemPack = GEM_PACKS.find((p) => p.id === selectedGemPack) || GEM_PACKS[0];
   const isActive = premiumStatus.active;
   const planLabel = PROMO_TYPE_LABELS[premiumStatus.type] || premiumStatus.type;
   const promoSection = (
@@ -272,57 +266,11 @@ export function PremiumSettings({ onBack, gemsBalance, onAddGems }) {
       ) : (
         promoSection
       )}
-      <div className="dm-settings-section-label">Gems</div>
-      <div className="dm-gems-balance-card">
-        <GemIcon size={26} className="dm-gems-balance-icon" />
-        <div className="dm-gems-balance-text">
-          <span className="dm-gems-balance-value">{(gemsBalance || 0).toLocaleString()}</span>
-          <span className="dm-gems-balance-label">Gems available</span>
-        </div>
-      </div>
-      <p className="dm-settings-hint dm-gems-hint">
-        Gems can be spent around the app on hint reveals, streak freezes and unlockable themes.
-      </p>
-      <div className="dm-gem-packs">
-        {GEM_PACKS.map((pack, i) => (
-          <button
-            key={pack.id}
-            type="button"
-            className={`dm-gem-pack ${selectedGemPack === pack.id ? "dm-gem-pack-active" : ""}`}
-            style={{
-              animationDelay: `${i * 0.06}s`,
-            }}
-            onClick={() => setSelectedGemPack(pack.id)}
-          >
-            {selectedGemPack === pack.id && (
-              <span className="dm-gem-pack-check">
-                <Check size={12} />
-              </span>
-            )}
-            <GemIcon size={22} className="dm-gem-pack-icon" />
-            <div className="dm-gem-pack-amount">
-              {pack.amount.toLocaleString()}
-              {pack.bonus && <span className="dm-gem-pack-bonus">{pack.bonus}</span>}
-            </div>
-            <div className="dm-gem-pack-price">{pack.price}</div>
-          </button>
-        ))}
-      </div>
-      <button
-        type="button"
-        className="dm-premium-cta dm-gem-cta"
-        onClick={() => {
-          openTelegramPurchase(`${gemPack.amount.toLocaleString()} gems`, gemPack.price);
-        }}
-      >
-        <GemIcon size={17} />
-        {` Get ${gemPack.amount.toLocaleString()} gems — ${gemPack.price}`}
-      </button>
       <div className={`dm-premium-notice ${notice ? "dm-premium-notice-show" : ""}`}>
         {notice || "\xA0"}
       </div>
       <p className="dm-settings-hint dm-premium-footnote">
-        Choose a plan or gem pack, then tap the button to open Telegram with a ready-made purchase
+        Choose a plan, then tap the button to open Telegram with a ready-made purchase
         message — we'll confirm payment and unlock it for you there.
       </p>
     </div>

@@ -2,7 +2,7 @@
  * Themes and AppearanceSettings screen.
  */
 
-import { FREE_THEME_LIMIT } from "../../services/premium-gems-store";
+import { FREE_THEME_LIMIT } from "../../services/premium-status";
 import { IconBtn } from "../common/common";
 import { Check, ChevronLeft } from "../icons/icons";
 import { LockIcon } from "../icons/settings-icons";

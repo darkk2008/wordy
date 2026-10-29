@@ -2,7 +2,6 @@
  * LAYER: banners, type scale, settings, spacing, phone games.
  */
 /* ===================== Design pass: banners, type scale, settings, spacing, phone games ===================== */
-
 /* 1. Home banners: neutral surface, colour only in the icon tile and a thin accent edge */
 .dm-home-view > .dm-due-banner {
   --banner-accent: var(--gold);
@@ -14,15 +13,13 @@
     inset 2px 0 0 var(--banner-accent),
     var(--shadow-sm);
 }
-@media (hover: hover) and (pointer: fine) {
-  .dm-home-view > .dm-due-banner:hover {
+@media (hover: hover) and (pointer: fine){.dm-home-view > .dm-due-banner:hover {
     border-color: color-mix(in srgb, var(--banner-accent) 45%, var(--border));
     box-shadow:
       inset 2px 0 0 var(--banner-accent),
       var(--shadow-md);
   }
 }
-
 /* 2. Type scale: clearer section labels, no unreadable captions */
 .dm-section-title {
   font-size: 17px;
@@ -36,8 +33,7 @@
 .dm-direction-badge {
   font-size: 11px;
 }
-.dm-premium-plan-badge,
-.dm-gem-pack-bonus {
+.dm-premium-plan-badge {
   font-size: 12.5px;
 }
 .dm-navbtn-label {
@@ -50,7 +46,6 @@
 .dm-settings-section-label {
   font-size: 13px;
 }
-
 /* 3. Settings: grouped, one neutral card style, a single accent colour */
 .dm-settings-group-label {
   font-family: "Sora", sans-serif;
@@ -79,7 +74,7 @@
   animation: dm-settings-line-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: inherit;
 }
-@keyframes dm-settings-label-in {
+@keyframes dm-settings-label-in{
   from {
     opacity: 0;
     transform: translateX(-12px);
@@ -89,7 +84,7 @@
     transform: none;
   }
 }
-@keyframes dm-settings-line-in {
+@keyframes dm-settings-line-in{
   from {
     transform: scaleX(0);
     opacity: 0;
@@ -99,9 +94,8 @@
     opacity: 1;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .dm-settings-group-label,
-  .dm-settings-group-label::after {
+@media (prefers-reduced-motion: reduce){.dm-settings-group-label,
+.dm-settings-group-label::after {
     animation: none;
   }
 }
@@ -124,15 +118,13 @@
 .dm-settings-grid > .dm-settings-card-premium .dm-settings-card-icon {
   color: var(--gold);
 }
-@media (hover: hover) and (pointer: fine) {
-  .dm-settings-grid > .dm-settings-card:hover:not(:disabled) {
+@media (hover: hover) and (pointer: fine){.dm-settings-grid > .dm-settings-card:hover:not(:disabled) {
     border-color: rgba(var(--cyan-rgb), 0.45);
   }
-  .dm-settings-grid > .dm-settings-card-premium:hover:not(:disabled) {
+.dm-settings-grid > .dm-settings-card-premium:hover:not(:disabled) {
     border-color: rgba(var(--gold-rgb), 0.65);
   }
 }
-
 /* 5. Home vertical rhythm: 16px between rows, 12px between the two banners, 24px before a section */
 .dm-home-view > .dm-header {
   margin-bottom: 16px;

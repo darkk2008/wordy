@@ -49,6 +49,7 @@ export function WordFormsGame({ words, onAnswer, onExit, onPlayAgain }) {
   return (
     <div className="dm-game-play">
       <GameTopBar onExit={onExit} progress={`${idx + 1}/${deck.length}`} title="Word Forms" />
+      {q.badge && <div className="dm-mix-badge">{q.badge}</div>}
       <div className="dm-write-hint">{q.prompt}</div>
       <Input
         className={`dm-input dm-write-input ${status === "correct" ? "dm-ok" : status === "wrong" ? "dm-bad" : ""}`}

@@ -2,7 +2,6 @@
  * LAYER: mobile adaptation pass (last, wins ties).
  */
 /* ===================== Mobile adaptation pass ===================== */
-
 /* Long German compounds must wrap inside game screens instead of pushing them wider than the phone */
 .dm-flip-face,
 .dm-flip-word,
@@ -41,34 +40,25 @@
   line-height: 1.1;
   padding: 4px;
 }
-
 /* Segmented controls: no wrapping of the 7 CEFR chips on narrow phones, and taller tap area on all phones */
-@media (max-width: 899px) {
-  .dm-seg {
+@media (max-width: 899px){.dm-seg {
     min-height: 36px;
   }
-  .dm-family-chip {
+.dm-family-chip {
     min-height: 34px;
   }
-  .dm-store-buy-btn {
-    min-height: 36px;
-  }
-  .dm-search-input {
+.dm-search-input {
     padding: 9px 0;
   }
 }
-@media (max-width: 380px) {
-  .dm-segmented {
+@media (max-width: 380px){.dm-segmented {
     flex-wrap: nowrap;
   }
-  .dm-segmented .dm-seg {
+.dm-segmented .dm-seg {
     padding-left: 4px;
     padding-right: 4px;
     min-width: 0;
   }
-}
-.dm-store-meta {
-  font-size: 12.5px;
 }
 .dm-mono {
   overflow-wrap: anywhere;
@@ -81,24 +71,22 @@
   margin-left: 0;
   margin-right: 0;
 }
-
 /* Landscape phones: slimmer bottom bar and less reserved space so content is not buried under it */
-@media (max-width: 899px) and (max-height: 480px) {
-  .dm-bottomnav {
+@media (max-width: 899px) and (max-height: 480px){.dm-bottomnav {
     padding-top: 5px;
     padding-bottom: 5px;
   }
-  .dm-navbtn {
+.dm-navbtn {
     flex-direction: row;
     gap: 8px;
     padding: 6px 14px;
     min-height: 40px;
     height: auto;
   }
-  .dm-content {
+.dm-content {
     padding-bottom: 68px;
   }
-  .dm-streak-hero {
+.dm-streak-hero {
     flex-direction: row;
     justify-content: center;
     align-items: center;
@@ -106,42 +94,34 @@
     flex-wrap: wrap;
     padding-bottom: 8px;
   }
-  .dm-streak-hero-flame {
+.dm-streak-hero-flame {
     width: 44px;
     height: 44px;
     margin: 0;
   }
-  .dm-streak-hero-num {
+.dm-streak-hero-num {
     font-size: 34px;
   }
-  .dm-streak-week {
+.dm-streak-week {
     padding: 8px 6px;
     margin-bottom: 8px;
   }
 }
-
 /* iOS Safari zooms the page when a focused field has font-size < 16px. Zoom is now allowed for the user,
    so keep every text field at 16px to prevent that automatic zoom (it broke the keyboard/viewport layout). */
-@media (pointer: coarse) {
-  .dm-app:not(.dm-section-games)
-    :is(
-      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-      textarea,
-      select
-    ) {
+@media (pointer: coarse){.dm-app:not(.dm-section-games)
+    :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
     font-size: 16px;
   }
 }
 /* ===== Accessibility pass: tap targets (visual size unchanged, hit area 44px) ===== */
-@media (pointer: coarse) {
-  :where(.dm-iconbtn, .dm-tr-swap-btn, .dm-gems-inline, .dm-store-buy-btn) {
+@media (pointer: coarse){:where(.dm-iconbtn, .dm-tr-swap-btn, .dm-count-pill) {
     position: relative;
   }
-  .dm-iconbtn::after,
-  .dm-tr-swap-btn::after,
-  .dm-gems-inline::after,
-  .dm-store-buy-btn::after,
-  .dm-nav-collapse-btn::after {
+.dm-iconbtn::after,
+.dm-tr-swap-btn::after,
+.dm-count-pill::after,
+.dm-nav-collapse-btn::after {
     content: "";
     position: absolute;
     left: 50%;
@@ -150,9 +130,8 @@
     height: max(100%, 44px);
     transform: translate(-50%, -50%);
   }
-  .dm-app:not(.dm-section-games) .dm-seg,
-  .dm-family-chip,
-  .dm-store-buy-btn {
+.dm-app:not(.dm-section-games) .dm-seg,
+.dm-family-chip {
     min-height: 44px;
   }
 }

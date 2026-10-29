@@ -27,7 +27,7 @@ import {
   FREE_TRANSLATE_LIMIT,
   getFreeTranslateCount,
   incFreeTranslateCount,
-} from "../../services/premium-gems-store";
+} from "../../services/premium-status";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import {
