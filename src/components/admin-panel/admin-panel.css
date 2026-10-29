@@ -41,7 +41,7 @@
 }
 .dm-admin-head-title h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--fs-lg);
   background: linear-gradient(135deg, #fff, #d9c8ff 65%, #f0abfc);
   -webkit-background-clip: text;
   background-clip: text;
@@ -49,14 +49,14 @@
 }
 .dm-admin-head-sub {
   margin: 1px 0 0;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 .dm-admin-tabs {
   margin-top: 14px;
 }
 .dm-admin-tab {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   padding: 9px 6px;
   display: flex;
   align-items: center;
@@ -106,13 +106,13 @@
 }
 .dm-admin-notice-body strong {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text);
   margin-bottom: 3px;
 }
 .dm-admin-notice-body p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--text-dim);
 }
@@ -207,11 +207,11 @@
 .dm-admin-stat-value {
   font-family: "Sora", sans-serif;
   font-weight: 800;
-  font-size: 17px;
+  font-size: var(--fs-xl);
   line-height: 1.15;
 }
 .dm-admin-stat-label {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--text-dim);
   margin-top: 2px;
@@ -219,7 +219,7 @@
   align-items: center;
 }
 .dm-admin-stat-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-dim);
   opacity: 0.75;
   margin-top: 2px;
@@ -235,7 +235,7 @@
   animation: dm-admin-pulse-ring 1.7s ease-out infinite;
 }
 .dm-admin-scope-note {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   opacity: 0.8;
   margin: 10px 2px 0;
@@ -272,7 +272,7 @@
   grid-column: span 2;
 }
 .dm-admin-discount-field-label {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--text-dim);
 }
@@ -322,13 +322,13 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-weight: 700;
   letter-spacing: 0.02em;
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .dm-admin-code-input {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-weight: 700;
   letter-spacing: 0.02em;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   background: transparent;
   border: none;
   color: var(--text);
@@ -341,7 +341,7 @@
   outline: none;
 }
 .dm-admin-code-type {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(var(--cyan-rgb), 0.16);
@@ -349,7 +349,7 @@
   flex-shrink: 0;
 }
 .dm-admin-code-meta {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   flex: 1 1 100%;
 }
@@ -364,7 +364,7 @@
 }
 .dm-admin-code-btn {
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .dm-admin-code-btn-error {
   border-color: rgba(255, 90, 95, 0.5);
@@ -411,18 +411,18 @@
     border-radius: 10px;
   }
   .dm-admin-head-title h3 {
-    font-size: 15px;
+    font-size: var(--fs-base);
   }
   .dm-admin-head-sub {
-    font-size: 12.5px;
+    font-size: var(--fs-sm);
   }
   .dm-admin-tab {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     padding: 8px 4px;
     gap: 4px;
   }
   .dm-admin-stat-value {
-    font-size: 15.5px;
+    font-size: var(--fs-lg);
   }
   .dm-admin-code-actions {
     width: 100%;
@@ -475,7 +475,7 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--green) 16%, transparent);
   color: var(--green);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
 }
 .dm-premium-plan-price-strike {
@@ -544,7 +544,7 @@
 .dm-admin-page-tag {
   margin-left: auto;
   margin-right: 12px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -559,7 +559,7 @@
 .dm-admin-page-title h3 {
   margin: 0;
   font-family: "Sora", sans-serif;
-  font-size: 20px;
+  font-size: var(--fs-2xl);
 }
 .dm-admin-page-body {
   margin-top: 10px;
@@ -580,7 +580,7 @@
 .dm-admin-gate h3 {
   margin: 4px 0 0;
   font-family: "Sora", sans-serif;
-  font-size: 19px;
+  font-size: var(--fs-2xl);
 }
 .dm-admin-gate .dm-admin-head-sub {
   margin: -6px 0 4px;
@@ -602,7 +602,7 @@
 }
 .dm-admin-gate-error {
   color: var(--red);
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .dm-admin-gate-btn {
   width: 100%;

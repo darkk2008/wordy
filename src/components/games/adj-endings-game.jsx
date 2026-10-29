@@ -12,6 +12,7 @@ import {
 } from "../word-forms/word-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function AdjEndingsGame({
   words,
   onAnswer,
@@ -133,7 +134,7 @@ export function AdjEndingsGame({
         </div>
       )}
       {!apiKey && (
-        <div className="dm-autofill-hint" onClick={onOpenAI}>
+        <div role="button" tabIndex={0} onKeyDown={activateOnKey} className="dm-autofill-hint" onClick={onOpenAI}>
           Add a Groq API key in the AI Tutor for sentences written just for this word.
         </div>
       )}

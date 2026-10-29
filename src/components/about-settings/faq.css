@@ -57,7 +57,7 @@
   flex: 1;
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   color: var(--text);
   animation: dm-faq-text-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
@@ -122,7 +122,7 @@
 }
 .dm-faq-answer {
   padding: 0 20px 16px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   line-height: 1.55;
   text-align: center;
@@ -143,9 +143,9 @@
 .dm-stat-value {
   font-family: "Sora", sans-serif;
   font-weight: 800;
-  font-size: 24px;
+  font-size: var(--fs-3xl);
 }
 .dm-stat-label {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }

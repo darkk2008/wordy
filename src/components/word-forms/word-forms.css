@@ -97,11 +97,11 @@
 .dm-modal-head h3 {
   font-family: "Sora", sans-serif;
   margin: 0;
-  font-size: 17px;
+  font-size: var(--fs-xl);
 }
 .dm-label {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   margin: 12px 0 6px;
   font-weight: 600;
@@ -115,7 +115,7 @@
   color: var(--text);
   border-radius: 12px;
   padding: 12px 13px;
-  font-size: 16px;
+  font-size: var(--fs-lg);
   outline: none;
   font-family: inherit;
   box-shadow: var(--shadow-inset);
@@ -134,7 +134,7 @@
   border-radius: 13px;
   padding: 12px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--fs-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,7 +166,7 @@
 }
 .dm-autofill-error {
   color: var(--red);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   margin-top: 6px;
 }
 .dm-voice-toast {
@@ -189,7 +189,7 @@
   cursor: pointer;
 }
 .dm-roman-inline {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   font-style: italic;
   letter-spacing: 0.2px;
@@ -203,14 +203,14 @@
   cursor: default;
 }
 .dm-flip-roman {
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: var(--text-dim);
   font-style: italic;
   margin-top: 4px;
 }
 .dm-autofill-hint {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   margin-top: 6px;
 }
 .dm-forms-modal-section {
@@ -220,7 +220,7 @@
   margin-top: 4px;
 }
 .dm-forms-modal-title {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -245,14 +245,14 @@
 }
 .dm-forms-modal-pronoun {
   color: var(--text-dim);
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 400;
   flex: 0 0 42%;
 }
 .dm-forms-modal-value {
   color: var(--text);
   opacity: 0.82;
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-family: inherit;
   font-weight: 400;
   flex: 1;
@@ -271,7 +271,7 @@
 }
 .dm-forms-modal-note {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   margin-top: 16px;
   line-height: 1.5;
 }
@@ -279,7 +279,7 @@
   text-align: center;
   color: var(--text-dim);
   padding: 30px 10px;
-  font-size: 14px;
+  font-size: var(--fs-md);
 }
 .dm-forms-head-actions {
   display: flex;

@@ -41,16 +41,16 @@
   }
 }
 .dm-settings-card-icon {
-  color: #ff6b9d;
+  color: var(--pink);
 }
 .dm-settings-card-name {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--fs-md);
   color: var(--text);
 }
 .dm-settings-card-desc {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 .dm-flag-icon {
@@ -95,7 +95,7 @@
   height: 22px;
 }
 .dm-lang-preview-name {
-  font-size: 14px;
+  font-size: var(--fs-md);
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -157,13 +157,13 @@
   flex-shrink: 0;
 }
 .dm-settings-hint {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   line-height: 1.5;
   margin: 14px 0 4px;
 }
 .dm-settings-section-label {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--text-dim);
@@ -208,7 +208,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 .dm-split-dot {
@@ -235,7 +235,7 @@
   gap: 10px;
 }
 .dm-barchart-label {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   font-weight: 600;
 }
@@ -268,7 +268,7 @@
   transition: width 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
 }
 .dm-barchart-value {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   text-align: right;
   font-family: "JetBrains Mono", monospace;
@@ -362,7 +362,7 @@
   height: 20px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.55);
-  color: #f0b429;
+  color: var(--warn);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +370,7 @@
 .dm-theme-name {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .dm-theme-check {
   position: absolute;

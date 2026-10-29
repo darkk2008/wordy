@@ -375,7 +375,7 @@
   .dm-btn-primary,
   .dm-btn-secondary {
     padding: 12px;
-    font-size: 13.5px;
+    font-size: var(--fs-md);
   }
   .dm-navbtn {
     padding: 6px 10px;

@@ -2,7 +2,7 @@
  * Shared bits: AnimatedIcon, IconBtn, GenderDot, AppLogo, WordMeta, FitText, form speak/eye buttons.
  */
 
-import { Fragment, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { APP_LOGO_SRC } from "../../assets/inline-images";
 import { wordGender } from "../../core/constants";
 import { ICON_SVGS, resolveIconId } from "../../core/icon-registry";

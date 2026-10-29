@@ -2,7 +2,7 @@
  * GameTopBar and GameDone (shared game header and results screen).
  */
 
-import { Fragment, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IconBtn } from "../common/common";
 import { ArrowRight, RotateCcw, X } from "../icons/icons";
 import { getLangAbbr } from "../language-settings/language-settings";

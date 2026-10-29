@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 const __openSwipeRows = new Set();
 function closeAllOpenSwipeRows() {
   __openSwipeRows.forEach((fn) => {
@@ -499,7 +500,7 @@ export function SwipeableRow({
       </div>
     );
   return (
-    <div
+    <div role="button" tabIndex={0} onKeyDown={activateOnKey}
       className={`dm-swipe-outer ${openSide !== "none" || forceElevated ? "dm-swipe-elevated" : ""} ${openSide === "down" ? "dm-swipe-outer-down-open" : ""}`}
       style={
         openSide === "down"

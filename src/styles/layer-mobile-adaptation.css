@@ -100,7 +100,7 @@
     margin: 0;
   }
 .dm-streak-hero-num {
-    font-size: 34px;
+    font-size: var(--fs-5xl);
   }
 .dm-streak-week {
     padding: 8px 6px;
@@ -111,7 +111,7 @@
    so keep every text field at 16px to prevent that automatic zoom (it broke the keyboard/viewport layout). */
 @media (pointer: coarse){.dm-app:not(.dm-section-games)
     :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
-    font-size: 16px;
+    font-size: var(--fs-lg);
   }
 }
 /* ===== Accessibility pass: tap targets (visual size unchanged, hit area 44px) ===== */

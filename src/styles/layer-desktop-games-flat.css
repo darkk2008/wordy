@@ -64,11 +64,11 @@
 }
 .dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-item b {
   font-weight: 800;
-  font-size: 14px;
+  font-size: var(--fs-md);
   letter-spacing: -0.01em;
 }
 .dm-home-view > .dm-stats-row > .dm-stats-group > .dm-count-pill.dm-count-pill .dm-count-label {
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   font-weight: 600;
   color: var(--text-dim);
 }

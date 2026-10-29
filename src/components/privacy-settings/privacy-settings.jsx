@@ -2,7 +2,7 @@
  * Privacy settings section.
  */
 
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { dmAnalyticsConsent, dmSetAnalyticsConsent } from "../../services/config-and-validation";
 import { FormsToggle } from "../games/setup-controls";
 

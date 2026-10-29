@@ -51,13 +51,13 @@
 }
 .dm-qrsync-name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--fs-base);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .dm-qrsync-sub {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 
@@ -94,7 +94,7 @@
   padding: 0 18px;
 }
 .dm-qr-parts-label {
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -131,6 +131,6 @@
 }
 .dm-qr-progress-label {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }

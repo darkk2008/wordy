@@ -33,6 +33,7 @@ import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 import { StackCard } from "../stack-card/stack-card";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function HomeView({
   stacks,
   families,
@@ -444,7 +445,7 @@ export function HomeView({
         <span className="dm-brand-ww">ww</span>ordy
       </div>
       <div className="dm-header">
-        <div className="dm-header-brand" onClick={handleLogoClick}>
+        <div role="button" tabIndex={0} onKeyDown={activateOnKey} className="dm-header-brand" onClick={handleLogoClick}>
           <AppLogo
             size={84}
             className="dm-header-logo"

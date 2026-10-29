@@ -1,0 +1,10 @@
+:root {
+  /* Repeated colors that used to be hard-coded in component CSS. Same values, one place to edit. */
+  --cyan-deep: #4fb8ce;
+  --warn: #f0b429;
+  --green-bright: #33d17a;
+  --pink: #ff6b9d;
+  --on-cyan: #06181c;
+  --orange: #ff8a3d;
+  --indigo: #8b93ff;
+}

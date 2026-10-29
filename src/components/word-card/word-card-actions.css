@@ -95,7 +95,7 @@
   position: relative;
   z-index: 1;
   padding: 12px 4px 13px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -147,7 +147,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #33d17a;
+  background: var(--green-bright);
   box-shadow: 0 0 0 2px var(--dm-bg, #0a0c11);
 }
 .dm-account-cta {

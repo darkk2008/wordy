@@ -2,7 +2,6 @@
  * Small SVG icon components (IconBase + Home, Star, Search, Plus ...).
  */
 
-import { Fragment } from "react";
 
 export function IconBase({ size = 18, color, fill, style, className, children, ...rest }) {
   return (

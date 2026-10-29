@@ -15,7 +15,7 @@
   box-shadow: none;
   color: rgba(var(--cyan-rgb), 0.85);
   font-family: "JetBrains Mono", monospace;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.02em;

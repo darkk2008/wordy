@@ -26,11 +26,11 @@
 }
 .dm-sync-card-title {
   font-weight: 700;
-  font-size: 14.5px;
+  font-size: var(--fs-base);
 }
 .dm-sync-card-sub {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   overflow-wrap: anywhere;
 }

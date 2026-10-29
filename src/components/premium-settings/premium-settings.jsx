@@ -2,7 +2,7 @@
  * Premium plans/features and the Premium settings screen.
  */
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { recordPremiumIntent } from "../../services/analytics-presence";
 import {
   loadActiveDiscount,

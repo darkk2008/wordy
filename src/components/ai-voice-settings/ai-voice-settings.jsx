@@ -2,7 +2,7 @@
  * Voice and AI-model settings sections.
  */
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DM_VOICE_FALLBACKS,
   DM_VOICE_SAMPLES,

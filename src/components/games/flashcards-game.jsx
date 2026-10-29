@@ -12,6 +12,7 @@ import { stripArticle } from "../word-forms/word-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
 import { FormsToggle } from "./setup-controls";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function FlashcardsGame({
   words,
   onAnswer,
@@ -186,7 +187,7 @@ export function FlashcardsGame({
           <FormsToggle checked={showForms} onChange={setShowForms} />
         )}
       </div>
-      <div
+      <div role="button" tabIndex={0} onKeyDown={activateOnKey}
         className={`dm-flip-wrap ${navDir < 0 ? "dm-flip-wrap-inprev" : "dm-flip-wrap-innext"}`}
         key={idx}
         ref={wrapRef}

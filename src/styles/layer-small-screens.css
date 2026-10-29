@@ -10,6 +10,6 @@
   }
   .dm-onboard-highlight {
     padding: 7px 10px;
-    font-size: 12.5px;
+    font-size: var(--fs-sm);
   }
 }

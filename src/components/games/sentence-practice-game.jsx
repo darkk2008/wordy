@@ -2,7 +2,7 @@
  * Sentence practice game.
  */
 
-import { Fragment, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { dmGroqFetch, dmParseJson } from "../../services/ai-groq";
 import { ArrowRight, Check, Loader2 } from "../icons/icons";

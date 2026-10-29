@@ -24,6 +24,7 @@ import { DmBadgeLock } from "../icons/settings-icons";
 import { SwipeableRow } from "../swipeable-row/swipeable-row";
 import { WordFormsLine, stripArticle } from "../word-forms/word-forms";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function WordCard({
   w,
   index,
@@ -240,7 +241,7 @@ export function WordCard({
       forcedOpenSide={multiPickMode ? (isPicked ? "left" : "none") : undefined}
       disableGestures={multiPickMode}
     >
-      <div
+      <div role="button" tabIndex={0} onKeyDown={activateOnKey}
         className={`dm-card${showMetaBelow ? " dm-card-wrapmeta" : ""}${longPressed ? " dm-card-longpress" : ""}${multiPickMode ? " dm-card-multipick" : ""}${multiPickMode && isPicked ? " dm-card-picked" : ""}`}
         ref={cardElRef}
         onPointerDown={multiPickMode ? undefined : startLongPress}
@@ -256,7 +257,7 @@ export function WordCard({
             : undefined
         }
       >
-        <div
+        <div role="button" tabIndex={0} onKeyDown={activateOnKey}
           className="dm-card-left"
           onClick={
             multiPickMode

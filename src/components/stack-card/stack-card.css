@@ -150,14 +150,14 @@
   margin-top: 9px;
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--fs-base);
   line-height: 1.25;
   letter-spacing: -0.005em;
   color: var(--text);
 }
 .dm-stack-count {
   flex-shrink: 0;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   line-height: 18px;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
@@ -209,7 +209,7 @@
   border: none;
   outline: none;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-md);
   font-family: inherit;
 }
 .dm-app .dm-search-input:focus-visible {
@@ -244,7 +244,7 @@
   color: var(--text-dim);
   padding: 7px 14px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -270,7 +270,7 @@
   border-radius: 999px;
   background: rgba(var(--gold-rgb), 0.85);
   color: #241a02;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 800;
   line-height: 1;
 }
@@ -305,11 +305,11 @@
 .dm-family-stat-value {
   font-family: "Sora", sans-serif;
   font-weight: 800;
-  font-size: 17px;
+  font-size: var(--fs-xl);
   color: var(--text);
 }
 .dm-family-stat-label {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--text-dim);
   font-weight: 600;
   text-transform: uppercase;
@@ -330,7 +330,7 @@
 .dm-family-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--cyan), #4fb8ce);
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-deep));
   transition: width 0.3s ease;
   transform-origin: left center;
   animation: dm-barfill-grow 0.7s cubic-bezier(0.22, 0.9, 0.3, 1) both;
@@ -351,7 +351,7 @@
   color: var(--text);
   padding: 10px 12px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -428,7 +428,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   font-weight: 600;
 }
@@ -588,7 +588,7 @@
   color: var(--text);
   padding: 8px 9px;
   border-radius: 10px;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -688,7 +688,7 @@
     padding: 8px 8px;
     min-height: 40px;
     border-radius: 10px;
-    font-size: 13.5px;
+    font-size: var(--fs-md);
   }
   .dm-dots-menu-icon {
     width: 26px;
@@ -707,7 +707,7 @@
     min-width: 144px;
   }
   .dm-dots-menu-item {
-    font-size: 13px;
+    font-size: var(--fs-sm);
   }
 }
 .dm-family-pick-list {
@@ -726,7 +726,7 @@
   color: var(--text);
   padding: 12px 14px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -761,7 +761,7 @@
   height: 18px;
   padding: 0 7px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   line-height: 1;
   color: var(--cyan);

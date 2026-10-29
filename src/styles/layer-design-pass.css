@@ -22,35 +22,35 @@
 }
 /* 2. Type scale: clearer section labels, no unreadable captions */
 .dm-section-title {
-  font-size: 17px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 .dm-eyebrow {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 .dm-level-badge,
 .dm-direction-badge {
-  font-size: 11px;
+  font-size: var(--fs-2xs);
 }
 .dm-premium-plan-badge {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 .dm-navbtn-label {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 .dm-stackselect-count,
 .dm-card-index,
 .dm-settings-card-desc,
 .dm-premium-plan-sub,
 .dm-settings-section-label {
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 /* 3. Settings: grouped, one neutral card style, a single accent colour */
 .dm-settings-group-label {
   font-family: "Sora", sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);

@@ -2,7 +2,7 @@
  * First-run onboarding flow.
  */
 
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ONBOARDING_LOGO_SRC } from "../../assets/inline-images";
 import { speak } from "../../core/speech-voices";
 import { seedWord } from "../../core/srs-and-seed-data";
@@ -10,10 +10,11 @@ import { FREE_THEME_LIMIT } from "../../services/premium-status";
 import { uiStaticText } from "../../services/ui-translation";
 import { THEMES } from "../appearance-settings/appearance-settings";
 import { AppLogo } from "../common/common";
-import { CardsIcon, Check, Flame, Gamepad2, Plus, Volume2 } from "../icons/icons";
+import { CardsIcon, Check, Flame, Gamepad2, Volume2 } from "../icons/icons";
 import { FlagIcon, LANGUAGES, getLangAbbr } from "../language-settings/language-settings";
 import { WordFormsLine } from "../word-forms/word-forms";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 function AnimatedText({ text, tag = "span", startDelay = 0, step = 0.045, className }) {
   const Tag = tag;
   const words = uiStaticText(text).split(" ");
@@ -217,7 +218,7 @@ function OnboardingFilterDemo({ sample, learningLanguage, nativeLanguage }) {
         ))}
       </div>
       <div className="dm-card dm-onboard-samplecard">
-        <div className="dm-card-left dm-onboard-swap" key={mode} onClick={() => speak(sample.de)}>
+        <div role="button" tabIndex={0} onKeyDown={activateOnKey} className="dm-card-left dm-onboard-swap" key={mode} onClick={() => speak(sample.de)}>
           <span className="dm-word-pair">
             {showWord && <span className="dm-de">{sample.de}</span>}
             {showTranslation && (

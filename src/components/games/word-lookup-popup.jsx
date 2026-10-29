@@ -2,7 +2,7 @@
  * Tap-a-word lookup popup used by listening/sentence games.
  */
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DM_DE_FORM_RULES,
   GENDER_SETS,

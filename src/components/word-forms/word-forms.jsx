@@ -2,7 +2,7 @@
  * Word forms line, forms table and the "all forms" modal (conjugations/declensions).
  */
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ARTICLE_SETS,
   DM_DE_FORM_RULES,
@@ -26,6 +26,7 @@ import { VERB_TENSE_LABELS } from "../games/write-game";
 import { Eye, EyeOff, Loader2, Sparkles, Star, X } from "../icons/icons";
 import { getLangName } from "../language-settings/language-settings";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function WordFormsLine({ w, showAudio }) {
   if (w.type === "noun" && w.plural) {
     const pluralText =
@@ -1206,7 +1207,7 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
         {" AI is filling in the missing forms…"}
       </div>
     ) : aiStatus === "error" ? (
-      <div
+      <div role="button" tabIndex={0} onKeyDown={activateOnKey}
         className="dm-autofill-error"
         style={{
           cursor: "pointer",
@@ -1261,7 +1262,7 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
           </div>
         )}
         {cStatus === "error" && !locked && (
-          <div
+          <div role="button" tabIndex={0} onKeyDown={activateOnKey}
             className="dm-autofill-error"
             style={{ cursor: "pointer" }}
             onClick={() => runConj(true)}
@@ -1344,7 +1345,7 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
     } else if (pStatus === "error") {
       body = (
         <>
-          <div
+          <div role="button" tabIndex={0} onKeyDown={activateOnKey}
             className="dm-autofill-error"
             style={{
               cursor: "pointer",
@@ -1393,7 +1394,7 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
           </div>
         </div>
         {locked && (
-          <div
+          <div role="button" tabIndex={0} onKeyDown={activateOnKey}
             className="dm-autofill-hint dm-forms-premium-hint"
             onClick={() => onOpenPremium && onOpenPremium()}
           >

@@ -27,6 +27,7 @@ import {
 } from "./games-config";
 import { FormsToggle } from "./setup-controls";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function GamesHub({
   stacks,
   onStart,
@@ -185,7 +186,7 @@ export function GamesHub({
                     compact
                     title="Play with word forms only"
                   />
-                  <span className="dm-forms-mix-label" onClick={() => setMixForms((v) => !v)}>
+                  <span role="button" tabIndex={0} onKeyDown={activateOnKey} className="dm-forms-mix-label" onClick={() => setMixForms((v) => !v)}>
                     Play all games with word forms only (genitive, plural, tenses, comparatives)
                   </span>
                 </div>

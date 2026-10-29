@@ -37,7 +37,7 @@
   }
 .dm-home-hero-sub {
     margin-top: 2px;
-    font-size: 13px;
+    font-size: var(--fs-sm);
     color: var(--text-dim);
     font-weight: 500;
   }
@@ -70,7 +70,7 @@
     height: 52px;
     padding: 0 18px;
     border-radius: 16px;
-    font-size: 16px;
+    font-size: var(--fs-lg);
     gap: 8px;
   }
 .dm-home-view > .dm-header .dm-streak svg {
@@ -95,7 +95,7 @@
     min-height: 46px;
     padding: 0 14px;
     border-radius: 12px;
-    font-size: 13.5px;
+    font-size: var(--fs-md);
   }
 .dm-count-pill,
 .dm-stat-chip,
@@ -142,7 +142,7 @@
     min-width: 134px;
     max-width: 134px;
     height: 44px;
-    font-size: 13.5px;
+    font-size: var(--fs-md);
     border-radius: 13px;
     gap: 6px;
     padding: 0 12px;
@@ -186,7 +186,7 @@
     border-radius: 14px;
   }
 .dm-forms-mix-label {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     line-height: 1.35;
   }
 .dm-stat-grid {
@@ -225,10 +225,10 @@
     border-radius: 13px;
   }
 .dm-home-view > .dm-due-banner .dm-due-banner-title {
-    font-size: 16px;
+    font-size: var(--fs-lg);
   }
 .dm-home-view > .dm-due-banner .dm-due-banner-sub {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     margin-top: 2px;
   }
 .dm-home-view > .dm-due-banner svg:last-child {
@@ -276,11 +276,11 @@
     min-width: 0;
   }
 .dm-settings-home .dm-settings-card-name {
-    font-size: 15px;
+    font-size: var(--fs-base);
     line-height: 1.25;
   }
 .dm-settings-home .dm-settings-card-desc {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     line-height: 1.35;
     margin-top: 2px;
     overflow: hidden;

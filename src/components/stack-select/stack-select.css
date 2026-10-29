@@ -74,7 +74,7 @@
   border: none;
   background: transparent;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-md);
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -166,14 +166,14 @@
 .dm-stackselect-name {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: var(--fs-base);
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dm-stackselect-count {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 .dm-stackselect-chevron {
@@ -224,14 +224,14 @@
 }
 .dm-stackselect-item-name {
   flex: 1;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dm-stackselect-item-count {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
 }
 .dm-stackselect-check {

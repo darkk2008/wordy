@@ -2,7 +2,7 @@
  * AI tutor modal (chat, key setup, suggestions).
  */
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DM_DE_FORM_RULES,
   DM_DE_SPELLING_RULES,

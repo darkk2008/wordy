@@ -127,7 +127,7 @@ body:not(.dm-scroll-locked) {
 .dm-skeleton-brand {
   font-family: "Sora", sans-serif;
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: var(--text-dim);
   letter-spacing: 0.02em;
 }

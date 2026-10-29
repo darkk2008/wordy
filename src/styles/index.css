@@ -4,6 +4,8 @@
  * override earlier ones (the "layer-*" files especially). Do not reorder without checking the screens.
  */
 @import "theme-tokens.css";
+@import "type-scale.css";
+@import "tokens-extra.css";
 @import "base-layout.css";
 @import "../components/home/home-header.css";
 @import "../components/stack-card/stack-card.css";
@@ -46,3 +48,23 @@
 @import "layer-word-index-v2.css";
 @import "../components/word-card/word-card-glass.css";
 @import "layer-desktop-games-flat.css";
+
+/* Accessibility: visible keyboard focus, and bigger touch areas that do not change the look. */
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .dm-iconbtn {
+    position: relative;
+  }
+  .dm-iconbtn::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}

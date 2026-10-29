@@ -66,7 +66,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -80,7 +80,7 @@
 .dm-onboard-stepcount-label {
   color: var(--text-dim);
   text-transform: uppercase;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   letter-spacing: 0.08em;
 }
 .dm-onboard-skip {
@@ -91,7 +91,7 @@
   border-radius: 999px;
   background: var(--surface);
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   transition: all 0.15s ease;
 }
 .dm-onboard-skip:hover {
@@ -151,7 +151,7 @@
 .dm-onboard-actions .dm-btn-secondary {
   min-height: 48px;
   border-radius: 16px;
-  font-size: 14.5px;
+  font-size: var(--fs-base);
 }
 .dm-onboard-actions .dm-onboard-back {
   flex: 0 0 34%;
@@ -173,12 +173,12 @@
   transform: scale(0.97);
 }
 .dm-onboard-title {
-  font-size: 23px;
+  font-size: var(--fs-3xl);
   letter-spacing: -0.015em;
   line-height: 1.2;
 }
 .dm-onboard-sub {
-  font-size: 14.5px;
+  font-size: var(--fs-base);
   max-width: 360px;
 }
 .dm-onboard-logo-frame {
@@ -230,11 +230,11 @@
 .dm-onboard-toggle-title {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   color: var(--text);
 }
 .dm-onboard-toggle-sub {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   line-height: 1.4;
 }
@@ -305,16 +305,16 @@
 .dm-settings-row-title {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   color: var(--text);
 }
 .dm-settings-row-sub {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   margin-top: 3px;
 }
 .dm-settings-row-sub-sm {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   line-height: 1.4;
 }
 .dm-settings-row-danger {
@@ -384,12 +384,12 @@
 .dm-guard-hero-title {
   font-family: "Sora", sans-serif;
   font-weight: 800;
-  font-size: 19px;
+  font-size: var(--fs-2xl);
   color: var(--text);
   letter-spacing: -0.01em;
 }
 .dm-guard-hero-text {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   line-height: 1.5;
   max-width: 300px;
@@ -402,7 +402,7 @@
   margin-top: 4px;
 }
 .dm-guard-group-label {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-dim);
@@ -479,11 +479,11 @@
 .dm-guard-title {
   font-family: "Sora", sans-serif;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: var(--fs-md);
   color: var(--text);
 }
 .dm-guard-sub {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--text-dim);
   margin-top: 3px;
   line-height: 1.4;
@@ -555,7 +555,7 @@
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 .dm-settings-card-premium .dm-settings-card-icon {
-  color: #f0b429;
+  color: var(--warn);
 }
 .dm-settings-card-contacts {
   border-color: rgba(45, 212, 191, 0.45);

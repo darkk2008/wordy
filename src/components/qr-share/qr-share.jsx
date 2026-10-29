@@ -2,7 +2,7 @@
  * QR share / scan modals (currently feature-flagged off).
  */
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   QR_MAX_BYTES,
   QR_MAX_FRAMES,

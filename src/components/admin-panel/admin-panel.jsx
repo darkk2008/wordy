@@ -2,7 +2,7 @@
  * Admin panel: stats, promo codes, devices.
  */
 
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../core/sharing-and-export";
 import {
   adminCreatePromoCode,

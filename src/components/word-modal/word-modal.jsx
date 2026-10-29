@@ -2,7 +2,7 @@
  * WordModal (add/edit word) and the shareable-HTML builder.
  */
 
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   DM_DE_FORM_RULES,
   DM_DE_SPELLING_RULES,

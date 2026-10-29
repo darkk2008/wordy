@@ -19,15 +19,9 @@ import {
   Star,
   Zap,
 } from "../icons/icons";
-import {
-  BellIcon,
-  GlobeIcon,
-  GraduationCap,
-  LockIcon,
-  ShieldIcon,
-  UsersIcon,
-} from "../icons/settings-icons";
+import { GlobeIcon, GraduationCap, LockIcon, ShieldIcon, UsersIcon } from "../icons/settings-icons";
 
+import { activateOnKey } from "../../behaviors/keyboard-activation";
 function useRevealOnView() {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
@@ -463,7 +457,7 @@ export function AppAboutSettings({ onBack }) {
         {FAQS.map((f) => {
           const isOpen = openId === f.id;
           return (
-            <div
+            <div role="button" tabIndex={0} onKeyDown={activateOnKey}
               key={f.id}
               className={`dm-faq-item ${isOpen ? "dm-faq-open" : ""}`}
               onClick={isOpen ? () => setOpenId(null) : undefined}
