@@ -173,11 +173,16 @@ export async function redeemPromoCode(rawCode) {
       message: "Enter a code.",
     };
   let data;
+  let token = null;
+  try {
+    token = window.wwordyCloud && window.wwordyCloud.getAccessToken ? await window.wwordyCloud.getAccessToken() : null;
+  } catch (e) {}
   try {
     const res = await fetch(`${NETLIFY_FN_BASE}/promo-redeem`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({
         code,
@@ -219,6 +224,13 @@ export async function redeemPromoCode(rawCode) {
     };
   }
   if (data.kind === "premium") {
+    // Recorded on the server: read Pro back from the entitlements table instead of trusting this device.
+    if (data.entitled && serverEntitlements()) {
+      try {
+        applyServerPremium(await window.wwordyCloud.getEntitlements());
+      } catch (e) {}
+      return { ok: true, message: data.message, status: loadPremiumStatus() };
+    }
     const status = grantPremium(data.type);
     return {
       ok: true,

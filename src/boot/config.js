@@ -19,6 +19,8 @@ window.DM_CONFIG = {
   proxyUrl: "/.netlify/functions/ai-proxy",
   sharedKey: "",
   blockFraming: true,
+  // Pro comes only from the Supabase `entitlements` table (run supabase-entitlements.sql first).
+  serverEntitlements: true,
 };
 /* Clickjacking protection (a <meta> CSP cannot set frame-ancestors): optional, see blockFraming above. */
 (function () {

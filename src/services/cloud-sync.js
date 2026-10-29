@@ -168,6 +168,13 @@ window.wwordyCloud = (function () {
     return res.data && res.data.session ? res.data.session.user.id : null;
   }
 
+  async function getAccessToken() {
+    var c = getClient();
+    if (!c) return null;
+    var res = await c.auth.getSession();
+    return res.data && res.data.session ? res.data.session.access_token : null;
+  }
+
   async function getMyPublicId() {
     var c = getClient();
     if (!c) return null;
@@ -324,6 +331,7 @@ window.wwordyCloud = (function () {
     pushData: pushData,
     pullData: pullData,
     getEntitlements: getEntitlements,
+    getAccessToken: getAccessToken,
     subscribe: subscribe,
     changePassword: changePassword,
     deleteAccount: deleteAccount,
