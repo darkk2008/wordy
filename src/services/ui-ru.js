@@ -916,6 +916,13 @@ const TOPIC_RU = {
  "emergencies, safety, accidents and calling for help": "экстренные случаи, безопасность, аварии и вызов помощи"
 };
 export const UI_RU_PATTERNS = [
+  [/^Comparative of (.+)$/, "Сравнит. степень от $1"],
+  [/^Superlative \(before noun\) of (.+)$/, "Превосх. степень (перед сущ.) от $1"],
+  [/^Superlative of (.+)$/, "Превосх. степень от $1"],
+  [/^Plural of (.+)$/, "Мн. число от $1"],
+  [/^Genitive of (.+)$/, "Родительный падеж от $1"],
+  [/^Past tense of (.+)$/, "Прошедшее время от $1"],
+  [/^Past participle of (.+)$/, "Причастие от $1"],
   [/^A \{\{0\}\}-word (\w+) pack covering (.+), translated into (\w+)\.$/, (m, a, topic, b) => "Пакет из {{0}} слов (" + (LANG_RU[a] || a) + ", перевод: " + (LANG_RU[b] || b) + "). Темы: " + (TOPIC_RU[topic] || topic) + "."],
   [/^(\{\{0\}\}) words · ready on Home$/, "Слов: {{0}} · уже на главной"],
   [/^\{\{0\}\} words · (.+)$/, "Слов: {{0}} · $1"],

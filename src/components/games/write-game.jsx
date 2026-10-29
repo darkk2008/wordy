@@ -99,14 +99,15 @@ export const VERB_TENSE_LABELS = {
 };
 // Builds one form question. The prompt is the English meaning of the
 // form in the user's native language (e.g. "more patient"); the grammar label goes in `badge`
-// (e.g. "Comparative of adj"). Falls back to the old "<label> of <word>"
+// (e.g. "Comparative of schön" — the generic "adj/noun/verb" is swapped for the base word). Falls back to the old "<label> of <word>"
 // text when the word has no English translation to build from.
 function formQ(w, kind, badge, fallbackLabel, answer) {
   const phrase = nativeFormPhrase(kind, w.en, uiTranslationLangCode);
   return {
     wordId: w.id,
     prompt: phrase || `${fallbackLabel} of “${w.de}”`,
-    badge,
+    // "Superlative of adj" -> "Superlative of gemütlich": name the word the form belongs to.
+    badge: badge.replace(/ of (adj|noun|verb)$/, () => ` of ${w.de}`),
     answer,
   };
 }
