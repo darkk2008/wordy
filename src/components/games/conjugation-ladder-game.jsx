@@ -20,6 +20,23 @@ export function ConjugationLadderGame({ words, onAnswer, onExit, onPlayAgain }) 
   const [picked, setPicked] = useState(null);
   const [slipped, setSlipped] = useState(false);
   const [climbed, setClimbed] = useState(0);
+  // Hooks must run on every render, so they sit above the early returns below.
+  const verb = verbs[verbIdx];
+  const forms = verb ? computeVerbForms(verb).praesens : [];
+  const order = useMemo(() => shuffle([0, 1, 2, 3, 4, 5]), [verbIdx]);
+  const person = forms[order[personIdx]];
+  const options = useMemo(() => {
+    if (!person) return [];
+    const seen = new Set([person.value]);
+    const distractors = [];
+    for (const r of shuffle(forms.filter((_, i) => i !== order[personIdx]))) {
+      if (seen.has(r.value)) continue;
+      seen.add(r.value);
+      distractors.push(r.value);
+      if (distractors.length === 3) break;
+    }
+    return shuffle([person.value, ...distractors]);
+  }, [verbIdx, personIdx]);
   if (!verbs.length) {
     return (
       <div className="dm-game-play">
@@ -39,21 +56,6 @@ export function ConjugationLadderGame({ words, onAnswer, onExit, onPlayAgain }) 
         score={`${climbed}/${totalRungs}`}
       />
     );
-  const verb = verbs[verbIdx];
-  const forms = computeVerbForms(verb).praesens;
-  const order = useMemo(() => shuffle([0, 1, 2, 3, 4, 5]), [verbIdx]);
-  const person = forms[order[personIdx]];
-  const options = useMemo(() => {
-    const seen = new Set([person.value]);
-    const distractors = [];
-    for (const r of shuffle(forms.filter((_, i) => i !== order[personIdx]))) {
-      if (seen.has(r.value)) continue;
-      seen.add(r.value);
-      distractors.push(r.value);
-      if (distractors.length === 3) break;
-    }
-    return shuffle([person.value, ...distractors]);
-  }, [verbIdx, personIdx]);
   const choose = (opt) => {
     if (picked !== null) return;
     const correct = opt === person.value;
