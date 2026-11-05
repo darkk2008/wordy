@@ -292,6 +292,12 @@ export const Headphones = (p) => (
     <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
   </IconBase>
 );
+export const Columns2 = (p) => (
+  <IconBase {...p}>
+    <rect x="3" y="4" width="18" height="16" rx="2.5" />
+    <path d="M12 4v16" />
+  </IconBase>
+);
 export const Grid2x2 = (p) => (
   <IconBase {...p}>
     <rect x="3" y="3" width="8" height="8" rx="1.5" />

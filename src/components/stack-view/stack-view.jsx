@@ -2,7 +2,8 @@
  * StackView: the screen showing one stack's words.
  */
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { shuffle } from "../../core/srs-and-seed-data";
 import { FREE_FAVORITE_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { FormsAudioToggle } from "../games/setup-controls";
@@ -12,12 +13,14 @@ import {
   ChevronLeft,
   ChevronsDownUp,
   ChevronsUpDown,
+  Columns2,
   Gamepad2,
   MenuOrClose,
   MiniStackBtnContent,
   Plus,
   QrCode,
   Share2,
+  Shuffle,
   Star,
   Trash2,
   X,
@@ -87,6 +90,56 @@ export function StackView({
       return next;
     });
   };
+  // Desktop-only "two words per row" layout (the button is hidden on phones via CSS)
+  const [wideMode, setWideMode] = useState(() => {
+    try {
+      return localStorage.getItem("dm-stack-wide") === "1";
+    } catch (e) {
+      return false;
+    }
+  });
+  const listRef = useRef(null);
+  const prevRects = useRef(null);
+  const snapshotList = () => {
+    const el = listRef.current;
+    if (!el) return;
+    prevRects.current = Array.from(el.children).map((c) => c.getBoundingClientRect());
+  };
+  const toggleWide = () => {
+    snapshotList();
+    setWideMode((w) => {
+      const next = !w;
+      try {
+        localStorage.setItem("dm-stack-wide", next ? "1" : "0");
+      } catch (e) {}
+      return next;
+    });
+  };
+  // FLIP: cards glide from their old position/size to the new one
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    const before = prevRects.current;
+    prevRects.current = null;
+    if (!el || !before) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    Array.from(el.children).forEach((child, i) => {
+      const a = before[i];
+      if (!a || !child.animate) return;
+      const b = child.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      const dx = a.left - b.left;
+      const dy = a.top - b.top;
+      const sx = a.width / b.width;
+      const sy = a.height / b.height;
+      child.animate(
+        [
+          { transformOrigin: "top left", transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+          { transformOrigin: "top left", transform: "none" },
+        ],
+        { duration: 460, easing: "cubic-bezier(0.22, 1, 0.36, 1)", delay: Math.min(i, 8) * 12 }
+      );
+    });
+  }, [wideMode]);
   const [pickedIds, setPickedIds] = useState(() => new Set());
   const enterMultiPick = (w) => {
     setMultiPickMode(true);
@@ -187,6 +240,15 @@ export function StackView({
     });
     setModalWord(undefined);
   };
+  const shuffleWords = () => {
+    if (stack.words.length < 2) return;
+    let next = shuffle(stack.words);
+    // make sure the order actually changes
+    for (let t = 0; t < 5 && next.every((w, i) => w.id === stack.words[i].id); t++) {
+      next = shuffle(stack.words);
+    }
+    onUpdateStack({ ...stack, words: next });
+  };
   const shareStack = async () => {
     const html = buildShareHTML(stack);
     const fileName = `${(stack.name || "stack").trim().replace(/[^a-z0-9]+/gi, "_")}.html`;
@@ -248,7 +310,11 @@ ${lines}`;
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="dm-view notranslate" translate="no" data-ui-ru="1">
+    <div
+      className={`dm-view dm-stack-screen notranslate${wideMode ? " dm-stack-wide" : ""}`}
+      translate="no"
+      data-ui-ru="1"
+    >
       <div className="dm-topbar">
         <IconBtn onClick={onBack} className="dm-topbar-fixed-btn">
           <ChevronLeft size={20} />
@@ -302,6 +368,9 @@ ${lines}`;
             <IconBtn title="Share stack" onClick={shareStack}>
               <Share2 size={18} />
             </IconBtn>
+            <IconBtn title="Shuffle words" onClick={shuffleWords}>
+              <Shuffle size={18} />
+            </IconBtn>
             {QR_SHARING_ENABLED && (
               <IconBtn title="Sync to phone via QR" onClick={() => setShowQRModal(true)}>
                 <QrCode size={18} />
@@ -331,16 +400,28 @@ ${lines}`;
           <AnimatedIcon id={stack.emoji} size={24} className="dm-stack-title-emoji" />
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
-        <button
-          type="button"
-          className={`dm-stack-actions-toggle${actionsCollapsed ? " is-collapsed" : ""}`}
-          title={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
-          aria-label={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
-          aria-pressed={actionsCollapsed}
-          onClick={toggleAllActions}
-        >
-          {actionsCollapsed ? <ChevronsUpDown size={18} /> : <ChevronsDownUp size={18} />}
-        </button>
+        <div className="dm-stack-title-tools">
+          <button
+            type="button"
+            className={`dm-stack-actions-toggle dm-stack-wide-toggle${wideMode ? " is-on" : ""}`}
+            title={wideMode ? "Back to one word per row" : "Two words per row"}
+            aria-label={wideMode ? "Back to one word per row" : "Two words per row"}
+            aria-pressed={wideMode}
+            onClick={toggleWide}
+          >
+            <Columns2 size={18} />
+          </button>
+          <button
+            type="button"
+            className={`dm-stack-actions-toggle${actionsCollapsed ? " is-collapsed" : ""}`}
+            title={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+            aria-label={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+            aria-pressed={actionsCollapsed}
+            onClick={toggleAllActions}
+          >
+            {actionsCollapsed ? <ChevronsUpDown size={18} /> : <ChevronsDownUp size={18} />}
+          </button>
+        </div>
       </div>
       <div className="dm-segmented dm-display-toggle">
         {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
@@ -359,6 +440,7 @@ ${lines}`;
       </div>
       <div
         className="dm-list"
+        ref={listRef}
         style={
           multiPickMode
             ? {
