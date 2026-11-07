@@ -222,7 +222,7 @@ export function GamesHub({
           </div>
         </div>
       </div>
-      <div className="dm-game-grid">
+      <div className="dm-game-grid dm-game-grid-v2">
         {orderedGames.map((g) => {
           const locked = !!g.premium && !isPremium;
           const cooldownUntil = isPremium ? 0 : getGameCooldownUntil(g.id);

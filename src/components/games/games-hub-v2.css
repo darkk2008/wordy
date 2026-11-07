@@ -1,0 +1,133 @@
+/* components/games/games-hub-v2.css
+ * Games screen, minimal look (same language as the Home stack tiles in stack-card-v2.css):
+ * flat tint instead of gradients and shadows, bare icon marks, one thin border that appears on hover.
+ * Visual only. Game tiles are scoped to .dm-game-grid-v2 (set on the GamesHub grid), the setup panel to
+ * .dm-gsetup, so every other screen keeps its current style. Imported last in styles/index.css.
+ */
+
+/* ============================== game tiles ============================== */
+.dm-game-grid-v2 { gap: 10px; }
+
+.dm-game-grid-v2 > .dm-game-card {
+  --accent: var(--gold);
+  min-height: 128px;
+  padding: 16px 16px 15px;
+  gap: 3px;
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--text) 4.5%, transparent);
+  box-shadow: none;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.25s ease,
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-game-grid-v2 > .dm-game-card:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--text) 7%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+    box-shadow: none;
+    transform: none;
+  }
+}
+.dm-game-grid-v2 > .dm-game-card:active:not(:disabled) { transform: scale(0.98); }
+
+/* the icon is a bare mark, no box */
+.dm-game-grid-v2 .dm-game-icon {
+  width: auto;
+  height: auto;
+  margin: 0 0 auto;
+  align-self: flex-start;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--accent);
+}
+.dm-game-grid-v2 .dm-game-name {
+  margin-top: 16px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.dm-game-grid-v2 .dm-game-desc {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* premium: a bare gold lock in the corner; "soon": plain small text */
+.dm-game-grid-v2 .dm-game-lock-badge {
+  top: 14px;
+  right: 14px;
+  width: auto;
+  height: auto;
+  background: none;
+  border: 0;
+  color: var(--gold);
+}
+.dm-game-grid-v2 .dm-game-soon {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border: 0;
+}
+/* the cooldown timer: a flat chip, no outline */
+.dm-game-grid-v2 .dm-game-cooldown-timer {
+  bottom: 14px;
+  right: 14px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border: 0;
+}
+
+/* ============================== setup panel ============================== */
+.dm-gsetup {
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--text) 4.5%, transparent);
+  box-shadow: none;
+}
+.dm-gsetup.dm-gsetup-collapsed { border-color: transparent; border-radius: 24px; }
+.dm-gsetup-mode { border-top-color: color-mix(in srgb, var(--text) 9%, transparent); }
+.dm-gsetup-toggle { border-radius: 50%; }
+.dm-gsetup-collapsed .dm-gsetup-toggle { color: var(--text-dim); }
+
+/* the stack dropdown and the mode chip: flat pills */
+.dm-gsetup-bar .dm-stackselect-trigger {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-color: transparent;
+  border-radius: 16px;
+}
+.dm-gsetup-bar .dm-stackselect-emoji { background: none; }
+.dm-gsetup-modechip {
+  border-radius: 16px;
+  border-color: transparent;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+.dm-gsetup-modechip.dm-gsetup-modechip-on {
+  background: color-mix(in srgb, var(--cyan) 16%, transparent);
+  border-color: transparent;
+  color: var(--text);
+}
+
+/* whole words / word forms switch */
+.dm-gsetup .dm-formsmode {
+  border: 0;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  box-shadow: none;
+}
+.dm-gsetup .dm-formsmode-btn { border-radius: 12px; }
+.dm-gsetup .dm-formsmode-btn-active,
+.dm-gsetup .dm-formsmode-btn-active:hover {
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  box-shadow: none;
+}
+
+/* ============================== larger screens ============================== */
+@media (min-width: 768px) {
+  .dm-game-grid-v2 { gap: 14px; }
+  .dm-game-grid-v2 > .dm-game-card { min-height: 150px; padding: 20px 20px 18px; }
+  .dm-game-grid-v2 .dm-game-name { font-size: var(--fs-lg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-game-grid-v2 > .dm-game-card { transition: none; }
+}

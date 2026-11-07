@@ -115,7 +115,15 @@
   background: none;
   box-shadow: none;
 }
-/* pinned: one small gold dot beside the icon */
+/* pinned: a gold border on the tile, plus one small gold dot beside the icon */
+.dm-stack-grid-v2[data-look="minimal"] .dm-stack-card.dm-sc.dm-stack-card-pinned {
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-stack-grid-v2[data-look="minimal"] .dm-stack-card.dm-sc.dm-stack-card-pinned:hover {
+    border-color: color-mix(in srgb, var(--gold) 85%, transparent);
+  }
+}
 .dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-pin-icon-badge {
   position: absolute;
   top: 0;
@@ -146,7 +154,13 @@
   line-height: 1.25;
   letter-spacing: -0.012em;
 }
-.dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-meta { gap: 2px 9px; }
+/* count on the left, family on the right of the same row */
+.dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-meta {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 2px 9px;
+}
+.dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-count { flex: none; }
 .dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-count {
   font-size: var(--fs-xs);
   line-height: 18px;
@@ -158,9 +172,12 @@
   color: var(--text);
 }
 .dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-family-badge {
+  margin-left: auto;
+  padding: 0;
   font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--text-dim);
+  text-align: right;
 }
 .dm-stack-grid-v2[data-look="minimal"] .dm-sc .dm-stack-family-badge::before {
   width: 5px;

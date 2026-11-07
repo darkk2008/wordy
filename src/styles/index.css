@@ -50,6 +50,8 @@
 @import "layer-desktop-games-flat.css";
 /* Home stack tiles (the "deck" design). Scoped to .dm-sc, so it must stay last. */
 @import "../components/stack-card/stack-card-v2.css";
+/* Games screen, same minimal look. Keep last. */
+@import "../components/games/games-hub-v2.css";
 
 /* Accessibility: visible keyboard focus, and bigger touch areas that do not change the look. */
 button:focus-visible,
