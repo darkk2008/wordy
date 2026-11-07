@@ -721,6 +721,11 @@ export function App() {
     syncReadyRef.current = false;
     const onVisible = async () => {
       if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
+      // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
+      try {
+        const ent = await cloud.getEntitlements();
+        if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
+      } catch (e) {}
       const r = await cloud.pullData();
       if (cancelled || r.failed || !r.payload) return;
       if (r.updated_by_device === cloud.getDeviceId()) return;

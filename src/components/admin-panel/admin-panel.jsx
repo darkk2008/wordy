@@ -15,7 +15,7 @@ import {
   setAdminSecret,
 } from "../../services/admin-promo";
 import { fetchOnlineCount, getAnalyticsSnapshot } from "../../services/analytics-presence";
-import { grantPremium, loadPremiumStatus, revokePremium } from "../../services/premium-status";
+import { adminGrantPremium, adminRevokePremium, loadPremiumStatus } from "../../services/premium-status";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import { Check, ChevronLeft, Eye, Sparkles, Trash2, X } from "../icons/icons";
@@ -237,11 +237,22 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
       setCopyFailedCode(null);
     }, 2200);
   };
-  const handleGrantPremium = (type) => {
-    setPremium(grantPremium(type));
-    setAnalytics(getAnalyticsSnapshot());
+  const [premiumMsg, setPremiumMsg] = useState("");
+  const handleGrantPremium = async (type) => {
+    setPremiumMsg("Saving to server…");
+    const r = await adminGrantPremium(type);
+    setPremiumMsg(r.ok ? "Saved on the server." : r.message);
+    if (r.ok) {
+      setPremium(r.status);
+      setAnalytics(getAnalyticsSnapshot());
+    }
   };
-  const handleRevokePremium = () => setPremium(revokePremium());
+  const handleRevokePremium = async () => {
+    setPremiumMsg("Revoking…");
+    const r = await adminRevokePremium();
+    setPremiumMsg(r.ok ? "Revoked on the server." : r.message);
+    if (r.ok) setPremium(r.status);
+  };
   const overviewTab = (
     <>
       <div className="dm-admin-stat-grid">
@@ -455,6 +466,7 @@ export function AdminPanel({ onClose, stacks, families, streak, asPage }) {
             ? `Active — ${PROMO_TYPE_LABELS[premium.type] || premium.type}${premium.expiresAt ? ` · expires ${formatAdminDate(premium.expiresAt)}` : " · never expires"}`
             : "Not active"}
         </p>
+        {premiumMsg && <p className="dm-settings-hint">{premiumMsg}</p>}
         <div className="dm-admin-grant-actions">
           <button
             type="button"

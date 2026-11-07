@@ -3,7 +3,7 @@
  */
 
 import { ADMIN_PREMIUM_KEY, PROMO_DURATIONS } from "../core/srs-and-seed-data";
-import { NETLIFY_FN_BASE, getDeviceId } from "./admin-promo";
+import { NETLIFY_FN_BASE, getDeviceId, adminPromoRequest } from "./admin-promo";
 import { recordPremiumActivation } from "./analytics-presence";
 
 export function loadPremiumStatus() {
@@ -136,6 +136,29 @@ export function grantPremium(type) {
   recordPremiumActivation();
   return status;
 }
+// Admin grant/revoke. With server entitlements the grant must be written to the server and read
+// back, otherwise the next sync (no server row) wipes it. Returns { ok, status?, message? }.
+async function syncFromServer() {
+  const row = await window.wwordyCloud.getEntitlements();
+  if (row && row.failed) return false;
+  applyServerPremium(row);
+  return true;
+}
+export async function adminGrantPremium(type) {
+  if (!serverEntitlements()) return { ok: true, status: grantPremium(type) };
+  const r = await adminPromoRequest("grant-self", { type });
+  if (!r || !r.ok) return { ok: false, message: (r && r.message) || "Grant failed." };
+  if (!(await syncFromServer())) return { ok: false, message: "Saved on the server, but couldn't read it back. Reload to refresh." };
+  recordPremiumActivation();
+  return { ok: true, status: loadPremiumStatus() };
+}
+export async function adminRevokePremium() {
+  if (!serverEntitlements()) return { ok: true, status: revokePremium() };
+  const r = await adminPromoRequest("revoke-self");
+  if (!r || !r.ok) return { ok: false, message: (r && r.message) || "Revoke failed." };
+  revokePremium();
+  return { ok: true, status: loadPremiumStatus() };
+}
 export function revokePremium() {
   const status = {
     active: false,
@@ -199,6 +222,7 @@ export async function redeemPromoCode(rawCode) {
   if (!data || !data.ok)
     return {
       ok: false,
+      needsLogin: !!(data && data.needsLogin),
       message: (data && data.message) || "That code isn't valid.",
     };
   // The server only validates and consumes the code; applying its effect
@@ -226,9 +250,17 @@ export async function redeemPromoCode(rawCode) {
   if (data.kind === "premium") {
     // Recorded on the server: read Pro back from the entitlements table instead of trusting this device.
     if (data.entitled && serverEntitlements()) {
-      try {
-        applyServerPremium(await window.wwordyCloud.getEntitlements());
-      } catch (e) {}
+      // Read back with a couple of retries so a slow read never leaves the user looking un-upgraded.
+      for (let i = 0; i < 3; i++) {
+        try {
+          const row = await window.wwordyCloud.getEntitlements();
+          if (!(row && row.failed)) {
+            applyServerPremium(row);
+            break;
+          }
+        } catch (e) {}
+        await new Promise((r) => setTimeout(r, 600));
+      }
       return { ok: true, message: data.message, status: loadPremiumStatus() };
     }
     const status = grantPremium(data.type);

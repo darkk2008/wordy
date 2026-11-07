@@ -58,12 +58,17 @@ export function setAdminSecret(value) {
   __dmAdminSecretMem = String(value || "");
 }
 export async function adminPromoRequest(action, extra) {
+  let token = null;
+  try {
+    token = window.wwordyCloud && window.wwordyCloud.getAccessToken ? await window.wwordyCloud.getAccessToken() : null;
+  } catch (e) {}
   try {
     const res = await fetch(`${NETLIFY_FN_BASE}/promo-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-admin-secret": getAdminSecret(),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(
         Object.assign(

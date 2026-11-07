@@ -2,10 +2,97 @@
  * StackCard: a stack tile on the home screen.
  */
 
+import { resolveIconId } from "../../core/icon-registry";
 import { AnimatedIcon } from "../common/common";
 import { MoreOrClose, Trash2 } from "../icons/icons";
 import { ArchiveIcon, PinIcon, UsersIcon } from "../icons/settings-icons";
 import { SwipeableRow } from "../swipeable-row/swipeable-row";
+
+/* ---- Presentation helpers (visual only: derived from the stack's icon and word count) ---- */
+
+/* Which look the Home stack tiles use. "minimal" (flat, typographic) or "cards" (taped flashcards).
+   Both are pure CSS in stack-card-v2.css; this is the only switch. */
+export const STACK_LOOK = "minimal";
+
+const STACK_TONES = {
+  sprout: "green",
+  tree: "green",
+  family: "green",
+  bolt: "gold",
+  target: "gold",
+  crown: "gold",
+  orbit: "gold",
+  puzzle: "gold",
+  star: "gold",
+  book: "violet",
+  home: "violet",
+  gem: "violet",
+  school: "orange",
+  nest: "orange",
+  food: "red",
+  heart: "red",
+};
+export function stackTone(icon) {
+  return STACK_TONES[resolveIconId(icon)] || "cyan";
+}
+/* how many "cards" peek out beneath the tile: a thicker deck means more words */
+export function stackDepth(wordCount) {
+  if (wordCount >= 10) return 2;
+  if (wordCount >= 1) return 1;
+  return 0;
+}
+
+/* The inside of a stack tile: cover art, icon jewel, name and meta. */
+export function StackFace({ s, isPinned, familyName }) {
+  const n = s.words.length;
+  return (
+    <>
+      <div className="dm-stack-cover" aria-hidden="true" data-count={n}>
+        <span className="dm-stack-art" />
+      </div>
+      <div className="dm-stack-emoji">
+        <AnimatedIcon id={s.emoji} size={28} />
+        {isPinned && (
+          <span className="dm-stack-pin-icon-badge" title="Pinned">
+            <PinIcon size={11} />
+          </span>
+        )}
+      </div>
+      <div className="dm-stack-body">
+        <div className="dm-stack-name">{s.name}</div>
+        <div className="dm-stack-meta">
+          <span className="dm-stack-count">
+            <b className="dm-stack-num">{n}</b>
+            {n === 1 ? " word" : " words"}
+          </span>
+          {familyName && (
+            <span className="dm-stack-family-badge" title={familyName}>
+              {familyName}
+            </span>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* The tile itself: the card, plus the layers of the "deck" behind it. */
+export function StackTile({ s, isPinned, familyName, className = "", children, ...rest }) {
+  return (
+    <div
+      className="dm-stack-deck"
+      data-tone={stackTone(s.emoji)}
+      data-depth={stackDepth(s.words.length)}
+    >
+      <span className="dm-stack-layer dm-stack-layer-1" aria-hidden="true" />
+      <span className="dm-stack-layer dm-stack-layer-2" aria-hidden="true" />
+      <div className={`dm-stack-card dm-sc ${className}`} {...rest}>
+        {children}
+        <StackFace s={s} isPinned={isPinned} familyName={familyName} />
+      </div>
+    </div>
+  );
+}
 
 export function StackCard({
   s,
@@ -79,8 +166,11 @@ export function StackCard({
           actionsColumn
           forceElevated={menuOpen}
         >
-          <div
-            className={`dm-stack-card ${isPinned ? "dm-stack-card-pinned" : ""} ${menuStackId === s.id || closingMenuId === s.id ? "dm-stack-card-menu-open" : ""}`}
+          <StackTile
+            s={s}
+            isPinned={isPinned}
+            familyName={familyName}
+            className={`${isPinned ? "dm-stack-card-pinned" : ""} ${menuStackId === s.id || closingMenuId === s.id ? "dm-stack-card-menu-open" : ""}`}
             role="button"
             tabIndex={0}
             onClick={() => onOpenStack(s.id)}
@@ -176,26 +266,7 @@ export function StackCard({
                 </button>
               </div>
             )}
-            <div className="dm-stack-emoji">
-              <AnimatedIcon id={s.emoji} size={30} />
-            </div>
-            <div className="dm-stack-name">{s.name}</div>
-            <div className="dm-stack-meta">
-              <span className="dm-stack-count">
-                {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
-              </span>
-              {isPinned && (
-                <span className="dm-stack-pin-icon-badge" title="Pinned">
-                  <PinIcon size={11} />
-                </span>
-              )}
-              {familyName && (
-                <span className="dm-stack-family-badge" title={familyName}>
-                  {familyName}
-                </span>
-              )}
-            </div>
-          </div>
+          </StackTile>
         </SwipeableRow>
       </div>
     </div>

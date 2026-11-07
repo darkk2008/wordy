@@ -30,7 +30,7 @@ import {
 import { ArchiveIcon } from "../icons/settings-icons";
 import { StreakModal } from "../pickers/pickers";
 import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
-import { StackCard } from "../stack-card/stack-card";
+import { STACK_LOOK, StackCard, StackTile } from "../stack-card/stack-card";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
@@ -709,7 +709,12 @@ export function HomeView({
           </button>
         </div>
       )}
-      <div className="dm-stack-grid" ref={gridRef} onClickCapture={dmListClickGuard}>
+      <div
+        className="dm-stack-grid dm-stack-grid-v2"
+        data-look={STACK_LOOK}
+        ref={gridRef}
+        onClickCapture={dmListClickGuard}
+      >
         {visibleStacks.map((s) => {
           const isEntering = enteringIds.has(s.id);
           const isPinned = !!s.pinned || (activeFamily !== "all" && !!s.familyPinned);
@@ -751,20 +756,11 @@ export function HomeView({
             }}
           >
             <div className="dm-stack-cell-inner">
-              <div className="dm-stack-card">
-                <div className="dm-stack-emoji">
-                  <AnimatedIcon id={s.emoji} size={30} />
-                </div>
-                <div className="dm-stack-name">{s.name}</div>
-                <div className="dm-stack-count">
-                  {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
-                </div>
-                {s.familyId && familyById[s.familyId] && (
-                  <div className="dm-stack-family-badge" title={familyById[s.familyId].name}>
-                    {familyById[s.familyId].name}
-                  </div>
-                )}
-              </div>
+              <StackTile
+                s={s}
+                isPinned={!!s.pinned}
+                familyName={s.familyId && familyById[s.familyId] ? familyById[s.familyId].name : null}
+              />
             </div>
           </div>
         ))}

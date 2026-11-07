@@ -81,3 +81,60 @@ export async function readJson(req, max = 8192) {
 }
 
 export const validId = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{8,64}$/.test(v);
+
+// ---- Supabase helpers shared by promo-redeem and promo-admin ----------------------------------
+
+// Verifies the caller's Supabase login token and returns the user id (or null).
+export async function userFromToken(req) {
+  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+  const m = /^Bearer (.+)$/.exec(req.headers.get("authorization") || "");
+  if (!m || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  try {
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${m[1]}` },
+    });
+    if (!r.ok) return null;
+    const u = await r.json();
+    return u && typeof u.id === "string" ? u.id : null;
+  } catch (e) { return null; }
+}
+
+function sbHeaders() {
+  const { SUPABASE_SERVICE_ROLE_KEY } = process.env;
+  return { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`, "Content-Type": "application/json" };
+}
+
+const DAYS = { monthly: 30, yearly: 365 };
+
+// Writes Pro to the `entitlements` table, extending (never shortening) what the user already has.
+export async function grantEntitlement(userId, type) {
+  const { SUPABASE_URL } = process.env;
+  if (!SUPABASE_URL || !(type === "permanent" || DAYS[type])) return false;
+  const headers = sbHeaders();
+  const cur = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?user_id=eq.${userId}&select=premium_type,premium_expires_at`, { headers });
+  if (!cur.ok) return false;
+  const row = (await cur.json())[0];
+  let expires = null;
+  if (type !== "permanent" && row?.premium_type !== "permanent") {
+    const base = Math.max(Date.now(), row?.premium_expires_at ? Date.parse(row.premium_expires_at) : 0);
+    expires = new Date(base + DAYS[type] * 864e5).toISOString();
+  }
+  const finalType = row?.premium_type === "permanent" ? "permanent" : type;
+  const up = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?on_conflict=user_id`, {
+    method: "POST",
+    headers: { ...headers, Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ user_id: userId, premium_type: finalType, premium_expires_at: finalType === "permanent" ? null : expires, updated_at: new Date().toISOString() }),
+  });
+  return up.ok;
+}
+
+// Removes Pro from the server (admin "Revoke").
+export async function revokeEntitlement(userId) {
+  const { SUPABASE_URL } = process.env;
+  if (!SUPABASE_URL) return false;
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?user_id=eq.${userId}`, {
+    method: "DELETE",
+    headers: { ...sbHeaders(), Prefer: "return=minimal" },
+  });
+  return r.ok;
+}

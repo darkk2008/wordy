@@ -1,5 +1,5 @@
 // Admin API for promo codes. Needs the ADMIN_SECRET environment variable.
-import { json, kv, isAdmin, readJson, makeCode, rateLimited } from "../lib/common.mjs";
+import { json, kv, isAdmin, readJson, makeCode, rateLimited, userFromToken, grantEntitlement, revokeEntitlement } from "../lib/common.mjs";
 
 export default async (req) => {
   if (req.method !== "POST") return json(405, { ok: false, message: "POST only." });
@@ -7,8 +7,24 @@ export default async (req) => {
   if (!isAdmin(req)) return json(401, { ok: false, message: "Unauthorized." });
   let body;
   try { body = await readJson(req); } catch (e) { return json(400, { ok: false, message: "Bad request." }); }
-  const store = await kv("promo");
   const action = body.action;
+
+  // Admin grants/revokes Pro on the CALLER'S OWN signed-in account, in the server table the app reads.
+  if (action === "grant-self" || action === "revoke-self") {
+    const userId = await userFromToken(req);
+    if (!userId) return json(200, { ok: false, needsLogin: true, message: "Sign in to your account in the app first." });
+    if (action === "revoke-self") {
+      return (await revokeEntitlement(userId))
+        ? json(200, { ok: true })
+        : json(200, { ok: false, message: "Couldn't revoke on the server." });
+    }
+    if (!["monthly", "yearly", "permanent"].includes(body.type)) return json(400, { ok: false, message: "Unknown type." });
+    return (await grantEntitlement(userId, body.type))
+      ? json(200, { ok: true })
+      : json(200, { ok: false, message: "Couldn't save Premium on the server. Check SUPABASE_URL / SERVICE_ROLE_KEY and that supabase-entitlements.sql was run." });
+  }
+
+  const store = await kv("promo");
 
   if (action === "list") {
     const codes = [];
