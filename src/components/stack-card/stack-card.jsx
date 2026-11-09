@@ -8,7 +8,6 @@ import { MoreOrClose, Trash2 } from "../icons/icons";
 import { ArchiveIcon, PinIcon, UsersIcon } from "../icons/settings-icons";
 import { SwipeableRow } from "../swipeable-row/swipeable-row";
 
-<<<<<<< HEAD
 /* ---- Presentation helpers (visual only: derived from the stack's icon and word count) ---- */
 
 /* Which look the Home stack tiles use. "minimal" (flat, typographic) or "cards" (taped flashcards).
@@ -53,25 +52,11 @@ export function StackFace({ s, isPinned, familyName }) {
       </div>
       <div className="dm-stack-emoji">
         <AnimatedIcon id={s.emoji} size={28} />
-=======
-// The inside of a stack tile (icon, name, one-line meta). Home, Archive and the Settings screens all
-// render it, so every stack looks the same everywhere.
-export function StackCardBody({ iconId, name, countText, isPinned, familyName, extra }) {
-  return (
-    <>
-      <div className="dm-stack-emoji">
-        <AnimatedIcon id={iconId} size={30} />
-      </div>
-      <div className="dm-stack-name">{name}</div>
-      <div className="dm-stack-meta">
-        <span className="dm-stack-count">{countText}</span>
->>>>>>> design-cleanup
         {isPinned && (
           <span className="dm-stack-pin-icon-badge" title="Pinned">
             <PinIcon size={11} />
           </span>
         )}
-<<<<<<< HEAD
       </div>
       <div className="dm-stack-body">
         <div className="dm-stack-name">{s.name}</div>
@@ -86,19 +71,10 @@ export function StackCardBody({ iconId, name, countText, isPinned, familyName, e
             </span>
           )}
         </div>
-=======
-        {familyName && (
-          <span className="dm-stack-family-badge" title={familyName}>
-            {familyName}
-          </span>
-        )}
-        {extra}
->>>>>>> design-cleanup
       </div>
     </>
   );
 }
-<<<<<<< HEAD
 
 /* The tile itself: the card, plus the layers of the "deck" behind it. */
 export function StackTile({ s, isPinned, familyName, className = "", children, ...rest }) {
@@ -117,9 +93,34 @@ export function StackTile({ s, isPinned, familyName, className = "", children, .
     </div>
   );
 }
-=======
+
+// The inside of a stack tile (icon, name, one-line meta) in the classic look. The Archive and Settings
+// screens render it, so every stack there looks the same. (Home uses StackTile/StackFace above.)
+export function StackCardBody({ iconId, name, countText, isPinned, familyName, extra }) {
+  return (
+    <>
+      <div className="dm-stack-emoji">
+        <AnimatedIcon id={iconId} size={30} />
+      </div>
+      <div className="dm-stack-name">{name}</div>
+      <div className="dm-stack-meta">
+        <span className="dm-stack-count">{countText}</span>
+        {isPinned && (
+          <span className="dm-stack-pin-icon-badge" title="Pinned">
+            <PinIcon size={11} />
+          </span>
+        )}
+        {familyName && (
+          <span className="dm-stack-family-badge" title={familyName}>
+            {familyName}
+          </span>
+        )}
+        {extra}
+      </div>
+    </>
+  );
+}
 export const wordCountText = (n) => `${n} ${n === 1 ? "word" : "words"}`;
->>>>>>> design-cleanup
 
 export function StackCard({
   s,
@@ -293,18 +294,7 @@ export function StackCard({
                 </button>
               </div>
             )}
-<<<<<<< HEAD
           </StackTile>
-=======
-            <StackCardBody
-              iconId={s.emoji}
-              name={s.name}
-              countText={wordCountText(s.words.length)}
-              isPinned={isPinned}
-              familyName={familyName}
-            />
-          </div>
->>>>>>> design-cleanup
         </SwipeableRow>
       </div>
     </div>

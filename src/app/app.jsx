@@ -911,21 +911,11 @@ export function App() {
     let retry = null;
     let poll = null;
     syncReadyRef.current = false;
-<<<<<<< HEAD
-    const onVisible = async () => {
-      if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
-      // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
-      try {
-        const ent = await cloud.getEntitlements();
-        if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
-      } catch (e) {}
-=======
     // Looks at the cloud row and applies it when another device changed it. Used by the poll, by
     // focus/online events and as the fallback whenever a realtime event is missing or incomplete.
     const pullNow = async () => {
       if (cancelled || !syncReadyRef.current || pushBusyRef.current) return;
       const seq = pushSeqRef.current;
->>>>>>> design-cleanup
       const r = await cloud.pullData();
       if (cancelled || !r || r.failed || !r.payload) return;
       // A push started while this read was in flight: the row may already be outdated.
@@ -937,8 +927,14 @@ export function App() {
       }
       acceptRemoteRow(r);
     };
-    const onVisible = () => {
-      if (document.visibilityState === "visible") pullNow();
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
+      // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
+      try {
+        const ent = await cloud.getEntitlements();
+        if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
+      } catch (e) {}
+      pullNow();
     };
     (async () => {
       const remote = await cloud.pullData();

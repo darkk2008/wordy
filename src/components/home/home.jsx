@@ -30,11 +30,7 @@ import {
 import { ArchiveIcon } from "../icons/settings-icons";
 import { StreakModal } from "../pickers/pickers";
 import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
-<<<<<<< HEAD
 import { STACK_LOOK, StackCard, StackTile } from "../stack-card/stack-card";
-=======
-import { StackCard, StackCardBody, wordCountText } from "../stack-card/stack-card";
->>>>>>> design-cleanup
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
@@ -760,22 +756,11 @@ export function HomeView({
             }}
           >
             <div className="dm-stack-cell-inner">
-<<<<<<< HEAD
               <StackTile
                 s={s}
                 isPinned={!!s.pinned}
                 familyName={s.familyId && familyById[s.familyId] ? familyById[s.familyId].name : null}
               />
-=======
-              <div className="dm-stack-card">
-                <StackCardBody
-                  iconId={s.emoji}
-                  name={s.name}
-                  countText={wordCountText(s.words.length)}
-                  familyName={s.familyId && familyById[s.familyId] ? familyById[s.familyId].name : null}
-                />
-              </div>
->>>>>>> design-cleanup
             </div>
           </div>
         ))}

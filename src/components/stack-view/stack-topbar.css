@@ -847,8 +847,6 @@
     min-height: 36px;
   }
 }
-<<<<<<< HEAD
-=======
 
 /* Double-click the title to rename / change the icon */
 .dm-stack-title-editable {
@@ -862,4 +860,3 @@
   outline-offset: 4px;
   border-radius: 10px;
 }
->>>>>>> design-cleanup
