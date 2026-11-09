@@ -1408,3 +1408,36 @@ export function AllFormsModal({ w: wProp, onClose, mini, isPremium, onOpenPremiu
     </div>
   );
 }
+
+// Plain-data version of the "All forms" modal, used by the shareable HTML file.
+// Returns [{ title, rows: [{ label, value }] }] using exactly the same rules as the modal,
+// or [] when the word has no inflected forms (adverbs, phrases, ...).
+export function getWordFormSections(w) {
+  try {
+    if (!w) return [];
+    const isDe = currentLearningLangCode === "de";
+    const clean = (rows) =>
+      (rows || []).filter((r) => r && String(r.value || "").trim() && String(r.value).trim() !== "—");
+    const make = (title, rows) => ({ title, rows: clean(rows) });
+    let sections = [];
+    if (!isDe && (w.type === "noun" || w.type === "verb" || w.type === "adj") && dmHasParadigm(w)) {
+      sections = w.paradigm.sections.map((s) => make(s.title, s.rows));
+    } else if (w.type === "noun") {
+      const f = computeNounForms(w);
+      sections = [make("Singular", f.singular), make("Plural", f.plural)];
+    } else if (w.type === "verb") {
+      const f = computeVerbForms(w);
+      sections = [
+        make(isDe ? "Präsens" : "Base form", f.praesens),
+        make(isDe ? "Präteritum" : "Past form", f.praeteritum),
+        make(isDe ? "Perfekt" : "Participle", f.perfekt),
+      ];
+      if (isDe && f.imperativ) sections.push(make("Imperativ", f.imperativ));
+    } else if (w.type === "adj") {
+      sections = [make(isDe ? "Steigerung" : "Comparison", computeAdjForms(w))];
+    }
+    return sections.filter((s) => s.rows.length);
+  } catch (e) {
+    return [];
+  }
+}

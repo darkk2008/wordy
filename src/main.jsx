@@ -20,6 +20,7 @@ import { ErrorBoundary } from "./components/error-boundary/error-boundary";
 import { initBottomNavVisibility } from "./behaviors/bottom-nav-visibility";
 import { initHapticsAndConfetti } from "./behaviors/haptics-confetti";
 import { initKeyboardViewport } from "./behaviors/keyboard-viewport";
+import { initModalExit } from "./behaviors/modal-exit";
 import { initScrollLock } from "./behaviors/scroll-lock";
 
 createRoot(document.getElementById("root")).render(
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")).render(
 initHapticsAndConfetti();
 initKeyboardViewport();
 initScrollLock();
+initModalExit();
 initBottomNavVisibility();
 
 // 5) Offline support: register the service worker (production builds on https or localhost only)

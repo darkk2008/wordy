@@ -9,6 +9,7 @@ import { Input } from "../common/Input";
 import { Check, Volume2 } from "../icons/icons";
 import { computeAdjForms, computeNounForms, computeVerbForms } from "../word-forms/word-forms";
 import { uiTranslationLangCode } from "../../services/ui-translation";
+import { translateFormPrompts } from "../../core/form-prompt-setting";
 import { nativeFormPhrase } from "./english-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
 
@@ -102,12 +103,18 @@ export const VERB_TENSE_LABELS = {
 // (e.g. "Comparative of schön" — the generic "adj/noun/verb" is swapped for the base word). Falls back to the old "<label> of <word>"
 // text when the word has no English translation to build from.
 function formQ(w, kind, badge, fallbackLabel, answer) {
+  // "Superlative of adj" -> "Superlative of gemütlich": name the word the form belongs to.
+  const label = badge.replace(/ of (adj|noun|verb)$/, () => ` of ${w.de}`);
+  if (!translateFormPrompts) {
+    // Guardrails: "Translate form cards" is off -> the card itself says "Past participle of
+    // verbrennen" (untranslated), so the separate badge would only repeat it.
+    return { wordId: w.id, prompt: label, badge: "", answer };
+  }
   const phrase = nativeFormPhrase(kind, w.en, uiTranslationLangCode);
   return {
     wordId: w.id,
     prompt: phrase || `${fallbackLabel} of “${w.de}”`,
-    // "Superlative of adj" -> "Superlative of gemütlich": name the word the form belongs to.
-    badge: badge.replace(/ of (adj|noun|verb)$/, () => ` of ${w.de}`),
+    badge: label,
     answer,
   };
 }

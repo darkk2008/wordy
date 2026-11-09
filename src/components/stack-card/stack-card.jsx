@@ -7,6 +7,34 @@ import { MoreOrClose, Trash2 } from "../icons/icons";
 import { ArchiveIcon, PinIcon, UsersIcon } from "../icons/settings-icons";
 import { SwipeableRow } from "../swipeable-row/swipeable-row";
 
+// The inside of a stack tile (icon, name, one-line meta). Home, Archive and the Settings screens all
+// render it, so every stack looks the same everywhere.
+export function StackCardBody({ iconId, name, countText, isPinned, familyName, extra }) {
+  return (
+    <>
+      <div className="dm-stack-emoji">
+        <AnimatedIcon id={iconId} size={30} />
+      </div>
+      <div className="dm-stack-name">{name}</div>
+      <div className="dm-stack-meta">
+        <span className="dm-stack-count">{countText}</span>
+        {isPinned && (
+          <span className="dm-stack-pin-icon-badge" title="Pinned">
+            <PinIcon size={11} />
+          </span>
+        )}
+        {familyName && (
+          <span className="dm-stack-family-badge" title={familyName}>
+            {familyName}
+          </span>
+        )}
+        {extra}
+      </div>
+    </>
+  );
+}
+export const wordCountText = (n) => `${n} ${n === 1 ? "word" : "words"}`;
+
 export function StackCard({
   s,
   isPinned,
@@ -176,25 +204,13 @@ export function StackCard({
                 </button>
               </div>
             )}
-            <div className="dm-stack-emoji">
-              <AnimatedIcon id={s.emoji} size={30} />
-            </div>
-            <div className="dm-stack-name">{s.name}</div>
-            <div className="dm-stack-meta">
-              <span className="dm-stack-count">
-                {`${s.words.length} ${s.words.length === 1 ? "word" : "words"}`}
-              </span>
-              {isPinned && (
-                <span className="dm-stack-pin-icon-badge" title="Pinned">
-                  <PinIcon size={11} />
-                </span>
-              )}
-              {familyName && (
-                <span className="dm-stack-family-badge" title={familyName}>
-                  {familyName}
-                </span>
-              )}
-            </div>
+            <StackCardBody
+              iconId={s.emoji}
+              name={s.name}
+              countText={wordCountText(s.words.length)}
+              isPinned={isPinned}
+              familyName={familyName}
+            />
           </div>
         </SwipeableRow>
       </div>

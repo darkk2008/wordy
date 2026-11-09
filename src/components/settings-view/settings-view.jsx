@@ -54,6 +54,8 @@ export function SettingsView({
   onToggleHideArticles,
   showLevelBadge,
   onToggleShowLevelBadge,
+  translateForms,
+  onToggleTranslateForms,
   dueCount,
   todayReviews,
   bestStreak,
@@ -147,6 +149,8 @@ export function SettingsView({
         onToggleHideArticles={onToggleHideArticles}
         showLevelBadge={showLevelBadge}
         onToggleShowLevelBadge={onToggleShowLevelBadge}
+        translateForms={translateForms}
+        onToggleTranslateForms={onToggleTranslateForms}
       />
     );
   if (section === "stats")
@@ -184,6 +188,7 @@ export function SettingsView({
         onUnarchiveStack={onUnarchiveStack}
         onPlayArchivedStack={onPlayArchivedStack}
         onOpenStack={onOpenStack}
+        families={families}
       />
     );
   if (section === "languages")

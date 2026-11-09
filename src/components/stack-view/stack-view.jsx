@@ -2,7 +2,8 @@
  * StackView: the screen showing one stack's words.
  */
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { shuffle } from "../../core/srs-and-seed-data";
 import { FREE_FAVORITE_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { FormsAudioToggle } from "../games/setup-controls";
@@ -12,19 +13,21 @@ import {
   ChevronLeft,
   ChevronsDownUp,
   ChevronsUpDown,
+  Columns2,
   Gamepad2,
   MenuOrClose,
   MiniStackBtnContent,
   Plus,
   QrCode,
   Share2,
+  Shuffle,
   Star,
   Trash2,
   X,
 } from "../icons/icons";
 import { getLangAbbr } from "../language-settings/language-settings";
-import { MiniStackCreateModal, MiniStackManageModal } from "../mini-stack/mini-stack";
 import { QRShareModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
+import { RenameStackModal } from "./rename-stack-modal";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 import { WordCard } from "../word-card/word-card";
 import { AllFormsModal, stripArticle } from "../word-forms/word-forms";
@@ -40,9 +43,9 @@ export function StackView({
   apiKey,
   onDrillWord,
   miniStack,
-  onCreateMiniStack,
+  onOpenMiniStack,
   onToggleMiniStackWord,
-  onDeleteMiniStack,
+  onClearMiniStack,
   allStacks,
   onUpdateWord,
   onDeleteWord,
@@ -51,21 +54,31 @@ export function StackView({
   learningLanguage,
   onOpenPremium,
   isPremium,
+  isFavorites = false, // the virtual "Favorites" stack: words come from many stacks (each has .stackId)
+  isMini = false, // a mini stack: also virtual, but without the AI / mini stack buttons
+  onAddClick,
 }) {
+  const isVirtual = isFavorites || isMini;
+  const stackIdOf = (w) => (isVirtual ? w.stackId : stack.id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState("BOTH");
   const [query, setQuery] = useState("");
   const [modalWord, setModalWord] = useState(undefined);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showMiniStackCreate, setShowMiniStackCreate] = useState(false);
-  const [showMiniStackManage, setShowMiniStackManage] = useState(false);
-  const handleMiniStackClick = () => {
-    if (!miniStack) {
-      setShowMiniStackCreate(true);
-      return;
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const lastTitleTapRef = useRef(0);
+  // Double click / double tap on the title opens the rename + icon modal (real stacks only).
+  const onTitleClick = () => {
+    if (isVirtual) return;
+    const now = Date.now();
+    if (now - lastTitleTapRef.current < 400) {
+      lastTitleTapRef.current = 0;
+      setShowRenameModal(true);
+    } else {
+      lastTitleTapRef.current = now;
     }
-    setShowMiniStackManage(true);
   };
+  const [confirmClearMini, setConfirmClearMini] = useState(false);
   const [showForms, setShowForms] = useState(false);
   const [confirmDeleteStack, setConfirmDeleteStack] = useState(false);
   const [formsWord, setFormsWord] = useState(undefined);
@@ -87,6 +100,56 @@ export function StackView({
       return next;
     });
   };
+  // Desktop-only "two words per row" layout (the button is hidden on phones via CSS)
+  const [wideMode, setWideMode] = useState(() => {
+    try {
+      return localStorage.getItem("dm-stack-wide") === "1";
+    } catch (e) {
+      return false;
+    }
+  });
+  const listRef = useRef(null);
+  const prevRects = useRef(null);
+  const snapshotList = () => {
+    const el = listRef.current;
+    if (!el) return;
+    prevRects.current = Array.from(el.children).map((c) => c.getBoundingClientRect());
+  };
+  const toggleWide = () => {
+    snapshotList();
+    setWideMode((w) => {
+      const next = !w;
+      try {
+        localStorage.setItem("dm-stack-wide", next ? "1" : "0");
+      } catch (e) {}
+      return next;
+    });
+  };
+  // FLIP: cards glide from their old position/size to the new one
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    const before = prevRects.current;
+    prevRects.current = null;
+    if (!el || !before) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    Array.from(el.children).forEach((child, i) => {
+      const a = before[i];
+      if (!a || !child.animate) return;
+      const b = child.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      const dx = a.left - b.left;
+      const dy = a.top - b.top;
+      const sx = a.width / b.width;
+      const sy = a.height / b.height;
+      child.animate(
+        [
+          { transformOrigin: "top left", transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+          { transformOrigin: "top left", transform: "none" },
+        ],
+        { duration: 460, easing: "cubic-bezier(0.22, 1, 0.36, 1)", delay: Math.min(i, 8) * 12 }
+      );
+    });
+  }, [wideMode]);
   const [pickedIds, setPickedIds] = useState(() => new Set());
   const enterMultiPick = (w) => {
     setMultiPickMode(true);
@@ -111,7 +174,7 @@ export function StackView({
       if (!already && onToggleMiniStackWord)
         onToggleMiniStackWord({
           ...w,
-          stackId: stack.id,
+          stackId: stackIdOf(w),
         });
     });
     cancelMultiPick();
@@ -131,6 +194,26 @@ export function StackView({
       .filter((w) => pickedIds.has(w.id))
       .every((w) => miniStack.words.some((mw) => mw.id === w.id));
   const deletePicked = () => {
+    if (isFavorites) {
+      // In Favorites "remove" only un-stars the words; they stay in their own stacks.
+      stack.words
+        .filter((w) => pickedIds.has(w.id))
+        .forEach((w) =>
+          onUpdateWord(w.stackId, w.id, (word) => ({
+            ...word,
+            favorite: false,
+          }))
+        );
+      cancelMultiPick();
+      return;
+    }
+    if (isMini) {
+      stack.words
+        .filter((w) => pickedIds.has(w.id))
+        .forEach((w) => onDeleteWord && onDeleteWord(w.stackId, w.id));
+      cancelMultiPick();
+      return;
+    }
     onUpdateStack({
       ...stack,
       words: stack.words.filter((w) => !pickedIds.has(w.id)),
@@ -181,11 +264,26 @@ export function StackView({
     setShowAddModal(false);
   };
   const deleteWord = (id) => {
+    if (isVirtual) {
+      const target = stack.words.find((w) => w.id === id);
+      if (target && onDeleteWord) onDeleteWord(target.stackId, id);
+      setModalWord(undefined);
+      return;
+    }
     onUpdateStack({
       ...stack,
       words: stack.words.filter((w) => w.id !== id),
     });
     setModalWord(undefined);
+  };
+  const shuffleWords = () => {
+    if (stack.words.length < 2) return;
+    let next = shuffle(stack.words);
+    // make sure the order actually changes
+    for (let t = 0; t < 5 && next.every((w, i) => w.id === stack.words[i].id); t++) {
+      next = shuffle(stack.words);
+    }
+    onUpdateStack({ ...stack, words: next });
   };
   const shareStack = async () => {
     const html = buildShareHTML(stack);
@@ -248,7 +346,11 @@ ${lines}`;
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="dm-view notranslate" translate="no" data-ui-ru="1">
+    <div
+      className={`dm-view dm-stack-screen notranslate${wideMode ? " dm-stack-wide" : ""}`}
+      translate="no"
+      data-ui-ru="1"
+    >
       <div className="dm-topbar">
         <IconBtn onClick={onBack} className="dm-topbar-fixed-btn">
           <ChevronLeft size={20} />
@@ -266,24 +368,33 @@ ${lines}`;
             className={`dm-topbar-default ${menuOpen ? "dm-topbar-default-hidden" : ""}`}
             aria-hidden={menuOpen}
           >
-            <IconBtn title="AI Tutor" onClick={onOpenAI} className="dm-stackview-ai-btn">
-              <Bot size={18} />
-            </IconBtn>
-            <IconBtn
-              title={
-                miniStack
-                  ? `Mini stack · ${miniStack.words.length} word${miniStack.words.length === 1 ? "" : "s"}`
-                  : "Create mini stack"
-              }
-              active={!!miniStack}
-              className="dm-stack-title-ministack-btn"
-              onClick={handleMiniStackClick}
-            >
-              <MiniStackBtnContent miniStack={miniStack} />
-            </IconBtn>
+            {!isMini && (
+              <IconBtn title="AI Tutor" onClick={onOpenAI} className="dm-stackview-ai-btn">
+                <Bot size={18} />
+              </IconBtn>
+            )}
+            {!isMini && (
+              <IconBtn
+                title={
+                  miniStack && miniStack.words.length
+                    ? `Mini stack · ${miniStack.words.length} word${miniStack.words.length === 1 ? "" : "s"}`
+                    : "Mini stack"
+                }
+                active={!!(miniStack && miniStack.words.length)}
+                className="dm-stack-title-ministack-btn"
+                onClick={() => onOpenMiniStack && onOpenMiniStack()}
+              >
+                <MiniStackBtnContent miniStack={miniStack} />
+              </IconBtn>
+            )}
             <IconBtn title="Play games" onClick={() => onPlayGames && onPlayGames(stack)}>
               <Gamepad2 size={18} />
             </IconBtn>
+            {isMini && (
+              <IconBtn title="Remove all words" onClick={() => setConfirmClearMini(true)}>
+                <Trash2 size={18} />
+              </IconBtn>
+            )}
           </div>
           <div
             className={`dm-topbar-extra ${menuOpen ? "dm-topbar-extra-open" : ""}`}
@@ -301,6 +412,9 @@ ${lines}`;
             />
             <IconBtn title="Share stack" onClick={shareStack}>
               <Share2 size={18} />
+            </IconBtn>
+            <IconBtn title="Shuffle words" onClick={shuffleWords}>
+              <Shuffle size={18} />
             </IconBtn>
             {QR_SHARING_ENABLED && (
               <IconBtn title="Sync to phone via QR" onClick={() => setShowQRModal(true)}>
@@ -321,26 +435,51 @@ ${lines}`;
             <span className="dm-topbar-premium-label-short">Pro</span>
           </button>
         )}
-        <IconBtn className="dm-topbar-fixed-btn" onClick={() => setShowAddModal(true)}>
+        <IconBtn
+          className="dm-topbar-fixed-btn"
+          title={isFavorites ? "Add favorites" : isMini ? "Add words" : undefined}
+          onClick={() => (onAddClick ? onAddClick() : setShowAddModal(true))}
+        >
           <Plus size={20} />
         </IconBtn>
       </div>
       <div className="dm-stack-title-row">
         <span className="dm-stack-title-spacer" aria-hidden="true" />
-        <div className="dm-stack-title-main">
-          <AnimatedIcon id={stack.emoji} size={24} className="dm-stack-title-emoji" />
+        <div
+          className={`dm-stack-title-main${isVirtual ? "" : " dm-stack-title-editable"}`}
+          onClick={onTitleClick}
+          onKeyDown={(e) => {
+            if (!isVirtual && e.key === "Enter") setShowRenameModal(true);
+          }}
+          role={isVirtual ? undefined : "button"}
+          tabIndex={isVirtual ? undefined : 0}
+          title={isVirtual ? undefined : "Double-click to rename or change the icon"}
+        >
+          <AnimatedIcon id={isFavorites ? "star" : stack.emoji} size={24} className="dm-stack-title-emoji" />
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
-        <button
-          type="button"
-          className={`dm-stack-actions-toggle${actionsCollapsed ? " is-collapsed" : ""}`}
-          title={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
-          aria-label={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
-          aria-pressed={actionsCollapsed}
-          onClick={toggleAllActions}
-        >
-          {actionsCollapsed ? <ChevronsUpDown size={18} /> : <ChevronsDownUp size={18} />}
-        </button>
+        <div className="dm-stack-title-tools">
+          <button
+            type="button"
+            className={`dm-stack-actions-toggle dm-stack-wide-toggle${wideMode ? " is-on" : ""}`}
+            title={wideMode ? "Back to one word per row" : "Two words per row"}
+            aria-label={wideMode ? "Back to one word per row" : "Two words per row"}
+            aria-pressed={wideMode}
+            onClick={toggleWide}
+          >
+            <Columns2 size={18} />
+          </button>
+          <button
+            type="button"
+            className={`dm-stack-actions-toggle${actionsCollapsed ? " is-collapsed" : ""}`}
+            title={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+            aria-label={actionsCollapsed ? "Show buttons on all cards" : "Hide buttons on all cards"}
+            aria-pressed={actionsCollapsed}
+            onClick={toggleAllActions}
+          >
+            {actionsCollapsed ? <ChevronsUpDown size={18} /> : <ChevronsDownUp size={18} />}
+          </button>
+        </div>
       </div>
       <div className="dm-segmented dm-display-toggle">
         {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
@@ -359,6 +498,7 @@ ${lines}`;
       </div>
       <div
         className="dm-list"
+        ref={listRef}
         style={
           multiPickMode
             ? {
@@ -374,14 +514,22 @@ ${lines}`;
               <div className="dm-empty-stack-icon">
                 <Plus size={26} />
               </div>
-              <div className="dm-empty-stack-title">No words yet</div>
-              <div className="dm-empty-stack-sub">Add your first word to start practicing.</div>
+              <div className="dm-empty-stack-title">
+                {isFavorites ? "No favorites yet" : isMini ? "Mini stack is empty" : "No words yet"}
+              </div>
+              <div className="dm-empty-stack-sub">
+                {isFavorites
+                  ? "Star words to collect them here."
+                  : isMini
+                    ? "Add words with +, or swipe a word card down."
+                    : "Add your first word to start practicing."}
+              </div>
               <button
                 className="dm-btn-primary dm-empty-stack-btn"
-                onClick={() => setShowAddModal(true)}
+                onClick={() => (onAddClick ? onAddClick() : setShowAddModal(true))}
               >
                 <Plus size={16} />
-                Add a word
+                {isFavorites ? "Add favorites" : isMini ? "Add words" : "Add a word"}
               </button>
             </div>
           ) : (
@@ -399,12 +547,23 @@ ${lines}`;
             onEdit={(word) => setModalWord(word)}
             onSpeak={onSpeak}
             onShowForms={(word) => setFormsWord(word)}
-            onDrill={onDrillWord ? (word) => onDrillWord(word, stack.id, stack.words) : undefined}
+            onDrill={
+              onDrillWord
+                ? (word) =>
+                    isVirtual
+                      ? onDrillWord(
+                          word,
+                          word.stackId,
+                          ((allStacks || []).find((st) => st.id === word.stackId) || {}).words
+                        )
+                      : onDrillWord(word, stack.id, stack.words)
+                : undefined
+            }
             onToggleMiniStack={(word) =>
               onToggleMiniStackWord &&
               onToggleMiniStackWord({
                 ...word,
-                stackId: stack.id,
+                stackId: stackIdOf(word),
               })
             }
             isInMiniStack={!!(miniStack && miniStack.words.some((mw) => mw.id === w.id))}
@@ -440,8 +599,8 @@ ${lines}`;
               disabled={pickedIds.size === 0}
               onClick={deletePicked}
             >
-              <Trash2 size={16} />
-              {" Delete"}
+              {isFavorites ? <Star size={16} /> : <Trash2 size={16} />}
+              {isFavorites ? " Unstar" : " Delete"}
             </button>
           </div>
         </div>
@@ -457,6 +616,16 @@ ${lines}`;
           nativeLanguage={nativeLanguage}
         />
       )}
+      {showRenameModal && !isVirtual && (
+        <RenameStackModal
+          stack={stack}
+          onClose={() => setShowRenameModal(false)}
+          onSave={({ name, emoji }) => {
+            onUpdateStack({ ...stack, name, emoji });
+            setShowRenameModal(false);
+          }}
+        />
+      )}
       {showAddModal && (
         <WordModal
           initial={null}
@@ -468,33 +637,6 @@ ${lines}`;
           onOpenAI={onOpenAI}
         />
       )}
-      {showMiniStackCreate && (
-        <MiniStackCreateModal
-          onClose={() => setShowMiniStackCreate(false)}
-          onCreate={(emoji) => {
-            onCreateMiniStack && onCreateMiniStack(emoji);
-            setShowMiniStackCreate(false);
-          }}
-        />
-      )}
-      {showMiniStackManage && miniStack && (
-        <MiniStackManageModal
-          miniStack={miniStack}
-          onClose={() => setShowMiniStackManage(false)}
-          onDeleteMiniStack={() => onDeleteMiniStack && onDeleteMiniStack()}
-          onRemoveWord={(w) => onToggleMiniStackWord && onToggleMiniStackWord(w)}
-          allStacks={allStacks || [stack]}
-          onUpdateWord={onUpdateWord}
-          onDeleteWord={onDeleteWord}
-          onSpeak={onSpeak}
-          apiKey={apiKey}
-          onOpenAI={onOpenAI}
-          nativeLanguage={nativeLanguage}
-          learningLanguage={learningLanguage}
-          isPremium={isPremium}
-          onOpenPremium={onOpenPremium}
-        />
-      )}
       {formsWord && (
         <AllFormsModal
           w={formsWord}
@@ -504,6 +646,35 @@ ${lines}`;
         />
       )}
       {showQRModal && <QRShareModal stack={stack} onClose={() => setShowQRModal(false)} />}
+      {confirmClearMini && (
+        <div className="dm-modal-backdrop" onClick={() => setConfirmClearMini(false)}>
+          <div className="dm-modal dm-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="dm-confirm-icon">
+              <Trash2 size={24} />
+            </div>
+            <h3 className="dm-confirm-title">Remove all words?</h3>
+            <p className="dm-confirm-sub">
+              Every word will be taken out of this mini stack. The words themselves stay in their
+              stacks.
+            </p>
+            <div className="dm-modal-actions">
+              <button className="dm-btn-secondary" onClick={() => setConfirmClearMini(false)}>
+                Cancel
+              </button>
+              <button
+                className="dm-btn-danger"
+                onClick={() => {
+                  setConfirmClearMini(false);
+                  onClearMiniStack && onClearMiniStack();
+                }}
+              >
+                <Trash2 size={16} />
+                {" Remove all"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {confirmDeleteStack && (
         <div className="dm-modal-backdrop" onClick={() => setConfirmDeleteStack(false)}>
           <div className="dm-modal dm-confirm-modal" onClick={(e) => e.stopPropagation()}>

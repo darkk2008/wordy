@@ -213,6 +213,63 @@ window.wwordyCloud = (function () {
     }
   }
 
+  // Like pushData, but refuses to overwrite a row that another device changed since this device
+  // last saw it (optimistic concurrency on updated_at). Returns:
+  //   { ok: true, updatedAt }  saved
+  //   { conflict: true }       the cloud row changed underneath us: pull + merge, then push again
+  //   { ok: false }            failed (offline, signed out, server error): the caller should retry
+  async function pushDataChecked(payload, expectedUpdatedAt) {
+    var c = getClient();
+    if (!c) return { ok: false };
+    var uid = await getSessionId();
+    if (!uid) {
+      setSync({ state: "error", error: "Signed out. Please sign in again." });
+      return { ok: false };
+    }
+    setSync({ state: "syncing", error: "" });
+    try {
+      var now = new Date().toISOString();
+      var row = {
+        user_id: uid,
+        payload: payload,
+        updated_at: now,
+        updated_by_device: getDeviceId(),
+      };
+      var res;
+      if (expectedUpdatedAt) {
+        // Only succeeds if the row still has the version we last saw.
+        res = await c
+          .from("user_data")
+          .update(row)
+          .eq("user_id", uid)
+          .eq("updated_at", expectedUpdatedAt)
+          .select("updated_at");
+      } else {
+        // First write for this account: never replace a row another device created meanwhile.
+        res = await c
+          .from("user_data")
+          .upsert(row, { onConflict: "user_id", ignoreDuplicates: true })
+          .select("updated_at");
+      }
+      if (res && res.error) throw new Error(res.error.message || "Sync failed.");
+      if (!res || !res.data || !res.data.length) {
+        setSync({ state: "idle", error: "" });
+        return { conflict: true };
+      }
+      setSync({ state: "idle", lastSyncAt: Date.now(), error: "" });
+      return { ok: true, updatedAt: res.data[0].updated_at || now };
+    } catch (e) {
+      setSync({
+        state: "error",
+        error:
+          typeof navigator !== "undefined" && navigator.onLine === false
+            ? "You're offline."
+            : (e && e.message) || "Sync failed.",
+      });
+      return { ok: false };
+    }
+  }
+
   // Returns { failed: true } when the cloud could not be read (so the caller must NOT overwrite
   // the cloud with local data), { empty: true } when the account has no row yet, or the row.
   async function pullData() {
@@ -249,33 +306,55 @@ window.wwordyCloud = (function () {
     return res.data || null;
   }
 
+  // Live updates. onRemoteChange(row) receives the whole row ({payload, updated_at,
+  // updated_by_device}); the payload can be missing when it was too large for realtime, in which
+  // case the caller should fetch the row itself. The channel reconnects on its own after errors.
   function subscribe(onRemoteChange) {
     var c = getClient();
     if (!c) return function () {};
-    getSessionId().then(function (uid) {
-      if (!uid) return;
-      channel = c
-        .channel("user_data_" + uid)
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "user_data", filter: "user_id=eq." + uid },
-          function (payload) {
-            var row = payload.new;
-            if (!row) return;
-            if (row.updated_by_device === getDeviceId()) return;
-            setSync({ state: "idle", lastSyncAt: Date.now(), error: "" });
-            onRemoteChange(row.payload);
-          }
-        )
-        .subscribe();
-    });
-    return function () {
-      if (channel && c) {
+    var stopped = false;
+    var ch = null;
+    var timer = null;
+    function drop() {
+      if (ch) {
+        var old = ch;
+        ch = null;
         try {
-          c.removeChannel(channel);
+          c.removeChannel(old);
         } catch (e) {}
-        channel = null;
       }
+    }
+    function connect() {
+      getSessionId().then(function (uid) {
+        if (stopped || !uid) return;
+        drop();
+        var mine = c
+          .channel("user_data_" + uid + "_" + Math.random().toString(36).slice(2))
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "user_data", filter: "user_id=eq." + uid },
+            function (payload) {
+              if (stopped || !payload || !payload.new) return;
+              onRemoteChange(payload.new);
+            }
+          );
+        ch = mine;
+        channel = mine;
+        mine.subscribe(function (status) {
+          if (stopped || mine !== ch) return;
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            clearTimeout(timer);
+            timer = setTimeout(connect, 5000);
+          }
+        });
+      });
+    }
+    connect();
+    return function () {
+      stopped = true;
+      clearTimeout(timer);
+      drop();
+      channel = null;
     };
   }
 
@@ -329,6 +408,7 @@ window.wwordyCloud = (function () {
     getSessionId: getSessionId,
     getMyPublicId: getMyPublicId,
     pushData: pushData,
+    pushDataChecked: pushDataChecked,
     pullData: pullData,
     getEntitlements: getEntitlements,
     getAccessToken: getAccessToken,

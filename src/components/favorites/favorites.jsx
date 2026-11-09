@@ -1,202 +1,84 @@
 /* components/favorites/favorites.jsx
- * FavoritesView.
+ * FavoritesView: the starred words from every stack, shown with the exact same screen as a
+ * stack (StackView): same top bar, title row, display toggle and word cards. It is a thin
+ * wrapper that turns the starred words into a virtual "Favorites" stack and maps StackView's
+ * edits back onto the stacks the words really live in.
  */
 
 import { useState } from "react";
-import { IconBtn } from "../common/common";
-import { FormsAudioToggle } from "../games/setup-controls";
-import { Bot, MiniStackBtnContent } from "../icons/icons";
-import { getLangAbbr } from "../language-settings/language-settings";
-import { MiniStackCreateModal, MiniStackManageModal } from "../mini-stack/mini-stack";
-import { dmListClickGuard } from "../swipeable-row/swipeable-row";
-import { WordCard } from "../word-card/word-card";
-import { AllFormsModal } from "../word-forms/word-forms";
-import { WordModal } from "../word-modal/word-modal";
+import { AddWordsModal } from "../stack-view/add-words-modal";
+import { StackView } from "../stack-view/stack-view";
+import { applyVirtualEdits, orderWords } from "../stack-view/virtual-stack";
 
 export function FavoritesView({
   stacks,
+  onBack,
   onUpdateWord,
   onDeleteWord,
   onSpeak,
   apiKey,
   onOpenAI,
   onDrillWord,
+  onPlayGames,
   miniStack,
-  onCreateMiniStack,
+  onOpenMiniStack,
   onToggleMiniStackWord,
-  onDeleteMiniStack,
   nativeLanguage,
   learningLanguage,
   isPremium,
   onOpenPremium,
 }) {
-  const [formsWord, setFormsWord] = useState(undefined);
-  const [modalWord, setModalWord] = useState(undefined);
-  const [displayMode, setDisplayMode] = useState("BOTH");
-  const [showForms, setShowForms] = useState(false);
-  const [showMiniStackCreate, setShowMiniStackCreate] = useState(false);
-  const [showMiniStackManage, setShowMiniStackManage] = useState(false);
-  const handleMiniStackClick = () => {
-    if (!miniStack) {
-      setShowMiniStackCreate(true);
-      return;
-    }
-    setShowMiniStackManage(true);
-  };
-  const favWords = [];
+  const [showAdd, setShowAdd] = useState(false);
+  const [orderIds, setOrderIds] = useState(null); // set by the shuffle button
+  let words = [];
+  const candidates = [];
   stacks.forEach((s) =>
     s.words.forEach((w) => {
-      if (w.favorite)
-        favWords.push({
-          ...w,
-          stackId: s.id,
-          stackName: s.name,
-        });
+      if (w.favorite) words.push({ ...w, stackId: s.id, stackName: s.name });
+      else candidates.push({ w, stack: s });
     })
   );
-  const isFormsMode = displayMode === "FORMS";
+  words = orderWords(words, orderIds);
+  const stack = { id: "__favorites__", name: "Favorites", emoji: "star", words };
+  const handleUpdateStack = (next) => {
+    applyVirtualEdits(words, next.words, onUpdateWord);
+    setOrderIds(next.words.map((w) => w.id));
+  };
   return (
-    <div className="dm-view">
-      <div className="dm-header">
-        <div>
-          <div className="dm-eyebrow">Quick revision</div>
-          <h1 className="dm-h1">Favorites</h1>
-        </div>
-        <div className="dm-header-actions">
-          {favWords.length > 0 && (
-            <FormsAudioToggle
-              checked={showForms}
-              onChange={setShowForms}
-              audioMode={isFormsMode}
-              title={
-                isFormsMode
-                  ? "Show/hide pronunciation for word forms"
-                  : "Show/hide plural • comparative forms"
-              }
-            />
-          )}
-          <IconBtn
-            title={
-              miniStack
-                ? `Mini stack · ${miniStack.words.length} word${miniStack.words.length === 1 ? "" : "s"}`
-                : "Create mini stack"
-            }
-            active={!!miniStack}
-            className="dm-stack-title-ministack-btn"
-            onClick={handleMiniStackClick}
-          >
-            <MiniStackBtnContent miniStack={miniStack} />
-          </IconBtn>
-          <IconBtn title="AI Tutor" onClick={onOpenAI}>
-            <Bot size={20} />
-          </IconBtn>
-        </div>
-      </div>
-      {favWords.length > 0 && (
-        <div className="dm-display-toggle-row">
-          <div className="dm-segmented dm-display-toggle">
-            {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
-              <button
-                key={m}
-                className={`dm-seg ${displayMode === m ? "dm-seg-active" : ""}`}
-                onClick={() => setDisplayMode(m)}
-              >
-                {m === "GER"
-                  ? getLangAbbr(learningLanguage)
-                  : m === "ENG"
-                    ? getLangAbbr(nativeLanguage)
-                    : m}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="dm-list" onClickCapture={dmListClickGuard}>
-        {favWords.length === 0 && <div className="dm-empty">Star words to collect them here.</div>}
-        {favWords.map((w) => (
-          <WordCard
-            key={w.id}
-            w={w}
-            displayMode={displayMode}
-            showForms={isFormsMode ? true : showForms}
-            formAudio={showForms}
-            onToggleFav={(id) =>
-              onUpdateWord(w.stackId, id, (word) => ({
-                ...word,
-                favorite: !word.favorite,
-              }))
-            }
-            onEdit={(word) => setModalWord(word)}
-            onSpeak={onSpeak}
-            onShowForms={(word) => setFormsWord(word)}
-            onDrill={
-              onDrillWord
-                ? (word) =>
-                    onDrillWord(
-                      word,
-                      w.stackId,
-                      (stacks.find((s) => s.id === w.stackId) || {}).words
-                    )
-                : undefined
-            }
-            onToggleMiniStack={onToggleMiniStackWord}
-            isInMiniStack={!!(miniStack && miniStack.words.some((mw) => mw.id === w.id))}
-            isPremium={isPremium}
-          />
-        ))}
-      </div>
-      {modalWord !== undefined && (
-        <WordModal
-          initial={modalWord}
-          onClose={() => setModalWord(undefined)}
-          onSave={(word) => {
-            onUpdateWord(modalWord.stackId, word.id, () => word);
-            setModalWord(undefined);
-          }}
-          onDelete={(id) => {
-            onDeleteWord(modalWord.stackId, id);
-            setModalWord(undefined);
-          }}
-          apiKey={apiKey}
-          onOpenAI={onOpenAI}
-          nativeLanguage={nativeLanguage}
+    <>
+      <StackView
+        stack={stack}
+        isFavorites
+        onBack={onBack}
+        onUpdateStack={handleUpdateStack}
+        onDeleteStack={() => {}}
+        onSpeak={onSpeak}
+        onOpenAI={onOpenAI}
+        apiKey={apiKey}
+        onDrillWord={onDrillWord}
+        miniStack={miniStack}
+        onOpenMiniStack={onOpenMiniStack}
+        onToggleMiniStackWord={onToggleMiniStackWord}
+        allStacks={stacks}
+        onUpdateWord={onUpdateWord}
+        onDeleteWord={onDeleteWord}
+        onPlayGames={onPlayGames}
+        nativeLanguage={nativeLanguage}
+        learningLanguage={learningLanguage}
+        onOpenPremium={onOpenPremium}
+        isPremium={isPremium}
+        onAddClick={() => setShowAdd(true)}
+      />
+      {showAdd && (
+        <AddWordsModal
+          title="Add favorites"
+          candidates={candidates}
+          onClose={() => setShowAdd(false)}
+          onPick={(stackId, wordId) =>
+            onUpdateWord(stackId, wordId, (w) => ({ ...w, favorite: true }))
+          }
         />
       )}
-      {formsWord && (
-        <AllFormsModal
-          w={formsWord}
-          onClose={() => setFormsWord(undefined)}
-          isPremium={isPremium}
-          onOpenPremium={onOpenPremium}
-        />
-      )}
-      {showMiniStackCreate && (
-        <MiniStackCreateModal
-          onClose={() => setShowMiniStackCreate(false)}
-          onCreate={(emoji) => {
-            onCreateMiniStack && onCreateMiniStack(emoji);
-            setShowMiniStackCreate(false);
-          }}
-        />
-      )}
-      {showMiniStackManage && miniStack && (
-        <MiniStackManageModal
-          miniStack={miniStack}
-          onClose={() => setShowMiniStackManage(false)}
-          onDeleteMiniStack={() => onDeleteMiniStack && onDeleteMiniStack()}
-          onRemoveWord={(w) => onToggleMiniStackWord && onToggleMiniStackWord(w)}
-          allStacks={stacks}
-          onUpdateWord={onUpdateWord}
-          onDeleteWord={onDeleteWord}
-          onSpeak={onSpeak}
-          apiKey={apiKey}
-          onOpenAI={onOpenAI}
-          nativeLanguage={nativeLanguage}
-          learningLanguage={learningLanguage}
-          isPremium={isPremium}
-          onOpenPremium={onOpenPremium}
-        />
-      )}
-    </div>
+    </>
   );
 }
