@@ -928,29 +928,19 @@ export function App() {
       }
       acceptRemoteRow(r);
     };
-<<<<<<< HEAD
-    const onVisible = async () => {
-      if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
-      // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
-=======
     // Pro can change on the server at any time (promo, admin grant, another device): re-read it on
     // resume, on a timer and on realtime events, independently of the (much bigger) user_data row.
     const refreshEntitlements = async () => {
       if (cancelled) return;
->>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
       try {
         const ent = await cloud.getEntitlements();
         if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
       } catch (e) {}
-<<<<<<< HEAD
-      pullNow();
-=======
     };
     const onVisible = async () => {
       if (document.visibilityState !== "visible") return;
       await refreshEntitlements();
       if (syncReadyRef.current) pullNow();
->>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
     };
     (async () => {
       // Pro first, on its own: a problem reading user_data must not keep this device from learning
