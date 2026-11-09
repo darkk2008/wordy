@@ -73,13 +73,13 @@ body::-webkit-scrollbar,
   padding: 20px 18px 26px;
   max-height: calc(var(--vv-height, 100vh) * 0.88);
   overflow-y: auto;
-  animation: dm-slideup 0.16s ease;
+  animation: dm-slideup 0.3s cubic-bezier(0.32, 0.72, 0, 1) backwards;
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
 }
 @keyframes dm-slideup {
   from {
-    transform: translateY(16px);
-    opacity: 0.5;
+    transform: translateY(56px);
+    opacity: 0;
   }
   to {
     transform: translateY(0);
@@ -87,7 +87,7 @@ body::-webkit-scrollbar,
   }
 }
 .dm-modal-backdrop {
-  animation: dm-backdrop-in 0.14s ease both;
+  animation: dm-backdrop-in 0.24s ease both;
 }
 @keyframes dm-backdrop-in {
   from {
@@ -117,9 +117,35 @@ body::-webkit-scrollbar,
     opacity: 1;
   }
   to {
-    transform: translateY(40px);
+    transform: translateY(56px);
     opacity: 0;
   }
+}
+/* Slide and keyboard must never move the sheet at the same time (the screen seemed to swim): a
+   modal that opens with the keyboard (autofocused field, or keyboard already up) and a modal that
+   closes while the keyboard goes down only fade. behaviors/modal-exit.js sets these classes. */
+.dm-modal-backdrop.dm-modal-kb .dm-modal {
+  animation: dm-modal-fade-in 0.2s ease backwards;
+}
+.dm-modal-backdrop.dm-modal-ghost-fade .dm-modal,
+.dm-modal-backdrop.dm-modal-ghost-fade .dm-modal-closing {
+  animation: none;
+}
+@keyframes dm-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* The copy shown while a modal that was just closed animates out (see behaviors/modal-exit.js). */
+.dm-modal-ghost {
+  pointer-events: none;
+  transition: none;
+}
+.dm-modal-ghost * {
+  pointer-events: none !important;
 }
 
 /* Admin panel */

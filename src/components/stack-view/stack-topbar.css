@@ -847,3 +847,19 @@
     min-height: 36px;
   }
 }
+<<<<<<< HEAD
+=======
+
+/* Double-click the title to rename / change the icon */
+.dm-stack-title-editable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.dm-stack-title-editable:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+>>>>>>> design-cleanup

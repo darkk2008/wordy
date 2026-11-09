@@ -1,0 +1,73 @@
+/* components/stack-view/add-words-modal.css
+ * The "add words" picker (Favorites and mini stacks). The screens themselves reuse the stack styles.
+ */
+.dm-fav-add-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: min(78dvh, 640px);
+}
+.dm-fav-add-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 10px;
+  color: var(--text-dim);
+}
+.dm-fav-add-search .dm-input {
+  flex: 1;
+  margin: 0;
+}
+.dm-fav-add-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scrollbar-width: none;
+}
+.dm-fav-add-list::-webkit-scrollbar {
+  display: none;
+}
+.dm-fav-add-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.dm-fav-add-row:hover {
+  background: var(--surface-strong);
+}
+.dm-fav-add-row > svg {
+  flex: none;
+  color: var(--cyan);
+}
+.dm-fav-add-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dm-fav-add-de {
+  font-weight: 700;
+}
+.dm-fav-add-en {
+  color: var(--text-dim);
+  font-size: 0.9em;
+}
+.dm-fav-add-stack {
+  flex: none;
+  max-width: 34%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  font-size: 0.8em;
+}

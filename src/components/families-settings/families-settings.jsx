@@ -25,6 +25,7 @@ import {
   Upload,
   X,
 } from "../icons/icons";
+import { StackCardBody, wordCountText } from "../stack-card/stack-card";
 import { FamilyQRShareModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 
 export function FamiliesSettings({
@@ -244,15 +245,11 @@ export function FamiliesSettings({
                   if (e.key === "Enter" && onOpenStack) onOpenStack(s.id);
                 }}
               >
-                <div className="dm-stack-emoji">
-                  <AnimatedIcon id={s.emoji} size={30} />
-                </div>
-                <div className="dm-stack-name">{s.name}</div>
-                <div className="dm-stack-count">
-                  {s.words.length}
-                  {" word"}
-                  {s.words.length === 1 ? "" : "s"}
-                </div>
+                <StackCardBody
+                  iconId={s.emoji}
+                  name={s.name}
+                  countText={wordCountText(s.words.length)}
+                />
               </div>
             ))}
           </div>
@@ -421,21 +418,18 @@ export function FamiliesSettings({
                   </button>
                 </div>
               )}
-              <div className="dm-stack-emoji">
-                <AnimatedIcon id={f.emoji || "family"} size={30} />
-              </div>
-              <div className="dm-stack-name">{f.name}</div>
-              <div className="dm-stack-count">
-                {st.stackCount}
-                {" stack"}
-                {st.stackCount === 1 ? "" : "s"}
-              </div>
-              {st.due > 0 && (
-                <div className="dm-stack-family-badge dm-family-due-badge" title={`${st.due} due`}>
-                  {st.due}
-                  {" due"}
-                </div>
-              )}
+              <StackCardBody
+                iconId={f.emoji || "family"}
+                name={f.name}
+                countText={`${st.stackCount} ${st.stackCount === 1 ? "stack" : "stacks"}`}
+                extra={
+                  st.due > 0 ? (
+                    <span className="dm-stack-family-badge dm-family-due-badge" title={`${st.due} due`}>
+                      {`${st.due} due`}
+                    </span>
+                  ) : null
+                }
+              />
             </div>
           );
         })}

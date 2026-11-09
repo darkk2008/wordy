@@ -5,7 +5,9 @@
 import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BottomNav } from "../components/bottom-nav/bottom-nav";
 import { AppLogo } from "../components/common/common";
+import { LazyFallback } from "../components/lazy-fallback/lazy-fallback";
 import { FavoritesView } from "../components/favorites/favorites";
+import { FAVORITES_PARENT_ID, MiniStackView } from "../components/mini-stack/mini-stack";
 import { FORMS_ONLY_GAMES } from "../components/games/games-config";
 import { GamesHub, ReviewGamePicker } from "../components/games/games-hub";
 import { WriteGame, buildFormWordPool } from "../components/games/write-game";
@@ -19,6 +21,7 @@ import { TranslationLoadingOverlay } from "../components/translation-overlay/tra
 import { stripArticle } from "../components/word-forms/word-forms";
 import { DAY, ROMAN_LANGS, todayStr, uid } from "../core/constants";
 import { HideArticlesContext, ShowLevelBadgeContext } from "../core/contexts";
+import { setTranslateFormPrompts } from "../core/form-prompt-setting";
 import { FAMILY_ICON_IDS, MINISTACK_ICON_IDS } from "../core/icon-registry";
 import { currentLearningLangCode, setSpeechLanguage, speak } from "../core/speech-voices";
 import {
@@ -57,6 +60,8 @@ import {
 } from "../services/ui-translation";
 
 // Heavy screens are loaded on demand so the first page load stays small.
+// Screens that are loaded on demand. Each one is declared once here: `lazy` for rendering, and the
+// same loader reused below for warming the chunk before anybody asks for it.
 const lazyNamed = (loader, name) => lazy(() => loader().then((m) => ({ default: m[name] })));
 const AdjEndingsGame = lazyNamed(() => import("../components/games/adj-endings-game"), "AdjEndingsGame");
 const CasesGame = lazyNamed(() => import("../components/games/cases-game"), "CasesGame");
@@ -83,18 +88,55 @@ const SettingsView = lazyNamed(() => import("../components/settings-view/setting
 const AdminPage = lazyNamed(() => import("../components/admin-panel/admin-panel"), "AdminPage");
 const OnboardingFlow = lazyNamed(() => import("../components/onboarding/onboarding"), "OnboardingFlow");
 
-// Warm the on-demand chunks (modals, settings) once the app is idle, so the first
-// click opens instantly instead of waiting for the chunk to download and parse.
-const preloadLazyScreens = () => {
-  [
-    () => import("../components/account/account"),
-    () => import("../components/ai-modal/ai-modal"),
-    () => import("../components/settings-view/settings-view"),
-  ].forEach((load) => load().catch(() => {}));
-};
+// Warm the on-demand chunks so the first tap opens a screen instantly instead of waiting for the
+// download. It starts right after the first paint (not after the load event + a long idle wait,
+// which could still be pending when somebody opened Settings or the AI tutor), and also the moment
+// the first finger touches the screen, which is always earlier than the tap itself.
+// Settings, the AI tutor and sign-in go first; the games follow when the browser is idle.
+const preloadLazyScreens = (() => {
+  let started = false;
+  return () => {
+    if (started) return;
+    started = true;
+    [
+      () => import("../components/account/account"),
+      () => import("../components/ai-modal/ai-modal"),
+      () => import("../components/settings-view/settings-view"),
+    ].forEach((load) => load().catch(() => {}));
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 600));
+    idle(
+      () =>
+        [
+          () => import("../components/games/adj-endings-game"),
+          () => import("../components/games/cases-game"),
+          () => import("../components/games/conjugation-ladder-game"),
+          () => import("../components/games/daily-mix-game"),
+          () => import("../components/games/flashcards-game"),
+          () => import("../components/games/listening-dictation-game"),
+          () => import("../components/games/matching-game"),
+          () => import("../components/games/memory-game"),
+          () => import("../components/games/multiple-choice-game"),
+          () => import("../components/games/paradigm-game"),
+          () => import("../components/games/scramble-game"),
+          () => import("../components/games/sentence-practice-game"),
+          () => import("../components/games/speaking-game"),
+          () => import("../components/games/speed-forms-game"),
+          () => import("../components/games/tense-mixer-game"),
+          () => import("../components/games/true-false-game"),
+          () => import("../components/games/word-forms-game"),
+          () => import("../components/games/word-quiz-game"),
+          () => import("../components/games/word-rain-game"),
+        ].forEach((load) => load().catch(() => {})),
+      { timeout: 3000 }
+    );
+  };
+})();
 if (typeof window !== "undefined") {
-  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
-  window.addEventListener("load", () => idle(preloadLazyScreens, { timeout: 4000 }), { once: true });
+  const soon = () => setTimeout(preloadLazyScreens, 250);
+  if (document.readyState === "complete") soon();
+  else window.addEventListener("load", soon, { once: true });
+  window.addEventListener("pointerdown", preloadLazyScreens, { once: true, capture: true, passive: true });
+  window.addEventListener("keydown", preloadLazyScreens, { once: true, capture: true });
 }
 
 export function App() {
@@ -249,6 +291,9 @@ export function App() {
   const [settingsInitialSection, setSettingsInitialSection] = useState(null);
   const [settingsMountKey, setSettingsMountKey] = useState(0);
   const [openStackId, setOpenStackId] = useState(null);
+  // Which mini stack screen is open: a stack id, FAVORITES_PARENT_ID, or null. It replaces the screen
+  // of that stack / of Favorites until Back (or "remove all words") returns to it.
+  const [miniView, setMiniView] = useState(null);
   const [premiumReturnTab, setPremiumReturnTab] = useState(null);
   const openPremium = () => {
     track("premium_modal_opened");
@@ -283,7 +328,7 @@ export function App() {
   // like it opened halfway down or at the bottom instead of at the top.
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [tab, openStackId, game ? game.type : null]);
+  }, [tab, openStackId, miniView, game ? game.type : null]);
   const [apiKey, setApiKey] = useState(() => {
     try {
       return window.localStorage.getItem("deutschmaster-groq-key") || "";
@@ -334,6 +379,21 @@ export function App() {
     setShowLevelBadge(val);
     try {
       window.localStorage.setItem("deutschmaster-show-level-badge", val ? "1" : "0");
+    } catch (e) {}
+  };
+  const [translateForms, setTranslateForms] = useState(() => {
+    let on = true;
+    try {
+      on = window.localStorage.getItem("deutschmaster-translate-form-prompts") !== "0";
+    } catch (e) {}
+    setTranslateFormPrompts(on);
+    return on;
+  });
+  const toggleTranslateForms = (val) => {
+    setTranslateForms(val);
+    setTranslateFormPrompts(val);
+    try {
+      window.localStorage.setItem("deutschmaster-translate-form-prompts", val ? "1" : "0");
     } catch (e) {}
   };
   const [showFamilyStats, setShowFamilyStats] = useState(() => {
@@ -631,9 +691,23 @@ export function App() {
   const lastSyncedRef = useRef("");
   const syncReadyRef = useRef(false); // true once the first pull for this account succeeded
   const latestRef = useRef({});
+  // updated_at of the cloud row this device last read or wrote. A push only succeeds while the row
+  // still has this version, so a device with stale data can never overwrite a newer upload.
+  const remoteVersionRef = useRef(null);
+  const pushSeqRef = useRef(0); // bumped when a push starts: a pull that began earlier is stale
+  const pushBusyRef = useRef(false);
   const [syncTick, setSyncTick] = useState(0); // bumps the push effect once the first pull is done
   const [retryTick, setRetryTick] = useState(0); // re-runs the first pull after a failed read
-  latestRef.current = { miniStacks, favMiniStack };
+  const [pushRetryTick, setPushRetryTick] = useState(0); // re-runs the push after a failed/conflicting write
+  latestRef.current = {
+    stacks,
+    families,
+    miniStacks,
+    favMiniStack,
+    streak,
+    bestStreak,
+    todayReviews,
+  };
   const cloudFingerprint = (c) =>
     JSON.stringify([
       c.stacks,
@@ -670,11 +744,21 @@ export function App() {
       reviews: p.todayReviews.count,
       premium: p.premium,
     });
-  const handleSyncNow = async () => {
-    const payload = buildCloudPayload();
-    const ok = await window.wwordyCloud.pushData(payload);
-    if (ok) lastSyncedRef.current = fingerprintOfPayload(payload);
-    return ok;
+  // True when this device has changes the cloud does not have yet.
+  const hasUnsyncedChanges = () => {
+    const L = latestRef.current;
+    return (
+      cloudFingerprint({
+        stacks: L.stacks,
+        families: L.families,
+        miniStacks: L.miniStacks,
+        favMiniStack: L.favMiniStack,
+        streak: L.streak,
+        bestStreak: L.bestStreak,
+        reviews: L.todayReviews,
+        premium: premiumForSync(),
+      }) !== lastSyncedRef.current
+    );
   };
   // Applies data that came from the cloud (not from a backup file).
   const applyRemote = (rawData) => {
@@ -708,17 +792,126 @@ export function App() {
     setBestStreak(best);
     setTodayReviews(reviews);
   };
+  // Cloud data arrived while this device has edits the cloud has not seen: keep both. Stacks,
+  // words and families are combined by id, then the combined result is pushed back.
+  const mergeRemote = (rawData) => {
+    const remote = dmSanitizeBackup(rawData);
+    applySyncedPremium(rawData && rawData.premium);
+    const L = latestRef.current;
+    const hasMini = !!(rawData && (rawData.miniStacks || rawData.miniStack));
+    const remoteMini = hasMini ? migrateMiniStacks(remote) : {};
+    const remoteFav = hasMini ? remote.favMiniStack || null : null;
+    const remoteStacks = remote.stacks || [];
+    const localStacks = L.stacks || [];
+    const remoteIds = new Set(remoteStacks.map((st) => st.id));
+    const mergedStacks = remoteStacks.map((rs) => {
+      const ls = localStacks.find((st) => st.id === rs.id);
+      if (!ls) return rs;
+      const have = new Set((rs.words || []).map((w) => w.id));
+      const extra = (ls.words || []).filter((w) => !have.has(w.id));
+      return extra.length ? { ...rs, words: [...(rs.words || []), ...extra] } : rs;
+    });
+    const localOnly = localStacks.filter((st) => !remoteIds.has(st.id));
+    const famIds = new Set((remote.families || []).map((f) => f.id));
+    const mergedFamilies = [
+      ...(remote.families || []),
+      ...(L.families || []).filter((f) => !famIds.has(f.id)),
+    ];
+    const mergedMini = { ...remoteMini, ...(L.miniStacks || {}) };
+    const mergedFav = L.favMiniStack || remoteFav;
+    const streakV = Math.max(L.streak || 1, remote.streak || 1);
+    const best = Math.max(L.bestStreak || 0, remote.bestStreak || 0, streakV);
+    const today = todayStr();
+    const remoteReviews =
+      remote.todayReviews && remote.todayReviews.date === today ? remote.todayReviews.count || 0 : 0;
+    // Remember what the cloud holds, so the merged state counts as "changed" and is pushed.
+    lastSyncedRef.current = cloudFingerprint({
+      stacks: remoteStacks,
+      families: remote.families || [],
+      miniStacks: hasMini ? remoteMini : L.miniStacks || {},
+      favMiniStack: hasMini ? remoteFav : L.favMiniStack || null,
+      streak: remote.streak || 1,
+      bestStreak: Math.max(remote.bestStreak || 0, remote.streak || 1),
+      reviews: remoteReviews,
+      premium: premiumForSync(),
+    });
+    setStacks([...localOnly, ...mergedStacks]);
+    setFamilies(mergedFamilies);
+    setMiniStacks(mergedMini);
+    setFavMiniStack(mergedFav);
+    setStreak(streakV);
+    setBestStreak(best);
+    setTodayReviews(Math.max(L.todayReviews || 0, remoteReviews));
+    setSyncTick((n) => n + 1);
+  };
+  // A cloud row written by another device (from a pull, the poll or a realtime event).
+  const acceptRemoteRow = (row) => {
+    if (!row || !row.payload) return;
+    remoteVersionRef.current = row.updated_at || remoteVersionRef.current;
+    if (hasUnsyncedChanges()) mergeRemote(row.payload);
+    else applyRemote(row.payload);
+  };
+  // Pushes the given payload; on a conflict (another device wrote first) merges and retries.
+  const pushPayload = async (payload) => {
+    const cloud = window.wwordyCloud;
+    pushSeqRef.current += 1;
+    pushBusyRef.current = true;
+    try {
+      const res = await cloud.pushDataChecked(payload, remoteVersionRef.current);
+      if (res.ok) {
+        remoteVersionRef.current = res.updatedAt || remoteVersionRef.current;
+        lastSyncedRef.current = fingerprintOfPayload(payload);
+        return { ok: true };
+      }
+      if (res.conflict) {
+        const row = await cloud.pullData();
+        if (row && !row.failed && row.payload) {
+          remoteVersionRef.current = row.updated_at || null;
+          mergeRemote(row.payload);
+        } else if (row && row.empty) {
+          remoteVersionRef.current = null;
+          setSyncTick((n) => n + 1);
+        }
+        return { ok: false, conflict: true };
+      }
+      return { ok: false };
+    } finally {
+      pushBusyRef.current = false;
+    }
+  };
+  const handleSyncNow = async () => {
+    const cloud = window.wwordyCloud;
+    // Pull first so a stale device never overwrites newer data, then push what is left.
+    const row = await cloud.pullData();
+    if (row && row.failed) return false;
+    if (row && row.payload && row.updated_at !== remoteVersionRef.current) {
+      const ownWrite = row.updated_by_device === cloud.getDeviceId() && remoteVersionRef.current;
+      if (!ownWrite) {
+        // Newer data from another device: apply/merge it. The push effect then uploads whatever
+        // is still different, so do not push the (now stale) pre-merge state from here.
+        acceptRemoteRow(row);
+        return true;
+      }
+    }
+    if (!hasUnsyncedChanges()) return true;
+    const res = await pushPayload(buildCloudPayload());
+    if (res.conflict) setPushRetryTick((n) => n + 1);
+    return !!res.ok;
+  };
   useEffect(() => {
     if (!account.id || !loaded) {
       syncReadyRef.current = false;
       lastSyncedRef.current = "";
+      remoteVersionRef.current = null;
       return;
     }
     const cloud = window.wwordyCloud;
     let cancelled = false;
     let unsub = () => {};
     let retry = null;
+    let poll = null;
     syncReadyRef.current = false;
+<<<<<<< HEAD
     const onVisible = async () => {
       if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
       // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
@@ -726,10 +919,26 @@ export function App() {
         const ent = await cloud.getEntitlements();
         if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
       } catch (e) {}
+=======
+    // Looks at the cloud row and applies it when another device changed it. Used by the poll, by
+    // focus/online events and as the fallback whenever a realtime event is missing or incomplete.
+    const pullNow = async () => {
+      if (cancelled || !syncReadyRef.current || pushBusyRef.current) return;
+      const seq = pushSeqRef.current;
+>>>>>>> design-cleanup
       const r = await cloud.pullData();
-      if (cancelled || r.failed || !r.payload) return;
-      if (r.updated_by_device === cloud.getDeviceId()) return;
-      applyRemote(r.payload);
+      if (cancelled || !r || r.failed || !r.payload) return;
+      // A push started while this read was in flight: the row may already be outdated.
+      if (seq !== pushSeqRef.current || pushBusyRef.current) return;
+      if (r.updated_at && r.updated_at === remoteVersionRef.current) return; // nothing new
+      if (r.updated_by_device === cloud.getDeviceId()) {
+        if (!remoteVersionRef.current) remoteVersionRef.current = r.updated_at || null;
+        return; // our own earlier write
+      }
+      acceptRemoteRow(r);
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") pullNow();
     };
     (async () => {
       const remote = await cloud.pullData();
@@ -743,21 +952,37 @@ export function App() {
       const ent = await cloud.getEntitlements();
       if (cancelled) return;
       if (!ent || !ent.failed) applyServerPremium(ent);
+      remoteVersionRef.current = remote.updated_at || null;
       const p = remote.payload;
       if (p && Array.isArray(p.stacks) && p.stacks.length) applyRemote(p);
       else applySyncedPremium(p && p.premium); // cloud has no stacks yet: local data gets uploaded
       syncReadyRef.current = true;
       setSyncTick((n) => n + 1);
-      unsub = cloud.subscribe((payload) => {
-        if (payload) applyRemote(payload);
+      unsub = cloud.subscribe((row) => {
+        if (cancelled || !syncReadyRef.current) return;
+        if (row.updated_by_device === cloud.getDeviceId()) return; // echo of our own write
+        if (!row.payload) {
+          pullNow(); // too big for a realtime message: read the row instead
+          return;
+        }
+        if (row.updated_at && row.updated_at === remoteVersionRef.current) return;
+        acceptRemoteRow(row);
       });
+      // Safety net: realtime can silently stop delivering (sleeping phone, flaky network,
+      // realtime not enabled for the table), so also check for changes regularly.
+      poll = setInterval(() => {
+        if (document.visibilityState === "visible" && navigator.onLine !== false) pullNow();
+      }, 10000);
     })();
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     window.addEventListener("online", onVisible);
     return () => {
       cancelled = true;
       if (retry) clearTimeout(retry);
+      if (poll) clearInterval(poll);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
       window.removeEventListener("online", onVisible);
       unsub();
     };
@@ -768,8 +993,9 @@ export function App() {
     const fp = fingerprintOfPayload(payload);
     if (fp === lastSyncedRef.current) return;
     const t = setTimeout(async () => {
-      const ok = await window.wwordyCloud.pushData(payload);
-      if (ok) lastSyncedRef.current = fp;
+      const res = await pushPayload(payload);
+      // A failed write used to be dropped until the next edit: try again shortly instead.
+      if (!res.ok) setTimeout(() => setPushRetryTick((n) => n + 1), res.conflict ? 300 : 8000);
     }, 1200);
     return () => clearTimeout(t);
   }, [
@@ -783,6 +1009,7 @@ export function App() {
     loaded,
     account.id,
     syncTick,
+    pushRetryTick,
     premiumRefreshTick,
   ]);
   const updateStack = (updated) =>
@@ -1001,35 +1228,11 @@ export function App() {
     );
     return list;
   }, [activeStacks]);
-  const createMiniStack = (stackId, emoji) => {
-    if (!stackId) return;
-    setMiniStacks((prev) =>
-      prev[stackId]
-        ? prev
-        : {
-            ...prev,
-            [stackId]: {
-              id: uid(),
-              emoji: MINISTACK_ICON_IDS.includes(emoji) ? emoji : MINISTACK_ICON_IDS[0],
-              words: [],
-            },
-          }
-    );
-  };
-  const deleteMiniStack = (stackId) => {
-    setMiniStacks((prev) => {
-      if (!prev[stackId]) return prev;
-      const next = {
-        ...prev,
-      };
-      delete next[stackId];
-      return next;
-    });
-  };
+  // Every stack has a mini stack by default: it is created the first time a word is pinned.
   const toggleMiniStackWord = (stackId, word) => {
+    if (!stackId) return;
     setMiniStacks((prev) => {
-      const cur = prev[stackId];
-      if (!cur) return prev;
+      const cur = prev[stackId] || { id: uid(), emoji: MINISTACK_ICON_IDS[0], words: [] };
       const exists = cur.words.some((w) => w.id === word.id);
       return {
         ...prev,
@@ -1040,29 +1243,25 @@ export function App() {
       };
     });
   };
-  const createFavMiniStack = (emoji) => {
-    setFavMiniStack(
-      (prev) =>
-        prev || {
-          id: uid(),
-          emoji: MINISTACK_ICON_IDS.includes(emoji) ? emoji : MINISTACK_ICON_IDS[0],
-          words: [],
-        }
-    );
-  };
-  const deleteFavMiniStack = () => {
-    setFavMiniStack(null);
+  const clearMiniStack = (stackId) => {
+    setMiniStacks((prev) => {
+      if (!prev[stackId]) return prev;
+      const next = { ...prev };
+      delete next[stackId];
+      return next;
+    });
   };
   const toggleFavMiniStackWord = (word) => {
     setFavMiniStack((prev) => {
-      if (!prev) return prev;
-      const exists = prev.words.some((w) => w.id === word.id);
+      const cur = prev || { id: uid(), emoji: MINISTACK_ICON_IDS[0], words: [] };
+      const exists = cur.words.some((w) => w.id === word.id);
       return {
-        ...prev,
-        words: exists ? prev.words.filter((w) => w.id !== word.id) : [...prev.words, word],
+        ...cur,
+        words: exists ? cur.words.filter((w) => w.id !== word.id) : [...cur.words, word],
       };
     });
   };
+  const clearFavMiniStack = () => setFavMiniStack(null);
   const startReview = () => {
     if (!dueWords.length) return;
     setGame({
@@ -1186,6 +1385,24 @@ export function App() {
       })),
     });
   };
+  // Games for the Favorites screen: the starred words of every stack, each keeping its own stack id.
+  const startFavoritesPlay = () => {
+    if (!favoriteWords.length) return;
+    setStackPlayPick({
+      stackId: "__favorites__",
+      name: "Favorites",
+      words: favoriteWords,
+    });
+  };
+  // Games for a mini stack screen (words arrive with their own stack id).
+  const startMiniPlay = (st) => {
+    if (!st || !st.words.length) return;
+    setStackPlayPick({
+      stackId: "__mini__",
+      name: "Mini stack",
+      words: st.words.map((w) => ({ ...w, _stackId: w.stackId })),
+    });
+  };
   const startStackPlayGame = (gameType, direction, level) => {
     if (!stackPlayPick) return;
     setGame({
@@ -1197,7 +1414,10 @@ export function App() {
       },
       direction: direction || "de2en",
       level,
-      backLabel: "Back to stack",
+      backLabel:
+        stackPlayPick.stackId === "__favorites__" || stackPlayPick.stackId === "__mini__"
+          ? "Done"
+          : "Back to stack",
     });
     setStackPlayPick(null);
   };
@@ -1222,7 +1442,7 @@ export function App() {
   };
   const deleteStack = (id) => {
     setStacks((prev) => prev.filter((s) => s.id !== id));
-    deleteMiniStack(id);
+    clearMiniStack(id);
     setOpenStackId(null);
   };
   const addWordToStack = (stackId, word) => {
@@ -1323,7 +1543,7 @@ export function App() {
   const [gamesMixForms, setGamesMixForms] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [game ? `game-${game.type}` : openStackId ? `stack-${openStackId}` : `tab-${tab}`]);
+  }, [game ? `game-${game.type}` : openStackId ? `stack-${openStackId}` : `tab-${tab}`, miniView]);
   useEffect(() => {
     const onFilled = (e) => {
       const d = e && e.detail;
@@ -1511,6 +1731,7 @@ export function App() {
   const goTab = (id) => {
     if (game) setGame(null);
     if (openStackId) setOpenStackId(null);
+    if (miniView) setMiniView(null);
     if (tab === "games" && id !== "games") {
       setGamesStackId(null);
       setGamesMixForms(false);
@@ -1518,7 +1739,30 @@ export function App() {
     setTab(id);
   };
   let content;
-  const viewKey = game ? `game-${game.type}` : openStack ? `stack-${openStack.id}` : `tab-${tab}`;
+  const miniOnStack = !!(openStack && miniView === openStack.id);
+  const miniOnFavorites = !openStack && tab === "favorites" && miniView === FAVORITES_PARENT_ID;
+  const viewKey = game
+    ? `game-${game.type}`
+    : miniOnStack || miniOnFavorites
+      ? `mini-${miniView}`
+      : openStack
+        ? `stack-${openStack.id}`
+        : `tab-${tab}`;
+  const miniCommon = {
+    stacks: activeStacks,
+    onUpdateWord: updateWordInStack,
+    onDeleteWord: deleteWordFromStack,
+    onSpeak: speak,
+    apiKey,
+    onOpenAI: openAI,
+    onDrillWord: drillWord,
+    onPlayGames: startMiniPlay,
+    nativeLanguage,
+    learningLanguage,
+    isPremium,
+    onOpenPremium: openPremium,
+    onBack: () => setMiniView(null),
+  };
   if (game) {
     const wantsFormsOnly = !!game.mixForms && FORMS_ONLY_GAMES.includes(game.type);
     const formsPool = wantsFormsOnly ? buildFormWordPool(game.stack.words) : null;
@@ -1577,6 +1821,19 @@ export function App() {
     else if (game.type === "adjendings") content = <AdjEndingsGame {...props} />;
     else if (game.type === "wordquiz") content = <WordQuizGame {...props} />;
     else if (game.type === "speaking") content = <SpeakingGame {...props} />;
+  } else if (miniOnStack) {
+    content = (
+      <MiniStackView
+        {...miniCommon}
+        parentId={openStack.id}
+        miniStack={miniStacks[openStack.id] || null}
+        onToggleMiniStackWord={(word) => toggleMiniStackWord(openStack.id, word)}
+        onClearMiniStack={() => {
+          clearMiniStack(openStack.id);
+          setMiniView(null);
+        }}
+      />
+    );
   } else if (openStack) {
     content = (
       <StackView
@@ -1589,9 +1846,8 @@ export function App() {
         apiKey={apiKey}
         onDrillWord={drillWord}
         miniStack={miniStacks[openStack.id] || null}
-        onCreateMiniStack={(emoji) => createMiniStack(openStack.id, emoji)}
+        onOpenMiniStack={() => setMiniView(openStack.id)}
         onToggleMiniStackWord={(word) => toggleMiniStackWord(openStack.id, word)}
-        onDeleteMiniStack={() => deleteMiniStack(openStack.id)}
         allStacks={activeStacks}
         onUpdateWord={updateWordInStack}
         onDeleteWord={deleteWordFromStack}
@@ -1666,10 +1922,25 @@ export function App() {
         onOpenPremium={openPremium}
       />
     );
+  } else if (miniOnFavorites) {
+    content = (
+      <MiniStackView
+        {...miniCommon}
+        parentId={FAVORITES_PARENT_ID}
+        miniStack={favMiniStack}
+        onToggleMiniStackWord={toggleFavMiniStackWord}
+        onClearMiniStack={() => {
+          clearFavMiniStack();
+          setMiniView(null);
+        }}
+      />
+    );
   } else if (tab === "favorites") {
     content = (
       <FavoritesView
         stacks={activeStacks}
+        onBack={() => goTab("home")}
+        onPlayGames={startFavoritesPlay}
         onUpdateWord={updateWordInStack}
         onDeleteWord={deleteWordFromStack}
         onSpeak={speak}
@@ -1677,9 +1948,8 @@ export function App() {
         onOpenAI={openAI}
         onDrillWord={drillWord}
         miniStack={favMiniStack}
-        onCreateMiniStack={createFavMiniStack}
+        onOpenMiniStack={() => setMiniView(FAVORITES_PARENT_ID)}
         onToggleMiniStackWord={toggleFavMiniStackWord}
-        onDeleteMiniStack={deleteFavMiniStack}
         nativeLanguage={nativeLanguage}
         learningLanguage={learningLanguage}
         isPremium={isPremium}
@@ -1715,6 +1985,8 @@ export function App() {
         onToggleHideArticles={toggleHideArticles}
         showLevelBadge={showLevelBadge}
         onToggleShowLevelBadge={toggleShowLevelBadge}
+        translateForms={translateForms}
+        onToggleTranslateForms={toggleTranslateForms}
         dueCount={dueWords.length}
         todayReviews={todayReviews}
         bestStreak={bestStreak}
@@ -1746,7 +2018,7 @@ export function App() {
         <div className="dm-bg-glow dm-bg-glow-1" />
         <div className="dm-bg-glow dm-bg-glow-2" />
         <div className="dm-content dm-content-noreserve">
-          <Suspense fallback={null}>
+          <Suspense fallback={<LazyFallback />}>
             <AdminPage onClose={closeAdminPage} />
           </Suspense>
         </div>
@@ -1771,7 +2043,7 @@ export function App() {
           <div className={`dm-content ${openStack && !game ? "dm-content-noreserve" : ""}`}>
             <Fragment key={viewKey}>
               <GameBackLabelContext.Provider value={(game && game.backLabel) || "Back to games"}>
-                <Suspense fallback={null}>{content}</Suspense>
+                <Suspense fallback={<LazyFallback />}>{content}</Suspense>
               </GameBackLabelContext.Provider>
             </Fragment>
           </div>
@@ -1781,7 +2053,7 @@ export function App() {
             hidden={!!(game || openStack)}
             learningLanguage={learningLanguage}
           />
-          <Suspense fallback={null}>
+          <Suspense fallback={<LazyFallback />}>
           {aiOpen && (
             <AiModal
               apiKey={apiKey}

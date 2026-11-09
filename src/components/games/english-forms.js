@@ -5,6 +5,8 @@
  * can show the meaning instead of "Komparativ of geduldig".
  */
 
+import { russianPastPhrase } from "./russian-forms";
+
 const IRREGULAR_VERBS = {
   be: ["was", "been"], become: ["became", "become"], begin: ["began", "begun"],
   bite: ["bit", "bitten"], blow: ["blew", "blown"], break: ["broke", "broken"],
@@ -98,6 +100,11 @@ export function nativeFormPhrase(kind, meaning, lang) {
   if (!base) return "";
   if (kind === "comparative") return (COMPARATIVE_PREFIX[code] || "") + base;
   if (kind === "superlative") return (SUPERLATIVE_PREFIX[code] || "") + base;
+  // Russian: real past tense / past participle (сжигать -> сжигал / сжигавший).
+  if (code === "ru" && (kind === "past" || kind === "participle")) {
+    const ru = russianPastPhrase(kind, base);
+    if (ru) return ru;
+  }
   return base;
 }
 

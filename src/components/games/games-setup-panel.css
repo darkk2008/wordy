@@ -162,31 +162,13 @@
 .dm-gsetup-bar .dm-stackselect-name { font-size: var(--fs-md); }
 .dm-gsetup-bar .dm-stackselect-count { font-size: var(--fs-2xs); }
 .dm-gsetup-bar .dm-stackselect-chevron { width: 16px; height: 16px; }
+/* The option list hangs right under the picker; its look and the stair animation live in
+   stack-select.css. On phones it is at least as wide as the picker. */
 .dm-gsetup-bar .dm-stackselect-menu {
-  top: calc(100% + 14px);
   right: auto;
   min-width: 100%;
   width: max-content;
   max-width: min(340px, calc(100vw - 56px));
-  max-height: 260px;
-  transform-origin: 24px top;
-  animation: dm-gsetup-pop 0.24s var(--dm-gs-ease) both;
-}
-@keyframes dm-gsetup-pop {
-  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
-  to { opacity: 1; transform: none; }
-}
-/* Closing: the menu stays mounted for ~0.18s (see StackSelect) so it can fade out
-   instead of vanishing. Selectors are deliberately more specific than the open rules. */
-.dm-stackselect-menu { overscroll-behavior: contain; }
-.dm-stackselect-menu.dm-stackselect-menu-leaving,
-.dm-gsetup-bar .dm-stackselect-menu.dm-stackselect-menu-leaving {
-  animation: dm-gsetup-pop-out 0.16s ease-in both;
-  pointer-events: none;
-}
-@keyframes dm-gsetup-pop-out {
-  from { opacity: 1; transform: none; }
-  to { opacity: 0; transform: translateY(-6px) scale(0.96); }
 }
 
 /* Tablet and desktop: the trigger now spans the bar, so the list opens
@@ -223,39 +205,8 @@
   }
 }
 
-/* Mouse / trackpad: the 0.24s pop above is over before the eye lands on
-   it, so on a computer the list just seemed to snap into place. Give it a
-   deliberate reveal and let the rows settle in one after another. Phones
-   and tablets with a finger keep the quick pop.
-
-   This used to be a clip-path "unfold": a hard rectangular mask animated
-   from fully-covering to fully-open over the menu. The menu's own
-   box-shadow (0 16px 40px, well outside its border) doesn't belong to the
-   clipped box in any simple way, so as the mask swept down it cut the
-   shadow off at a straight moving line instead of the shadow's natural
-   soft falloff — the shadow read as a separate rectangle trailing behind
-   the menu rather than being attached to it. Scaling the whole element
-   instead keeps the shadow rendered together with the box at every frame,
-   so it opens as one solid object with no detached edges. */
 @media (hover: hover) and (pointer: fine) {
-  .dm-gsetup-bar .dm-stackselect-menu {
-    transform-origin: top center;
-    animation: dm-gsetup-unfold 0.32s cubic-bezier(.16,1,.3,1) backwards;
-  }
-  .dm-gsetup-bar .dm-stackselect-item {
-    animation: dm-gsetup-item-in 0.3s cubic-bezier(.16,1,.3,1) backwards;
-    animation-delay: 0.1s;
-  }
-  .dm-gsetup-bar .dm-stackselect-item:nth-child(1) { animation-delay: 0.08s; }
-  .dm-gsetup-bar .dm-stackselect-item:nth-child(2) { animation-delay: 0.11s; }
-  .dm-gsetup-bar .dm-stackselect-item:nth-child(3) { animation-delay: 0.14s; }
-  .dm-gsetup-bar .dm-stackselect-item:nth-child(4) { animation-delay: 0.17s; }
   .dm-gsetup-bar .dm-stackselect-chevron { transition-duration: 0.35s; }
-}
-@keyframes dm-gsetup-unfold {
-  0% { opacity: 0; transform: translateY(-6px) scaleY(0.82) scaleX(0.96); }
-  55% { opacity: 1; }
-  100% { opacity: 1; transform: translateY(0) scaleY(1) scaleX(1); }
 }
 @keyframes dm-gsetup-item-in {
   from { opacity: 0; transform: translateY(-4px); }

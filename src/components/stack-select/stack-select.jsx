@@ -24,9 +24,10 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
       setMenuMounted(false);
       return;
     }
-    const t = setTimeout(() => setMenuMounted(false), 180);
+    // Keep the menu mounted until the last "stair" has finished stepping back in.
+    const t = setTimeout(() => setMenuMounted(false), 260 + Math.min(stacks.length, 12) * 28);
     return () => clearTimeout(t);
-  }, [open]);
+  }, [open, stacks.length]);
   const showMenu = open || menuMounted;
   const [edges, setEdges] = useState({
     t: false,
@@ -132,23 +133,35 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
         </button>
       )}
       {showDropdown && showMenu && (
-        <div className={"dm-stackselect-menu" + (open ? "" : " dm-stackselect-menu-leaving")}>
-          {stacks.map((s) => (
+        <div
+          className={"dm-stackselect-menu" + (open ? "" : " dm-stackselect-menu-leaving")}
+          role="listbox"
+          style={{ "--n": stacks.length }}
+        >
+          {stacks.map((s, i) => (
             <button
               key={s.id}
               type="button"
-              className={`dm-stackselect-item ${s.id === value ? "dm-stackselect-item-active" : ""}`}
+              role="option"
+              aria-selected={s.id === value}
+              style={{ "--i": i }}
+              className={`dm-ss-opt ${s.id === value ? "dm-ss-opt-active" : ""}`}
               onClick={() => {
                 onChange(s.id);
                 setOpen(false);
               }}
             >
-              <span className="dm-stackselect-emoji">
+              <span className="dm-ss-opt-icon">
                 <AnimatedIcon id={s.emoji} size={20} />
               </span>
-              <span className="dm-stackselect-item-name">{s.name}</span>
-              <span className="dm-stackselect-item-count">{s.words.length}</span>
-              {s.id === value && <Check size={15} className="dm-stackselect-check" />}
+              <span className="dm-ss-opt-text">
+                <span className="dm-ss-opt-name">{s.name}</span>
+                <span className="dm-ss-opt-count">
+                  {s.words.length}
+                  {s.words.length === 1 ? " word" : " words"}
+                </span>
+              </span>
+              {s.id === value && <Check size={16} className="dm-ss-opt-check" />}
             </button>
           ))}
         </div>

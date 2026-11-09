@@ -3,8 +3,9 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatedIcon, IconBtn } from "../common/common";
+import { IconBtn } from "../common/common";
 import { ChevronLeft, Gamepad2, MoreOrClose, RotateCcw } from "../icons/icons";
+import { StackCardBody, wordCountText } from "../stack-card/stack-card";
 import { SwipeableRow, dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 export function ArchivedStacksSettings({
@@ -13,8 +14,13 @@ export function ArchivedStacksSettings({
   onUnarchiveStack,
   onPlayArchivedStack,
   onOpenStack,
+  families,
 }) {
   const list = archivedStacks || [];
+  const familyById = {};
+  (families || []).forEach((f) => {
+    familyById[f.id] = f;
+  });
   const [menuStackId, setMenuStackId] = useState(null);
   const [closingMenuId, setClosingMenuId] = useState(null);
   const [confirmRestoreStackId, setConfirmRestoreStackId] = useState(null);
@@ -168,15 +174,12 @@ export function ArchivedStacksSettings({
                           </button>
                         </div>
                       )}
-                      <div className="dm-stack-emoji">
-                        <AnimatedIcon id={s.emoji} size={30} />
-                      </div>
-                      <div className="dm-stack-name">{s.name}</div>
-                      <div className="dm-stack-count">
-                        {s.words.length}
-                        {" word"}
-                        {s.words.length === 1 ? "" : "s"}
-                      </div>
+                      <StackCardBody
+                        iconId={s.emoji}
+                        name={s.name}
+                        countText={wordCountText(s.words.length)}
+                        familyName={s.familyId && familyById[s.familyId] ? familyById[s.familyId].name : null}
+                      />
                     </div>
                   </SwipeableRow>
                 </div>

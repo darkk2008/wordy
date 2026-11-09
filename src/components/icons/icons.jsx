@@ -435,11 +435,6 @@ export function MiniStackBtnContent({ miniStack }) {
   return (
     <>
       <MiniStackIcon size={20} />
-      {!miniStack && (
-        <span className="dm-ministack-plus" aria-hidden="true">
-          +
-        </span>
-      )}
       {miniStack && n > 0 && (
         <span key={n} className="dm-ministack-badge">
           {n > 99 ? "99+" : n}

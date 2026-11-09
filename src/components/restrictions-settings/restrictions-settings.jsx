@@ -29,6 +29,8 @@ export function RestrictionsSettings({
   onToggleHideArticles,
   showLevelBadge,
   onToggleShowLevelBadge,
+  translateForms,
+  onToggleTranslateForms,
 }) {
   return (
     <div className="dm-view dm-settings-subview">
@@ -70,6 +72,12 @@ export function RestrictionsSettings({
         sub="When on, the level badge (A1, B2, …) is shown on word cards. Turn off for a cleaner card."
         checked={showLevelBadge}
         onChange={onToggleShowLevelBadge}
+      />
+      <SettingToggle
+        title="Translate form cards"
+        sub="When on, form cards (past tense, plural, comparative…) show the meaning in your native language. When off, they show the label as is, like “Past participle of verbrennen”."
+        checked={translateForms !== false}
+        onChange={onToggleTranslateForms}
       />
     </div>
   );

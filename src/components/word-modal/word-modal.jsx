@@ -24,6 +24,12 @@ import { Input } from "../common/Input";
 import { Check, Loader2, Sparkles, Trash2, X } from "../icons/icons";
 import { getLangName } from "../language-settings/language-settings";
 import { mainSuperlativ, stripArticle } from "../word-forms/word-forms";
+import {
+  SHARE_TOGGLE_CSS,
+  SHARE_TOGGLE_SCRIPT,
+  buildModeBarHtml,
+  buildStackTablesHtml,
+} from "../../core/share-forms-html";
 
 export function WordModal({
   initial,
@@ -407,6 +413,7 @@ export function buildShareHTML(stackData) {
         )
         .join("")
     : `<div class="empty">No words in this stack yet.</div>`;
+  const tablesHtml = buildStackTablesHtml(stackData.words);
   let dataJson = JSON.stringify({
     name: stackData.name || "Vocabulary",
     emoji,
@@ -465,7 +472,7 @@ export function buildShareHTML(stackData) {
   footer{text-align:center;color:var(--text-dim);font-size:11px;margin-top:32px;opacity:.65;}
   .js-only{display:none;}
   .js-ready .js-only{display:block;}
-
+${SHARE_TOGGLE_CSS}
 </style>
 </head>
 <body>
@@ -475,11 +482,15 @@ export function buildShareHTML(stackData) {
     <h1>${safeName}</h1>
     <div class="sub">${wordCountLabel}</div>
   </div>
-  <div id="studyArea" class="js-only"></div>
-  <div class="list">
-    <h2>All words</h2>
-    <div id="listWrap">${listRowsHtml}</div>
+  ${buildModeBarHtml()}
+  <div class="view-list">
+    <div id="studyArea" class="js-only"></div>
+    <div class="list">
+      <h2>All words</h2>
+      <div id="listWrap">${listRowsHtml}</div>
+    </div>
   </div>
+  <div class="view-tables">${tablesHtml}</div>
   <footer>Shared from wwordy · works fully offline</footer>
 </div>
 <script>
@@ -535,6 +546,7 @@ export function buildShareHTML(stackData) {
       } catch (e) {}
     });
     document.addEventListener("keydown", function (e) {
+      if (document.body.classList.contains("mode-tables")) return;
       if (e.key === "ArrowRight") document.getElementById("nextBtn").click();
       if (e.key === "ArrowLeft") document.getElementById("prevBtn").click();
       if (e.key === " ") { e.preventDefault(); document.getElementById("flipBtn").click(); }
@@ -543,6 +555,7 @@ export function buildShareHTML(stackData) {
   } catch (e) {}
 })();
 <\/script>
+<script>${SHARE_TOGGLE_SCRIPT}<\/script>
 </body>
 </html>`;
 }

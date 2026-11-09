@@ -5,6 +5,7 @@
 import { stripArticle } from "../components/word-forms/word-forms";
 import { escapeHtml, genderClass } from "../components/word-modal/word-modal";
 import { DM_LIMITS, dmSanitizeStack, dmStr } from "../services/config-and-validation";
+import { SHARE_TOGGLE_CSS, SHARE_TOGGLE_SCRIPT, buildModeBarHtml, buildStackTablesHtml } from "./share-forms-html";
 import { uid } from "./constants";
 
 export async function copyTextToClipboard(text) {
@@ -344,6 +345,11 @@ export function buildFamilyShareHTML(familyName, familyEmoji, stacksList) {
         })
         .join("")
     : `<div class="empty">No stacks in this family yet.</div>`;
+  const tablesHtml = (stacksList || []).length
+    ? (stacksList || [])
+        .map((s) => buildStackTablesHtml(s.words, `${s.name || "Stack"} · ${(s.words || []).length}`))
+        .join("")
+    : `<div class="empty">No stacks in this family yet.</div>`;
   // Embed the full, uncompressed family payload so this file can also be
   // re-imported into wwordy later (via the "Import family from file" option),
   // for cases where scanning a QR code isn't practical.
@@ -376,6 +382,7 @@ export function buildFamilyShareHTML(familyName, familyEmoji, stacksList) {
   .ren{color:var(--text-dim);font-size:13px;text-align:right;flex-shrink:0;padding-left:8px;}
   .empty{text-align:center;color:var(--text-dim);padding:40px 0;font-size:14px;}
   footer{text-align:center;color:var(--text-dim);font-size:11px;margin-top:32px;opacity:.65;}
+${SHARE_TOGGLE_CSS}
 </style>
 </head>
 <body>
@@ -384,10 +391,13 @@ export function buildFamilyShareHTML(familyName, familyEmoji, stacksList) {
     <h1>${safeName}</h1>
     <div class="sub">${subLabel}</div>
   </div>
-  ${sectionsHtml}
+  ${buildModeBarHtml()}
+  <div class="view-list">${sectionsHtml}</div>
+  <div class="view-tables">${tablesHtml}</div>
   <footer>Shared from wwordy · re-importable via "Import family from file"</footer>
 </div>
 <script id="wordifyFamilyData" type="application/json">${dataJson}<\/script>
+<script>${SHARE_TOGGLE_SCRIPT}<\/script>
 </body>
 </html>`;
 }
