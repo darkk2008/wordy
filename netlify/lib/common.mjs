@@ -84,57 +84,125 @@ export const validId = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{8,64}$/.t
 
 // ---- Supabase helpers shared by promo-redeem and promo-admin ----------------------------------
 
-// Verifies the caller's Supabase login token and returns the user id (or null).
-export async function userFromToken(req) {
-  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+// The project URL and the publishable (anon) key are public: the browser already ships them in
+// src/services/cloud-sync.js. They are used as a fallback so the functions keep working when only the
+// secret key was added to Netlify. Only the service-role (secret) key has to be configured.
+const PUBLIC_SUPABASE_URL = "https://cdnwkqidxgeluxxoheoo.supabase.co";
+const PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_spV56yK2wRuDitapAVZO4g_E2SJrC08";
+
+export function supabaseConfig() {
+  const env = process.env;
+  return {
+    url: String(env.SUPABASE_URL || env.VITE_SUPABASE_URL || PUBLIC_SUPABASE_URL).replace(/\/+$/, ""),
+    anonKey: env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY || PUBLIC_SUPABASE_ANON_KEY,
+    serviceKey: env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || "",
+  };
+}
+
+const MSG_NO_SERVICE_KEY =
+  "The server has no SUPABASE_SERVICE_ROLE_KEY. In Netlify > Site configuration > Environment variables add it " +
+  "(Supabase > Project Settings > API > service_role / secret key), then redeploy the site.";
+
+// Headers for a request made with an API key. The new-style keys (sb_...) are not JWTs, so they go
+// in `apikey` only; legacy JWT keys are also sent as the bearer token.
+function keyHeaders(key, extra) {
+  const h = { apikey: key, "Content-Type": "application/json", ...(extra || {}) };
+  if (!String(key).startsWith("sb_")) h.Authorization = `Bearer ${key}`;
+  return h;
+}
+
+// Verifies the caller's Supabase login token. Returns { userId } on success, otherwise
+// { reason, message } where reason is "no-token" | "bad-token" | "unreachable".
+// The token is checked with the public key: that call does not need the secret key at all.
+export async function authenticate(req) {
   const m = /^Bearer (.+)$/.exec(req.headers.get("authorization") || "");
-  if (!m || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  if (!m) {
+    return {
+      reason: "no-token",
+      message: "This device sent no login. Open Settings > Account, make sure you are signed in (sign out and in again if you are), then retry.",
+    };
+  }
+  const { url, anonKey } = supabaseConfig();
   try {
-    const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${m[1]}` },
-    });
-    if (!r.ok) return null;
+    const r = await fetch(`${url}/auth/v1/user`, { headers: keyHeaders(anonKey, { Authorization: `Bearer ${m[1]}` }) });
+    if (r.status === 401 || r.status === 403) {
+      return { reason: "bad-token", message: "Your login has expired. Sign out and sign in again in Settings > Account, then retry." };
+    }
+    if (!r.ok) return { reason: "unreachable", message: `Couldn't verify your login (Supabase answered ${r.status}).` };
     const u = await r.json();
-    return u && typeof u.id === "string" ? u.id : null;
-  } catch (e) { return null; }
+    if (u && typeof u.id === "string") return { userId: u.id };
+    return { reason: "bad-token", message: "Your login could not be verified. Sign out and sign in again, then retry." };
+  } catch (e) {
+    return { reason: "unreachable", message: "Couldn't reach Supabase to verify your login." };
+  }
+}
+
+// Kept for callers that only need the id.
+export async function userFromToken(req) {
+  const r = await authenticate(req);
+  return r.userId || null;
 }
 
 function sbHeaders() {
-  const { SUPABASE_SERVICE_ROLE_KEY } = process.env;
-  return { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`, "Content-Type": "application/json" };
+  return keyHeaders(supabaseConfig().serviceKey);
+}
+
+// Turns a failed PostgREST answer into a message that says what to fix.
+async function explainFailure(res, what) {
+  let detail = "";
+  try { detail = (await res.text()).slice(0, 300); } catch (e) {}
+  if (res.status === 404 || /PGRST205|42P01|does not exist|schema cache/i.test(detail)) {
+    return "The entitlements table doesn't exist yet. Run supabase-entitlements.sql in the Supabase SQL editor.";
+  }
+  if (res.status === 401 || res.status === 403 || /permission denied|42501|Invalid API key|JWT/i.test(detail)) {
+    return "Supabase refused the server's key. Check SUPABASE_SERVICE_ROLE_KEY in Netlify (must be the service_role / secret key) and re-run supabase-entitlements.sql so the grants exist.";
+  }
+  return `Supabase error while ${what} (${res.status}). ${detail}`.trim();
 }
 
 const DAYS = { monthly: 30, yearly: 365 };
 
 // Writes Pro to the `entitlements` table, extending (never shortening) what the user already has.
+// Returns { ok: true } or { ok: false, message }.
 export async function grantEntitlement(userId, type) {
-  const { SUPABASE_URL } = process.env;
-  if (!SUPABASE_URL || !(type === "permanent" || DAYS[type])) return false;
-  const headers = sbHeaders();
-  const cur = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?user_id=eq.${userId}&select=premium_type,premium_expires_at`, { headers });
-  if (!cur.ok) return false;
-  const row = (await cur.json())[0];
-  let expires = null;
-  if (type !== "permanent" && row?.premium_type !== "permanent") {
-    const base = Math.max(Date.now(), row?.premium_expires_at ? Date.parse(row.premium_expires_at) : 0);
-    expires = new Date(base + DAYS[type] * 864e5).toISOString();
+  const { url, serviceKey } = supabaseConfig();
+  if (!serviceKey) return { ok: false, message: MSG_NO_SERVICE_KEY };
+  if (!(type === "permanent" || DAYS[type])) return { ok: false, message: "Unknown type." };
+  try {
+    const headers = sbHeaders();
+    const cur = await fetch(`${url}/rest/v1/entitlements?user_id=eq.${encodeURIComponent(userId)}&select=premium_type,premium_expires_at`, { headers });
+    if (!cur.ok) return { ok: false, message: await explainFailure(cur, "reading the entitlement") };
+    const row = (await cur.json())[0];
+    let expires = null;
+    if (type !== "permanent" && row?.premium_type !== "permanent") {
+      const base = Math.max(Date.now(), row?.premium_expires_at ? Date.parse(row.premium_expires_at) : 0);
+      expires = new Date(base + DAYS[type] * 864e5).toISOString();
+    }
+    const finalType = row?.premium_type === "permanent" ? "permanent" : type;
+    const up = await fetch(`${url}/rest/v1/entitlements?on_conflict=user_id`, {
+      method: "POST",
+      headers: { ...headers, Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({ user_id: userId, premium_type: finalType, premium_expires_at: finalType === "permanent" ? null : expires, updated_at: new Date().toISOString() }),
+    });
+    if (!up.ok) return { ok: false, message: await explainFailure(up, "saving the entitlement") };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: "Couldn't reach Supabase to save Premium." };
   }
-  const finalType = row?.premium_type === "permanent" ? "permanent" : type;
-  const up = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?on_conflict=user_id`, {
-    method: "POST",
-    headers: { ...headers, Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ user_id: userId, premium_type: finalType, premium_expires_at: finalType === "permanent" ? null : expires, updated_at: new Date().toISOString() }),
-  });
-  return up.ok;
 }
 
-// Removes Pro from the server (admin "Revoke").
+// Removes Pro from the server (admin "Revoke"). Returns { ok: true } or { ok: false, message }.
 export async function revokeEntitlement(userId) {
-  const { SUPABASE_URL } = process.env;
-  if (!SUPABASE_URL) return false;
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/entitlements?user_id=eq.${userId}`, {
-    method: "DELETE",
-    headers: { ...sbHeaders(), Prefer: "return=minimal" },
-  });
-  return r.ok;
+  const { url, serviceKey } = supabaseConfig();
+  if (!serviceKey) return { ok: false, message: MSG_NO_SERVICE_KEY };
+  try {
+    const r = await fetch(`${url}/rest/v1/entitlements?user_id=eq.${encodeURIComponent(userId)}`, {
+      method: "DELETE",
+      headers: { ...sbHeaders(), Prefer: "return=minimal" },
+    });
+    if (!r.ok) return { ok: false, message: await explainFailure(r, "revoking the entitlement") };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: "Couldn't reach Supabase to revoke Premium." };
+  }
 }

@@ -1,6 +1,6 @@
 // Validates and consumes a promo code. The app applies the effect locally;
 // the server's job is to make sure each code can only be used as intended.
-import { json, kv, readJson, rateLimited, originOk, validId, userFromToken, grantEntitlement } from "../lib/common.mjs";
+import { json, kv, readJson, rateLimited, originOk, validId, authenticate, grantEntitlement } from "../lib/common.mjs";
 
 const MESSAGES = {
   monthly: "Premium unlocked for 30 days.",
@@ -44,9 +44,12 @@ export default async (req) => {
   // store it (a device-only grant is wiped by the next sync), so refuse WITHOUT burning the code.
   let entitled = false;
   if (DAYS[entry.type] || entry.type === "permanent") {
-    const userId = await userFromToken(req);
-    if (!userId) return json(200, { ok: false, needsLogin: true, message: "Sign in to your account first, then enter the code again. Your code was not used." });
-    if (!(await grantEntitlement(userId, entry.type))) return json(200, { ok: false, message: "Couldn't save your Premium. Try again." });
+    const auth = await authenticate(req);
+    if (!auth.userId) {
+      return json(200, { ok: false, needsLogin: auth.reason !== "unreachable", message: `${auth.message} Your code was not used.` });
+    }
+    const g = await grantEntitlement(auth.userId, entry.type);
+    if (!g.ok) return json(200, { ok: false, message: `${g.message} Your code was not used.` });
     entitled = true;
   }
   entry.used = true;

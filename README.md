@@ -78,6 +78,7 @@ Build command `npm run build`, publish directory `dist` (already in `netlify.tom
 Environment variables (Site configuration > Environment variables):
 - `GROQ_API_KEY` (required for AI): a NEW Groq key; revoke any older one.
 - `ADMIN_SECRET` (required for the admin panel): a long random string; you type it in the admin panel to create promo codes and see device/online counts.
+- `SUPABASE_SERVICE_ROLE_KEY` (required for Premium: promo codes and the admin "Grant" button): Supabase > Project Settings > API > `service_role` (or the new `secret`) key. Server only, never put it in the app. Without it Premium cannot be saved on the server. `SUPABASE_URL` and `SUPABASE_ANON_KEY` are optional (they default to the project in `cloud-sync.js`).
 - `SITE_URL` (optional): `https://yourdomain.com` for canonical links, share previews and sitemap.
 - `AI_ALLOWED_ORIGINS` (optional): your site origin(s), comma-separated.
 
@@ -96,3 +97,6 @@ Note: `blockFraming` is now `true` in `src/boot/config.js`, so the site cannot b
 
 ## New Supabase project
 If you do not have access to the old project, create a new one and run `supabase-setup.sql` and then `supabase-delete-account.sql` in its SQL Editor. Turn OFF "Confirm email" (Authentication > Providers > Email). Then put the new project's URL and publishable (anon) key into `window.SUPABASE_CONFIG` at the top of `src/services/cloud-sync.js` and rebuild. Existing accounts in the old project do not carry over.
+
+## Premium (server-owned)
+Premium lives in the Supabase `entitlements` table and is read by every device signed in to the account (on start, on resume, about every 30 s, and live via realtime). Setup, once: run `supabase-entitlements.sql` in the Supabase SQL editor, add `SUPABASE_SERVICE_ROLE_KEY` in Netlify and redeploy. To give yourself Premium: sign in to your account in the app, open the admin panel and use Grant, or redeem a promo code. A device that is not signed in cannot receive Premium.

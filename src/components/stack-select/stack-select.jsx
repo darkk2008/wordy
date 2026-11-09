@@ -4,31 +4,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatedIcon } from "../common/common";
-import { Check, ChevronDown, Layers } from "../icons/icons";
+import { Check, ChevronDown, Layers, X } from "../icons/icons";
 
-export function StackSelect({ stacks, value, onChange, variant, active = true }) {
+export function StackSelect({
+  stacks,
+  value,
+  onChange,
+  variant,
+  active = true,
+}) {
   const showDropdown = variant !== "rail";
   const showRail = variant !== "dropdown";
   const [open, setOpen] = useState(false);
-  const [menuMounted, setMenuMounted] = useState(false);
-  useEffect(() => {
-    if (open) {
-      setMenuMounted(true);
-      return;
-    }
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setMenuMounted(false);
-      return;
-    }
-    // Keep the menu mounted until the last "stair" has finished stepping back in.
-    const t = setTimeout(() => setMenuMounted(false), 260 + Math.min(stacks.length, 12) * 28);
-    return () => clearTimeout(t);
-  }, [open, stacks.length]);
-  const showMenu = open || menuMounted;
+  const listRef = useRef(null);
   const [edges, setEdges] = useState({
     t: false,
     b: false,
@@ -54,6 +42,11 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
     if (!active) setOpen(false);
   }, [active]);
   useEffect(() => {
+    if (!open || !listRef.current) return;
+    const a = listRef.current.querySelector('[aria-selected="true"]');
+    if (a && a.scrollIntoView) a.scrollIntoView({ block: "center" });
+  }, [open]);
+  useEffect(() => {
     if (!showRail) return;
     const el = railRef.current;
     if (!el) return;
@@ -66,7 +59,7 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
           : {
               t,
               b,
-            }
+            },
       );
     };
     update();
@@ -132,38 +125,67 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
           <ChevronDown size={18} className="dm-stackselect-chevron" />
         </button>
       )}
-      {showDropdown && showMenu && (
+      {showDropdown && open && (
         <div
-          className={"dm-stackselect-menu" + (open ? "" : " dm-stackselect-menu-leaving")}
-          role="listbox"
-          style={{ "--n": stacks.length }}
+          className="dm-modal-backdrop dm-ss-backdrop"
+          onClick={() => setOpen(false)}
         >
-          {stacks.map((s, i) => (
-            <button
-              key={s.id}
-              type="button"
-              role="option"
-              aria-selected={s.id === value}
-              style={{ "--i": i }}
-              className={`dm-ss-opt ${s.id === value ? "dm-ss-opt-active" : ""}`}
-              onClick={() => {
-                onChange(s.id);
-                setOpen(false);
-              }}
-            >
-              <span className="dm-ss-opt-icon">
-                <AnimatedIcon id={s.emoji} size={20} />
-              </span>
-              <span className="dm-ss-opt-text">
-                <span className="dm-ss-opt-name">{s.name}</span>
-                <span className="dm-ss-opt-count">
-                  {s.words.length}
-                  {s.words.length === 1 ? " word" : " words"}
-                </span>
-              </span>
-              {s.id === value && <Check size={16} className="dm-ss-opt-check" />}
-            </button>
-          ))}
+          <div
+            className="dm-modal dm-ss-sheet"
+            role="dialog"
+            aria-label="Choose a stack to practice"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="dm-ss-head">
+              <div className="dm-ss-head-text">
+                <div className="dm-ss-title">Practice stack</div>
+                <div className="dm-ss-sub">
+                  {stacks.length}
+                  {stacks.length === 1 ? " stack" : " stacks"}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="dm-ss-close"
+                aria-label="Close"
+                onClick={() => setOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="dm-ss-list" role="listbox" ref={listRef}>
+              {stacks.map((s) => {
+                const on = s.id === value;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="option"
+                    aria-selected={on}
+                    className={`dm-ss-opt ${on ? "dm-ss-opt-active" : ""}`}
+                    onClick={() => {
+                      onChange(s.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className="dm-ss-opt-icon">
+                      <AnimatedIcon id={s.emoji} size={26} />
+                    </span>
+                    <span className="dm-ss-opt-text">
+                      <span className="dm-ss-opt-name">{s.name}</span>
+                      <span className="dm-ss-opt-count">
+                        <b>{s.words.length}</b>
+                        {s.words.length === 1 ? " word" : " words"}
+                      </span>
+                    </span>
+                    <span className="dm-ss-opt-mark" aria-hidden="true">
+                      {on && <Check size={14} />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
       {showRail && (
@@ -182,11 +204,14 @@ export function StackSelect({ stacks, value, onChange, variant, active = true })
               return;
             const i = stacks.findIndex((s) => s.id === value);
             if (i < 0) return;
-            const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+            const step =
+              e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
             const next = stacks[(i + step + stacks.length) % stacks.length];
             e.preventDefault();
             onChange(next.id);
-            const el = e.currentTarget.querySelector(`[data-stack-id="${next.id}"]`);
+            const el = e.currentTarget.querySelector(
+              `[data-stack-id="${next.id}"]`,
+            );
             if (el) el.focus();
           }}
         >
@@ -267,8 +292,12 @@ export function StackPickerUp({ stacks, value, onChange, open, setOpen }) {
                 <AnimatedIcon id={s.emoji} size={20} />
               </span>
               <span className="dm-stackselect-item-name">{s.name}</span>
-              <span className="dm-stackselect-item-count">{s.words.length}</span>
-              {s.id === value && <Check size={15} className="dm-stackselect-check" />}
+              <span className="dm-stackselect-item-count">
+                {s.words.length}
+              </span>
+              {s.id === value && (
+                <Check size={15} className="dm-stackselect-check" />
+              )}
             </button>
           ))}
         </div>
@@ -290,7 +319,7 @@ export function recordGameCooldown(gameId) {
   try {
     window.localStorage.setItem(
       "wf-game-cooldown-" + gameId,
-      String(Date.now() + GAME_COOLDOWN_MS)
+      String(Date.now() + GAME_COOLDOWN_MS),
     );
   } catch (e) {}
 }

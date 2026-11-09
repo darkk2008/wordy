@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IconBtn } from "../common/common";
 import { ChevronLeft, Gamepad2, MoreOrClose, RotateCcw } from "../icons/icons";
-import { StackCardBody, wordCountText } from "../stack-card/stack-card";
+import { StackGrid, StackTile } from "../stack-card/stack-card";
 import { SwipeableRow, dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 export function ArchivedStacksSettings({
@@ -37,14 +37,15 @@ export function ArchivedStacksSettings({
     () => () => {
       if (menuCloseTimerRef.current) clearTimeout(menuCloseTimerRef.current);
     },
-    []
+    [],
   );
   useEffect(() => {
     if (!menuStackId) return;
     const handler = (e) => {
       if (
         e.target.closest &&
-        (e.target.closest(".dm-stack-dots") || e.target.closest(".dm-dots-menu"))
+        (e.target.closest(".dm-stack-dots") ||
+          e.target.closest(".dm-dots-menu"))
       )
         return;
       e.preventDefault();
@@ -64,7 +65,8 @@ export function ArchivedStacksSettings({
       document.removeEventListener("keydown", keyHandler, true);
     };
   }, [menuStackId, closeStackMenu]);
-  const confirmRestoreStack = list.find((s) => s.id === confirmRestoreStackId) || null;
+  const confirmRestoreStack =
+    list.find((s) => s.id === confirmRestoreStackId) || null;
   return (
     <div className="dm-view dm-settings-subview">
       <div className="dm-topbar">
@@ -74,13 +76,14 @@ export function ArchivedStacksSettings({
         <div className="dm-topbar-title">Archived Stacks</div>
       </div>
       <p className="dm-settings-hint">
-        Archived stacks are hidden from Home, Games and Favorites, but nothing is deleted. Tap a
-        stack to review its words, or restore it to bring it back to its default place.
+        Archived stacks are hidden from Home, Games and Favorites, but nothing
+        is deleted. Tap a stack to review its words, or restore it to bring it
+        back to its default place.
       </p>
       {list.length === 0 ? (
         <div className="dm-empty">No archived stacks yet.</div>
       ) : (
-        <div className="dm-stack-grid" onClickCapture={dmListClickGuard}>
+        <StackGrid onClickCapture={dmListClickGuard}>
           {list.map((s) => {
             const menuOpen = menuStackId === s.id || closingMenuId === s.id;
             const leftActions = [
@@ -102,7 +105,10 @@ export function ArchivedStacksSettings({
               },
             ];
             return (
-              <div key={s.id} className="dm-stack-cell dm-stack-cell-visible">
+              <div
+                key={s.id}
+                className={`dm-stack-cell dm-stack-cell-visible ${menuOpen ? "dm-swipe-elevated" : ""}`}
+              >
                 <div className="dm-stack-cell-inner">
                   <SwipeableRow
                     actions={rightActions}
@@ -110,8 +116,14 @@ export function ArchivedStacksSettings({
                     actionsColumn
                     forceElevated={menuOpen}
                   >
-                    <div
-                      className={`dm-stack-card ${menuOpen ? "dm-stack-card-menu-open" : ""}`}
+                    <StackTile
+                      s={s}
+                      familyName={
+                        s.familyId && familyById[s.familyId]
+                          ? familyById[s.familyId].name
+                          : null
+                      }
+                      className={menuOpen ? "dm-stack-card-menu-open" : ""}
                       role="button"
                       tabIndex={0}
                       onClick={() => onOpenStack && onOpenStack(s.id)}
@@ -156,7 +168,9 @@ export function ArchivedStacksSettings({
                               <span className="dm-dots-menu-icon dm-dots-menu-icon-green">
                                 <Gamepad2 size={15} />
                               </span>
-                              <span className="dm-dots-menu-item-label">Play games</span>
+                              <span className="dm-dots-menu-item-label">
+                                Play games
+                              </span>
                             </button>
                           )}
                           <button
@@ -170,34 +184,39 @@ export function ArchivedStacksSettings({
                             <span className="dm-dots-menu-icon dm-dots-menu-icon-gold">
                               <RotateCcw size={15} />
                             </span>
-                            <span className="dm-dots-menu-item-label">Restore</span>
+                            <span className="dm-dots-menu-item-label">
+                              Restore
+                            </span>
                           </button>
                         </div>
                       )}
-                      <StackCardBody
-                        iconId={s.emoji}
-                        name={s.name}
-                        countText={wordCountText(s.words.length)}
-                        familyName={s.familyId && familyById[s.familyId] ? familyById[s.familyId].name : null}
-                      />
-                    </div>
+                    </StackTile>
                   </SwipeableRow>
                 </div>
               </div>
             );
           })}
-        </div>
+        </StackGrid>
       )}
       {confirmRestoreStack && (
-        <div className="dm-modal-backdrop" onClick={() => setConfirmRestoreStackId(null)}>
-          <div className="dm-modal dm-confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="dm-modal-backdrop"
+          onClick={() => setConfirmRestoreStackId(null)}
+        >
+          <div
+            className="dm-modal dm-confirm-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="dm-confirm-icon dm-confirm-icon-gold">
               <RotateCcw size={24} />
             </div>
             <h3 className="dm-confirm-title">Restore this stack?</h3>
             <p className="dm-confirm-sub">{`"${confirmRestoreStack.name}" will be brought back to Home, Games and Favorites.`}</p>
             <div className="dm-modal-actions">
-              <button className="dm-btn-secondary" onClick={() => setConfirmRestoreStackId(null)}>
+              <button
+                className="dm-btn-secondary"
+                onClick={() => setConfirmRestoreStackId(null)}
+              >
                 Cancel
               </button>
               <button

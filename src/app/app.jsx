@@ -910,6 +910,7 @@ export function App() {
     let unsub = () => {};
     let retry = null;
     let poll = null;
+    let pollCount = 0;
     syncReadyRef.current = false;
     // Looks at the cloud row and applies it when another device changed it. Used by the poll, by
     // focus/online events and as the fallback whenever a realtime event is missing or incomplete.
@@ -927,16 +928,34 @@ export function App() {
       }
       acceptRemoteRow(r);
     };
+<<<<<<< HEAD
     const onVisible = async () => {
       if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
       // Pro can change on the server at any time (promo, admin grant): refresh it on every resume.
+=======
+    // Pro can change on the server at any time (promo, admin grant, another device): re-read it on
+    // resume, on a timer and on realtime events, independently of the (much bigger) user_data row.
+    const refreshEntitlements = async () => {
+      if (cancelled) return;
+>>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
       try {
         const ent = await cloud.getEntitlements();
         if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
       } catch (e) {}
+<<<<<<< HEAD
       pullNow();
+=======
+    };
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible") return;
+      await refreshEntitlements();
+      if (syncReadyRef.current) pullNow();
+>>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
     };
     (async () => {
+      // Pro first, on its own: a problem reading user_data must not keep this device from learning
+      // that the account is Premium (or no longer is).
+      await refreshEntitlements();
       const remote = await cloud.pullData();
       if (cancelled) return;
       if (remote.failed) {
@@ -944,10 +963,6 @@ export function App() {
         retry = setTimeout(() => setRetryTick((n) => n + 1), 5000);
         return;
       }
-      // Pro status comes from the server-owned entitlements table (no-op unless enabled in config).
-      const ent = await cloud.getEntitlements();
-      if (cancelled) return;
-      if (!ent || !ent.failed) applyServerPremium(ent);
       remoteVersionRef.current = remote.updated_at || null;
       const p = remote.payload;
       if (p && Array.isArray(p.stacks) && p.stacks.length) applyRemote(p);
@@ -963,11 +978,14 @@ export function App() {
         }
         if (row.updated_at && row.updated_at === remoteVersionRef.current) return;
         acceptRemoteRow(row);
-      });
+      }, refreshEntitlements);
       // Safety net: realtime can silently stop delivering (sleeping phone, flaky network,
       // realtime not enabled for the table), so also check for changes regularly.
       poll = setInterval(() => {
-        if (document.visibilityState === "visible" && navigator.onLine !== false) pullNow();
+        if (document.visibilityState === "visible" && navigator.onLine !== false) {
+          pullNow();
+          if (++pollCount % 3 === 0) refreshEntitlements(); // about every 30 s
+        }
       }, 10000);
     })();
     document.addEventListener("visibilitychange", onVisible);

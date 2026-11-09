@@ -162,17 +162,9 @@
 .dm-gsetup-bar .dm-stackselect-name { font-size: var(--fs-md); }
 .dm-gsetup-bar .dm-stackselect-count { font-size: var(--fs-2xs); }
 .dm-gsetup-bar .dm-stackselect-chevron { width: 16px; height: 16px; }
-/* The option list hangs right under the picker; its look and the stair animation live in
-   stack-select.css. On phones it is at least as wide as the picker. */
-.dm-gsetup-bar .dm-stackselect-menu {
-  right: auto;
-  min-width: 100%;
-  width: max-content;
-  max-width: min(340px, calc(100vw - 56px));
-}
+/* The stack list opens as a sheet (see stack-select.css), so nothing here positions it. */
 
-/* Tablet and desktop: the trigger now spans the bar, so the list opens
-   at exactly the trigger's width instead of shrink-wrapping its content. */
+/* Tablet and desktop */
 @media (min-width: 600px) {
   /* The picker used to be the only flex:1 item in the row next to a
      content-sized mode chip, so it swallowed all the row's leftover width
@@ -181,12 +173,6 @@
      going anywhere useful. Capping it lets the button size to something
      that actually looks intentional. */
   .dm-gsetup-bar .dm-stackselect { flex: 0 1 300px; max-width: 300px; }
-  .dm-gsetup-bar .dm-stackselect-menu {
-    right: 0;
-    width: auto;
-    min-width: 0;
-    max-width: none;
-  }
   /* Capping the picker alone just moved the dead space from inside the
      button to the right of it — the outer card was still full-width. In
      mini mode the card should size to what it actually holds and sit
@@ -439,7 +425,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dm-gsetup, .dm-gsetup *, .dm-gsetup-bar .dm-stackselect-menu { transition: none !important; animation: none !important; }
+  .dm-gsetup, .dm-gsetup * { transition: none !important; animation: none !important; }
   .dm-stackrail-item,
   .dm-formsmode-btn,
   .dm-game-card { transition: none; }

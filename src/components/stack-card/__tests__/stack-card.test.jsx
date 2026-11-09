@@ -22,6 +22,7 @@ describe("archived stacks use the home stack tile", () => {
         />
       )
     );
+    expect(el.querySelector(".dm-stack-grid-v2 .dm-stack-deck")).not.toBeNull();
     const card = el.querySelector(".dm-stack-card");
     expect(card.querySelector(".dm-stack-meta .dm-stack-count").textContent).toBe("2 words");
     expect(card.querySelector(".dm-stack-meta .dm-stack-family-badge").textContent).toBe("German");

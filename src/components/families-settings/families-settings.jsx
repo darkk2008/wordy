@@ -3,7 +3,10 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FAMILY_ICON_IDS, parseFamilyImportText } from "../../core/icon-registry";
+import {
+  FAMILY_ICON_IDS,
+  parseFamilyImportText,
+} from "../../core/icon-registry";
 import {
   buildFamilyShareHTML,
   downloadTextAsFile,
@@ -25,7 +28,7 @@ import {
   Upload,
   X,
 } from "../icons/icons";
-import { StackCardBody, wordCountText } from "../stack-card/stack-card";
+import { StackGrid, StackTile } from "../stack-card/stack-card";
 import { FamilyQRShareModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 
 export function FamiliesSettings({
@@ -69,14 +72,15 @@ export function FamiliesSettings({
     () => () => {
       if (menuCloseTimerRef.current) clearTimeout(menuCloseTimerRef.current);
     },
-    []
+    [],
   );
   useEffect(() => {
     if (!menuFamilyId) return;
     const handler = (e) => {
       if (
         e.target.closest &&
-        (e.target.closest(".dm-stack-dots") || e.target.closest(".dm-dots-menu"))
+        (e.target.closest(".dm-stack-dots") ||
+          e.target.closest(".dm-dots-menu"))
       )
         return;
       e.preventDefault();
@@ -145,13 +149,16 @@ export function FamiliesSettings({
     if (e.target) e.target.value = "";
     if (!file) return;
     try {
-      if (file.size > 8 * 1024 * 1024) throw new Error("This file is too large to import.");
+      if (file.size > 8 * 1024 * 1024)
+        throw new Error("This file is too large to import.");
       const text = await file.text();
       const imported = parseFamilyImportText(text);
       setImportError(null);
       if (onImportFamily) onImportFamily(imported);
     } catch (err) {
-      setImportError(err && err.message ? err.message : "Could not import this file.");
+      setImportError(
+        err && err.message ? err.message : "Could not import this file.",
+      );
     }
   };
   const familyStats = useMemo(() => {
@@ -167,7 +174,7 @@ export function FamiliesSettings({
           words++;
           if (w.srs && w.srs.level >= 5) mastered++;
           if (w.srs && w.srs.next <= now) due++;
-        })
+        }),
       );
       map[f.id] = {
         stackCount: famStacks.length,
@@ -187,7 +194,9 @@ export function FamiliesSettings({
       due: 0,
       progress: 0,
     };
-    const famStacks = (stacks || []).filter((s) => s.familyId === viewingFamily.id);
+    const famStacks = (stacks || []).filter(
+      (s) => s.familyId === viewingFamily.id,
+    );
     return (
       <div className="dm-view dm-settings-subview">
         <div className="dm-topbar">
@@ -196,7 +205,10 @@ export function FamiliesSettings({
           </IconBtn>
           <div className="dm-topbar-title">{viewingFamily.name}</div>
           {QR_SHARING_ENABLED && vst.stackCount > 0 && (
-            <IconBtn title="Share family via QR" onClick={() => setQrFamilyId(viewingFamily.id)}>
+            <IconBtn
+              title="Share family via QR"
+              onClick={() => setQrFamilyId(viewingFamily.id)}
+            >
               <QrCode size={20} />
             </IconBtn>
           )}
@@ -233,26 +245,23 @@ export function FamiliesSettings({
         {famStacks.length === 0 ? (
           <div className="dm-empty">No stacks in this family yet.</div>
         ) : (
-          <div className="dm-stack-grid">
+          <StackGrid>
             {famStacks.map((s) => (
-              <div
-                key={s.id}
-                className="dm-stack-card"
-                role="button"
-                tabIndex={0}
-                onClick={() => onOpenStack && onOpenStack(s.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && onOpenStack) onOpenStack(s.id);
-                }}
-              >
-                <StackCardBody
-                  iconId={s.emoji}
-                  name={s.name}
-                  countText={wordCountText(s.words.length)}
-                />
+              <div key={s.id} className="dm-stack-cell dm-stack-cell-visible">
+                <div className="dm-stack-cell-inner">
+                  <StackTile
+                    s={s}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onOpenStack && onOpenStack(s.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && onOpenStack) onOpenStack(s.id);
+                    }}
+                  />
+                </div>
               </div>
             ))}
-          </div>
+          </StackGrid>
         )}
         {qrFamily && (
           <FamilyQRShareModal
@@ -276,8 +285,16 @@ export function FamiliesSettings({
           <Upload size={20} />
         </IconBtn>
         <IconBtn
-          title={familyLimitReached ? "Upgrade to Premium for more families" : "New family"}
-          onClick={() => (familyLimitReached ? onOpenPremium && onOpenPremium() : setAdding(true))}
+          title={
+            familyLimitReached
+              ? "Upgrade to Premium for more families"
+              : "New family"
+          }
+          onClick={() =>
+            familyLimitReached
+              ? onOpenPremium && onOpenPremium()
+              : setAdding(true)
+          }
         >
           <Plus size={20} />
         </IconBtn>
@@ -292,15 +309,17 @@ export function FamiliesSettings({
         onChange={handleImportFile}
       />
       <p className="dm-settings-hint">
-        Group your stacks into families, then filter by family on the Home screen. Tap a family to
-        see its stacks. Share a family via QR, or download it as a file when a QR code isn't
-        practical.
+        Group your stacks into families, then filter by family on the Home
+        screen. Tap a family to see its stacks. Share a family via QR, or
+        download it as a file when a QR code isn't practical.
       </p>
-      {importError && <p className="dm-settings-hint dm-import-error">{importError}</p>}
+      {importError && (
+        <p className="dm-settings-hint dm-import-error">{importError}</p>
+      )}
       {families.length === 0 && (
         <div className="dm-empty">No families yet. Tap + to create one.</div>
       )}
-      <div className="dm-stack-grid">
+      <StackGrid>
         {families.map((f) => {
           const st = familyStats[f.id] || {
             stackCount: 0,
@@ -313,127 +332,141 @@ export function FamiliesSettings({
           return (
             <div
               key={f.id}
-              className={`dm-stack-card dm-family-grid-card ${menuOpen ? "dm-family-grid-card-menu-open" : ""}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => setViewingFamilyId(f.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") setViewingFamilyId(f.id);
-              }}
+              className={`dm-stack-cell dm-stack-cell-visible ${menuOpen ? "dm-swipe-elevated" : ""}`}
             >
-              <button
-                type="button"
-                className="dm-stack-dots"
-                title="Family options"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (menuFamilyId === f.id) {
-                    closeFamilyMenu(f.id);
-                  } else {
-                    setClosingMenuId(null);
-                    setMenuFamilyId(f.id);
+              <div className="dm-stack-cell-inner">
+                <StackTile
+                  icon={f.emoji || "family"}
+                  name={f.name}
+                  count={st.stackCount}
+                  unit={["stack", "stacks"]}
+                  extra={
+                    st.due > 0 ? (
+                      <span
+                        className="dm-stack-family-badge dm-family-due-badge"
+                        title={`${st.due} due`}
+                      >
+                        {`${st.due} due`}
+                      </span>
+                    ) : null
                   }
-                }}
-              >
-                <MoreOrClose open={menuFamilyId === f.id} size={16} />
-              </button>
-              {(menuFamilyId === f.id || closingMenuId === f.id) && (
-                <div
-                  className={`dm-dots-menu ${menuFamilyId === f.id ? "" : "dm-dots-menu-closing"}`}
-                  onClick={(e) => e.stopPropagation()}
+                  className={`dm-family-grid-card ${menuOpen ? "dm-family-grid-card-menu-open dm-stack-card-menu-open" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setViewingFamilyId(f.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") setViewingFamilyId(f.id);
+                  }}
                 >
-                  {st.words > 0 && onPlayFamilyGames && (
-                    <button
-                      type="button"
-                      className="dm-dots-menu-item"
-                      onClick={() => {
-                        onPlayFamilyGames(f.id);
-                        closeFamilyMenu(f.id);
-                      }}
-                    >
-                      <span className="dm-dots-menu-icon dm-dots-menu-icon-green">
-                        <Gamepad2 size={15} />
-                      </span>
-                      <span className="dm-dots-menu-item-label">Play games</span>
-                    </button>
-                  )}
                   <button
                     type="button"
-                    className="dm-dots-menu-item"
-                    onClick={() => {
-                      setEditingId(f.id);
-                      setEditName(f.name);
-                      setEditEmoji(f.emoji || "family");
-                      closeFamilyMenu(f.id);
+                    className="dm-stack-dots"
+                    title="Family options"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (menuFamilyId === f.id) {
+                        closeFamilyMenu(f.id);
+                      } else {
+                        setClosingMenuId(null);
+                        setMenuFamilyId(f.id);
+                      }
                     }}
                   >
-                    <span className="dm-dots-menu-icon">
-                      <Pencil size={15} />
-                    </span>
-                    <span className="dm-dots-menu-item-label">Rename</span>
+                    <MoreOrClose open={menuFamilyId === f.id} size={16} />
                   </button>
-                  {QR_SHARING_ENABLED && st.stackCount > 0 && (
-                    <button
-                      type="button"
-                      className="dm-dots-menu-item"
-                      onClick={() => {
-                        setQrFamilyId(f.id);
-                        closeFamilyMenu(f.id);
-                      }}
+                  {(menuFamilyId === f.id || closingMenuId === f.id) && (
+                    <div
+                      className={`dm-dots-menu ${menuFamilyId === f.id ? "" : "dm-dots-menu-closing"}`}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="dm-dots-menu-icon">
-                        <QrCode size={15} />
-                      </span>
-                      <span className="dm-dots-menu-item-label">Share via QR</span>
-                    </button>
+                      {st.words > 0 && onPlayFamilyGames && (
+                        <button
+                          type="button"
+                          className="dm-dots-menu-item"
+                          onClick={() => {
+                            onPlayFamilyGames(f.id);
+                            closeFamilyMenu(f.id);
+                          }}
+                        >
+                          <span className="dm-dots-menu-icon dm-dots-menu-icon-green">
+                            <Gamepad2 size={15} />
+                          </span>
+                          <span className="dm-dots-menu-item-label">
+                            Play games
+                          </span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="dm-dots-menu-item"
+                        onClick={() => {
+                          setEditingId(f.id);
+                          setEditName(f.name);
+                          setEditEmoji(f.emoji || "family");
+                          closeFamilyMenu(f.id);
+                        }}
+                      >
+                        <span className="dm-dots-menu-icon">
+                          <Pencil size={15} />
+                        </span>
+                        <span className="dm-dots-menu-item-label">Rename</span>
+                      </button>
+                      {QR_SHARING_ENABLED && st.stackCount > 0 && (
+                        <button
+                          type="button"
+                          className="dm-dots-menu-item"
+                          onClick={() => {
+                            setQrFamilyId(f.id);
+                            closeFamilyMenu(f.id);
+                          }}
+                        >
+                          <span className="dm-dots-menu-icon">
+                            <QrCode size={15} />
+                          </span>
+                          <span className="dm-dots-menu-item-label">
+                            Share via QR
+                          </span>
+                        </button>
+                      )}
+                      {st.stackCount > 0 && (
+                        <button
+                          type="button"
+                          className="dm-dots-menu-item"
+                          onClick={() => {
+                            shareFamilyHTML(f);
+                            closeFamilyMenu(f.id);
+                          }}
+                        >
+                          <span className="dm-dots-menu-icon">
+                            <Share2 size={15} />
+                          </span>
+                          <span className="dm-dots-menu-item-label">
+                            Share as file
+                          </span>
+                        </button>
+                      )}
+                      <div className="dm-dots-menu-divider" />
+                      <button
+                        type="button"
+                        className="dm-dots-menu-item dm-dots-menu-item-danger"
+                        onClick={() => {
+                          setConfirmDeleteId(f.id);
+                          closeFamilyMenu(f.id);
+                        }}
+                      >
+                        <span className="dm-dots-menu-icon dm-dots-menu-icon-red">
+                          <Trash2 size={15} />
+                        </span>
+                        <span className="dm-dots-menu-item-label">Delete</span>
+                      </button>
+                    </div>
                   )}
-                  {st.stackCount > 0 && (
-                    <button
-                      type="button"
-                      className="dm-dots-menu-item"
-                      onClick={() => {
-                        shareFamilyHTML(f);
-                        closeFamilyMenu(f.id);
-                      }}
-                    >
-                      <span className="dm-dots-menu-icon">
-                        <Share2 size={15} />
-                      </span>
-                      <span className="dm-dots-menu-item-label">Share as file</span>
-                    </button>
-                  )}
-                  <div className="dm-dots-menu-divider" />
-                  <button
-                    type="button"
-                    className="dm-dots-menu-item dm-dots-menu-item-danger"
-                    onClick={() => {
-                      setConfirmDeleteId(f.id);
-                      closeFamilyMenu(f.id);
-                    }}
-                  >
-                    <span className="dm-dots-menu-icon dm-dots-menu-icon-red">
-                      <Trash2 size={15} />
-                    </span>
-                    <span className="dm-dots-menu-item-label">Delete</span>
-                  </button>
-                </div>
-              )}
-              <StackCardBody
-                iconId={f.emoji || "family"}
-                name={f.name}
-                countText={`${st.stackCount} ${st.stackCount === 1 ? "stack" : "stacks"}`}
-                extra={
-                  st.due > 0 ? (
-                    <span className="dm-stack-family-badge dm-family-due-badge" title={`${st.due} due`}>
-                      {`${st.due} due`}
-                    </span>
-                  ) : null
-                }
-              />
+                </StackTile>
+              </div>
             </div>
           );
         })}
-      </div>
+      </StackGrid>
       {adding && (
         <div className="dm-modal-backdrop" onClick={() => setAdding(false)}>
           <div className="dm-modal" onClick={(e) => e.stopPropagation()}>
@@ -510,8 +543,10 @@ export function FamiliesSettings({
               placeholder="Family name"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && editName.trim()) {
-                  if (editName.trim()) onRenameFamily(editingFamily.id, editName.trim());
-                  if (onSetFamilyEmoji) onSetFamilyEmoji(editingFamily.id, editEmoji);
+                  if (editName.trim())
+                    onRenameFamily(editingFamily.id, editName.trim());
+                  if (onSetFamilyEmoji)
+                    onSetFamilyEmoji(editingFamily.id, editEmoji);
                   setEditingId(null);
                 } else if (e.key === "Escape") {
                   setEditingId(null);
@@ -536,8 +571,10 @@ export function FamiliesSettings({
                 className="dm-btn-primary"
                 disabled={!editName.trim()}
                 onClick={() => {
-                  if (editName.trim()) onRenameFamily(editingFamily.id, editName.trim());
-                  if (onSetFamilyEmoji) onSetFamilyEmoji(editingFamily.id, editEmoji);
+                  if (editName.trim())
+                    onRenameFamily(editingFamily.id, editName.trim());
+                  if (onSetFamilyEmoji)
+                    onSetFamilyEmoji(editingFamily.id, editEmoji);
                   setEditingId(null);
                 }}
               >
@@ -549,15 +586,24 @@ export function FamiliesSettings({
         </div>
       )}
       {confirmDeleteFamily && (
-        <div className="dm-modal-backdrop" onClick={() => setConfirmDeleteId(null)}>
-          <div className="dm-modal dm-confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="dm-modal-backdrop"
+          onClick={() => setConfirmDeleteId(null)}
+        >
+          <div
+            className="dm-modal dm-confirm-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="dm-confirm-icon">
               <Trash2 size={24} />
             </div>
             <h3 className="dm-confirm-title">Delete this family?</h3>
             <p className="dm-confirm-sub">{`"${confirmDeleteFamily.name}" will be removed. Stacks in it won't be deleted, they'll just be unassigned.`}</p>
             <div className="dm-modal-actions">
-              <button className="dm-btn-secondary" onClick={() => setConfirmDeleteId(null)}>
+              <button
+                className="dm-btn-secondary"
+                onClick={() => setConfirmDeleteId(null)}
+              >
                 Cancel
               </button>
               <button

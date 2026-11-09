@@ -309,7 +309,9 @@ window.wwordyCloud = (function () {
   // Live updates. onRemoteChange(row) receives the whole row ({payload, updated_at,
   // updated_by_device}); the payload can be missing when it was too large for realtime, in which
   // case the caller should fetch the row itself. The channel reconnects on its own after errors.
-  function subscribe(onRemoteChange) {
+  // onEntitlementChange() (optional) fires when this account's Pro row is inserted/updated/deleted
+  // (needs the entitlements table in the supabase_realtime publication, see supabase-entitlements.sql).
+  function subscribe(onRemoteChange, onEntitlementChange) {
     var c = getClient();
     if (!c) return function () {};
     var stopped = false;
@@ -338,6 +340,15 @@ window.wwordyCloud = (function () {
               onRemoteChange(payload.new);
             }
           );
+        if (onEntitlementChange) {
+          mine = mine.on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "entitlements", filter: "user_id=eq." + uid },
+            function () {
+              if (!stopped) onEntitlementChange();
+            }
+          );
+        }
         ch = mine;
         channel = mine;
         mine.subscribe(function (status) {

@@ -1,5 +1,6 @@
 /* components/stack-card/stack-card.jsx
- * StackCard: a stack tile on the home screen.
+ * StackCard: a stack tile on the home screen. StackTile / StackGrid are the shared tile and grid that
+ * Home, Archived stacks and Families all use, so a stack looks the same everywhere.
  */
 
 import { resolveIconId } from "../../core/icon-registry";
@@ -42,16 +43,32 @@ export function stackDepth(wordCount) {
   return 0;
 }
 
-/* The inside of a stack tile: cover art, icon jewel, name and meta. */
-export function StackFace({ s, isPinned, familyName }) {
-  const n = s.words.length;
+/* The inside of a stack tile: cover art, icon jewel, name and meta.
+   Normally it reads everything from the stack `s`. Other lists that want the same tile (families)
+   pass icon / name / count / unit / extra instead. */
+export function StackFace({
+  s,
+  isPinned,
+  familyName,
+  icon,
+  name,
+  count,
+  unit,
+  extra,
+}) {
+  const n = count != null ? count : s.words.length;
+  const [one, many] = unit || ["word", "words"];
   return (
     <>
       <div className="dm-stack-cover" aria-hidden="true" data-count={n}>
         <span className="dm-stack-art" />
       </div>
       <div className="dm-stack-emoji">
+<<<<<<< HEAD
         <AnimatedIcon id={s.emoji} size={28} />
+=======
+        <AnimatedIcon id={icon != null ? icon : s.emoji} size={28} />
+>>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
         {isPinned && (
           <span className="dm-stack-pin-icon-badge" title="Pinned">
             <PinIcon size={11} />
@@ -59,41 +76,66 @@ export function StackFace({ s, isPinned, familyName }) {
         )}
       </div>
       <div className="dm-stack-body">
-        <div className="dm-stack-name">{s.name}</div>
+        <div className="dm-stack-name">{name != null ? name : s.name}</div>
         <div className="dm-stack-meta">
           <span className="dm-stack-count">
             <b className="dm-stack-num">{n}</b>
-            {n === 1 ? " word" : " words"}
+            {n === 1 ? ` ${one}` : ` ${many}`}
           </span>
           {familyName && (
             <span className="dm-stack-family-badge" title={familyName}>
               {familyName}
             </span>
           )}
+          {extra}
         </div>
       </div>
     </>
   );
 }
 
-/* The tile itself: the card, plus the layers of the "deck" behind it. */
-export function StackTile({ s, isPinned, familyName, className = "", children, ...rest }) {
+/* The tile itself: the card, plus the layers of the "deck" behind it.
+   Must sit inside a `.dm-stack-grid.dm-stack-grid-v2` grid (see StackGrid) for the look to apply. */
+export function StackTile({
+  s,
+  isPinned,
+  familyName,
+  icon,
+  name,
+  count,
+  unit,
+  extra,
+  className = "",
+  children,
+  ...rest
+}) {
+  const n = count != null ? count : s.words.length;
   return (
     <div
       className="dm-stack-deck"
-      data-tone={stackTone(s.emoji)}
-      data-depth={stackDepth(s.words.length)}
+      data-tone={stackTone(icon != null ? icon : s.emoji)}
+      data-depth={stackDepth(n)}
     >
       <span className="dm-stack-layer dm-stack-layer-1" aria-hidden="true" />
       <span className="dm-stack-layer dm-stack-layer-2" aria-hidden="true" />
       <div className={`dm-stack-card dm-sc ${className}`} {...rest}>
         {children}
-        <StackFace s={s} isPinned={isPinned} familyName={familyName} />
+        <StackFace
+          s={s}
+          isPinned={isPinned}
+          familyName={familyName}
+          icon={icon}
+          name={name}
+          count={count}
+          unit={unit}
+          extra={extra}
+        />
       </div>
     </div>
   );
 }
 
+<<<<<<< HEAD
 // The inside of a stack tile (icon, name, one-line meta) in the classic look. The Archive and Settings
 // screens render it, so every stack there looks the same. (Home uses StackTile/StackFace above.)
 export function StackCardBody({ iconId, name, countText, isPinned, familyName, extra }) {
@@ -121,6 +163,20 @@ export function StackCardBody({ iconId, name, countText, isPinned, familyName, e
   );
 }
 export const wordCountText = (n) => `${n} ${n === 1 ? "word" : "words"}`;
+=======
+/* The grid every list of stack tiles lives in: Home, Archived stacks, Families. */
+export function StackGrid({ className = "", children, ...rest }) {
+  return (
+    <div
+      className={`dm-stack-grid dm-stack-grid-v2 ${className}`}
+      data-look={STACK_LOOK}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+>>>>>>> d73b746 (Fix premium grant and sync, unify stack tiles, new stack picker in Games)
 
 export function StackCard({
   s,
@@ -155,7 +211,10 @@ export function StackCard({
       tone: "gold",
       active: isPinned,
       icon: <PinIcon size={18} />,
-      onClick: () => (activeFamily === "all" ? onTogglePinStack : onToggleFamilyPinStack)(s.id),
+      onClick: () =>
+        (activeFamily === "all" ? onTogglePinStack : onToggleFamilyPinStack)(
+          s.id,
+        ),
     },
     {
       key: "family",
@@ -248,7 +307,9 @@ export function StackCard({
                   type="button"
                   className="dm-dots-menu-item"
                   onClick={() => {
-                    (activeFamily === "all" ? onTogglePinStack : onToggleFamilyPinStack)(s.id);
+                    (activeFamily === "all"
+                      ? onTogglePinStack
+                      : onToggleFamilyPinStack)(s.id);
                     closeStackMenu(s.id);
                   }}
                 >

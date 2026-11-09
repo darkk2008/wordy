@@ -2,8 +2,8 @@
  * Home stack tiles, two looks. Visual only.
  *
  * Switch: STACK_LOOK in stack-card.jsx ("minimal" or "cards"), which becomes
- * data-look on the Home grid. Every rule below is scoped to .dm-stack-grid-v2, so the family and
- * archived-stack screens keep the older tile from stack-card.css. Imported last in styles/index.css.
+ * data-look on the grid. Every rule below is scoped to .dm-stack-grid-v2, which <StackGrid> sets on Home,
+ * Archived stacks and the Families screens. Imported last in styles/index.css.
  *
  * Markup (shared by both looks)
  *   .dm-stack-deck          wrapper; data-tone = accent hue, data-depth = 0/1/2 by word count
