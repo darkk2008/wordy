@@ -110,6 +110,18 @@
 .dm-lang-card {
   cursor: pointer;
 }
+/* The interface language sits on its own row, full width. */
+.dm-settings-grid.dm-lang-ui-grid {
+  grid-template-columns: 1fr;
+}
+.dm-lang-ui-hint {
+  margin-top: 10px;
+}
+.dm-lang-ui-reset {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
 .dm-lang-card-row {
   display: flex;
   flex-direction: row;

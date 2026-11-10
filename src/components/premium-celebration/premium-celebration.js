@@ -357,13 +357,16 @@ export function celebratePremiumUnlock(type) {
 
     // This overlay is appended directly to document.body, outside #root,
     // so it's outside the reach of the in-app UI translation observer.
-    // Translate it here directly into the user's saved native language.
+    // Translate it here directly into the user's interface language.
     (function translateCelebrationCard() {
       let langCode =
         (typeof uiTranslationLangCode !== "undefined" && uiTranslationLangCode) || null;
       if (!langCode) {
         try {
-          langCode = window.localStorage.getItem("deutschmaster-native-lang") || null;
+          langCode =
+            window.localStorage.getItem("deutschmaster-ui-lang") ||
+            window.localStorage.getItem("deutschmaster-native-lang") ||
+            null;
         } catch (e) {}
       }
       if (!langCode || langCode === "en") return;

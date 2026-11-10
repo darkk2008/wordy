@@ -164,6 +164,10 @@ export function LanguagesSettings({
   learningLanguage,
   onSetNativeLanguage,
   onSetLearningLanguage,
+  uiLanguage,
+  uiLanguageCustom,
+  onSetUiLanguage,
+  onResetUiLanguage,
 }) {
   const [openField, setOpenField] = useState(null);
   const romanizationEnabled = useRomanizationEnabled();
@@ -178,6 +182,8 @@ export function LanguagesSettings({
   }, []);
   const nativeLang = LANGUAGES.find((l) => l.code === nativeLanguage) || LANGUAGES[0];
   const learningLang = LANGUAGES.find((l) => l.code === learningLanguage) || LANGUAGES[1];
+  // The app's own text. It follows the native language until another one is picked here.
+  const uiLang = LANGUAGES.find((l) => l.code === (uiLanguage || nativeLanguage)) || nativeLang;
   return (
     <div className="dm-view dm-settings-subview">
       <div className="dm-topbar">
@@ -187,8 +193,8 @@ export function LanguagesSettings({
         <div className="dm-topbar-title">Languages</div>
       </div>
       <p className="dm-settings-hint">
-        Set the language you already know and the one you're learning. This is just remembered for
-        later — it doesn't change anything else in the app yet.
+        Pick the language you already know and the one you're learning. AI translates your words into
+        your native language.
       </p>
       <div ref={wrapRef} className="dm-lang-wrap">
         <div className="dm-lang-preview">
@@ -234,6 +240,28 @@ export function LanguagesSettings({
             }}
           />
         </div>
+        <div className="dm-settings-grid dm-lang-grid dm-lang-ui-grid">
+          <LanguageCard
+            label="Interface language"
+            lang={uiLang}
+            value={uiLang.code}
+            open={openField === "ui"}
+            onToggle={() => setOpenField((f) => (f === "ui" ? null : "ui"))}
+            onPick={(code) => {
+              if (onSetUiLanguage) onSetUiLanguage(code);
+              setOpenField(null);
+            }}
+          />
+        </div>
+        <p className="dm-settings-hint dm-lang-ui-hint">
+          Only changes the text of the app (menus, buttons). Words and translations the AI writes stay
+          in your native language.
+        </p>
+        {uiLanguageCustom && onResetUiLanguage && (
+          <button type="button" className="dm-btn-secondary dm-lang-ui-reset" onClick={onResetUiLanguage}>
+            Follow native language
+          </button>
+        )}
       </div>
       <div className="dm-settings-section-label">Romanization</div>
       <div className="dm-settings-row">

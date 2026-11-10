@@ -8,8 +8,7 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { Input } from "../common/Input";
 import { Check, Volume2 } from "../icons/icons";
 import { computeAdjForms, computeNounForms, computeVerbForms } from "../word-forms/word-forms";
-import { uiTranslationLangCode } from "../../services/ui-translation";
-import { translateFormPrompts } from "../../core/form-prompt-setting";
+import { nativeFormLangCode, translateFormPrompts } from "../../core/form-prompt-setting";
 import { nativeFormPhrase } from "./english-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
 
@@ -110,7 +109,7 @@ function formQ(w, kind, badge, fallbackLabel, answer) {
     // verbrennen" (untranslated), so the separate badge would only repeat it.
     return { wordId: w.id, prompt: label, badge: "", answer };
   }
-  const phrase = nativeFormPhrase(kind, w.en, uiTranslationLangCode);
+  const phrase = nativeFormPhrase(kind, w.en, nativeFormLangCode);
   return {
     wordId: w.id,
     prompt: phrase || `${fallbackLabel} of “${w.de}”`,

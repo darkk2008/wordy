@@ -428,6 +428,12 @@ async function flushUiTranslationQueue() {
     if (uiTranslationQueue.size > 0) scheduleUiTranslationFlush();
   }
 }
+/* What the current interface language shows for an English text (undefined when it has no translation yet). */
+function uiDisplayOf(original) {
+  const { template, nums } = uiTemplateOf(original);
+  const translated = uiLookup(template);
+  return translated ? uiApplyTemplate(translated, nums) : undefined;
+}
 function revertUiTranslationsToEnglish() {
   const oldTextMap = uiOriginalTextByNode;
   const oldAttrMap = uiOriginalAttrByEl;
@@ -437,7 +443,10 @@ function revertUiTranslationsToEnglish() {
     let n;
     while ((n = walker.nextNode())) {
       const original = oldTextMap.get(n);
-      if (original !== undefined && n.nodeValue !== original) n.nodeValue = original;
+      // Only put the English text back when the node still shows our translation. If the app changed
+      // it since (React updates a text node in place), it already holds the new English text.
+      if (original !== undefined && n.nodeValue !== original && n.nodeValue === uiDisplayOf(original))
+        n.nodeValue = original;
     }
   }
   if (oldAttrMap && root) {
@@ -445,7 +454,8 @@ function revertUiTranslationsToEnglish() {
       root.querySelectorAll("[" + attr + "]").forEach((el) => {
         const rec = oldAttrMap.get(el);
         const original = rec && rec[attr];
-        if (original !== undefined && el.getAttribute(attr) !== original)
+        const shown = el.getAttribute(attr);
+        if (original !== undefined && shown !== original && shown === uiDisplayOf(original))
           el.setAttribute(attr, original);
       });
     });
@@ -511,7 +521,10 @@ const UI_PRELOAD_STRINGS = [
   "Export, import or reset",
   "About",
   "How wwordy works",
-  "Set the language you already know and the one you're learning. This is just remembered for later — it doesn't change anything else in the app yet.",
+  "Pick the language you already know and the one you're learning. AI translates your words into your native language.",
+  "Interface language",
+  "Only changes the text of the app (menus, buttons). Words and translations the AI writes stay in your native language.",
+  "Follow native language",
   "Native language",
   "Learning language",
   "Pick a theme for the app. The quick toggle on the Home screen only switches between Dark and Light.",

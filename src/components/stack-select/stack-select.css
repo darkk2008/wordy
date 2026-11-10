@@ -321,6 +321,141 @@
   .dm-ss-sheet { padding: 28px 18px 18px; max-width: 440px; }
   .dm-ss-list { max-height: min(420px, 60dvh); }
 }
+/* ---- Select several stacks at once ---- */
+/* The switch row: in the sheet under the title, in the rail above the stacks. */
+.dm-ss-multi {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.dm-ss-multi.is-on {
+  background: color-mix(in srgb, var(--cyan) 9%, transparent);
+  border-color: color-mix(in srgb, var(--cyan) 34%, transparent);
+}
+.dm-ss-multi:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-ss-multi-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.dm-ss-multi-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  font-size: var(--fs-base);
+  letter-spacing: -0.01em;
+}
+.dm-ss-multi-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+.dm-ss-multi-track {
+  flex: none;
+  position: relative;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 22%, transparent);
+  transition: background-color 0.18s ease;
+}
+.dm-ss-multi-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.3, 1.2, 0.45, 1);
+}
+.dm-ss-multi.is-on .dm-ss-multi-track { background: var(--cyan); }
+.dm-ss-multi.is-on .dm-ss-multi-thumb { transform: translateX(16px); }
+.dm-ss-multi-compact {
+  width: auto;
+  display: inline-flex;
+  margin: 0 0 10px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 12px;
+}
+.dm-ss-multi-compact .dm-ss-multi-title { font-size: var(--fs-sm); }
+/* Rows become checkboxes (rounded squares) while several stacks can be picked. */
+.dm-ss-opt-mark-box { border-radius: 7px; }
+.dm-ss-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px 6px 0;
+  border-top: 1px solid var(--border);
+}
+.dm-ss-foot-link {
+  padding: 8px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--cyan);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.dm-ss-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--cyan);
+  color: #04141a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.dm-ss-done:active { transform: scale(0.97); }
+.dm-ss-foot-link:focus-visible,
+.dm-ss-done:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+/* In the rail (the open practice settings) each chip gets a check box at its end. */
+.dm-stackrail-check {
+  flex: none;
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, var(--text) 24%, transparent);
+  color: transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.dm-stackrail-item-active .dm-stackrail-check {
+  border-color: var(--cyan);
+  background: var(--cyan);
+  color: #04141a;
+}
 .dm-stackselect-item {
   width: 100%;
   display: flex;

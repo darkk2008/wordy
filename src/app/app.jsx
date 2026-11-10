@@ -9,6 +9,9 @@ import { LazyFallback } from "../components/lazy-fallback/lazy-fallback";
 import { FavoritesView } from "../components/favorites/favorites";
 import { FAVORITES_PARENT_ID, MiniStackView } from "../components/mini-stack/mini-stack";
 import { FORMS_ONLY_GAMES } from "../components/games/games-config";
+import { setNativeFormLangCode } from "../core/form-prompt-setting";
+import { readUiLanguageChoice, resolveUiLanguage, saveUiLanguageChoice } from "../core/ui-language";
+import { MULTI_STACK_ID } from "../components/games/combine-stacks";
 import { GamesHub, ReviewGamePicker } from "../components/games/games-hub";
 import { WriteGame, buildFormWordPool } from "../components/games/write-game";
 import { HomeView } from "../components/home/home";
@@ -444,6 +447,12 @@ export function App() {
       return "en";
     }
   });
+  // The language of the app's own text. Until one is picked it follows the native language; the native
+  // language itself is what AI translates words into and never depends on this setting.
+  const [uiLanguageChoice, setUiLanguageChoice] = useState(() =>
+    readUiLanguageChoice(LANGUAGES.map((l) => l.code))
+  );
+  const uiLanguage = resolveUiLanguage(uiLanguageChoice, nativeLanguage);
   const [i18nLoading, setI18nLoading] = useState(null);
   const [i18nLoadingStrings, setI18nLoadingStrings] = useState(null);
   const commitNativeLanguage = (code) => {
@@ -452,14 +461,18 @@ export function App() {
       window.localStorage.setItem("deutschmaster-native-lang", code);
     } catch (e) {}
   };
-  const updateNativeLanguage = (code) => {
-    if (!code || code === nativeLanguage) return;
+  const commitUiLanguage = (code) => {
+    setUiLanguageChoice(code);
+    saveUiLanguageChoice(code);
+  };
+  // Get the app text for `code` ready (the "translating the interface" overlay), then run `commit`.
+  const withUiLanguageReady = (code, commit) => {
     let hasKey = false;
     try {
       hasKey = !!window.localStorage.getItem("deutschmaster-groq-key");
     } catch (e) {}
     if (code === "en" || code === "ru" || !hasKey) {
-      commitNativeLanguage(code);
+      commit();
       return;
     }
     setI18nLoading({
@@ -484,11 +497,32 @@ export function App() {
       .finally(() => {
         setI18nLoading(null);
         setI18nLoadingStrings(null);
-        commitNativeLanguage(code);
+        commit();
       });
   };
+  const updateNativeLanguage = (code) => {
+    if (!code || code === nativeLanguage) return;
+    // The app text only follows the native language while no interface language is picked.
+    if (uiLanguageChoice) {
+      commitNativeLanguage(code);
+      return;
+    }
+    withUiLanguageReady(code, () => commitNativeLanguage(code));
+  };
+  const updateUiLanguage = (code) => {
+    if (!code || code === uiLanguageChoice) return;
+    withUiLanguageReady(code, () => commitUiLanguage(code));
+  };
+  // Back to "the app text follows the native language".
+  const resetUiLanguage = () => {
+    if (!uiLanguageChoice) return;
+    withUiLanguageReady(nativeLanguage, () => commitUiLanguage(null));
+  };
   useEffect(() => {
-    setUiTranslationLanguage(nativeLanguage);
+    setUiTranslationLanguage(uiLanguage);
+  }, [uiLanguage]);
+  useEffect(() => {
+    setNativeFormLangCode(nativeLanguage);
   }, [nativeLanguage]);
   const [learningLanguage, setLearningLanguage] = useState(() => {
     try {
@@ -1544,6 +1578,9 @@ export function App() {
     }));
   };
   const [gamesStackId, setGamesStackId] = useState(null);
+  // Games with several stacks at once: the mode, and the picked stack ids.
+  const [gamesMulti, setGamesMulti] = useState(false);
+  const [gamesStackIds, setGamesStackIds] = useState([]);
   const [gamesMixForms, setGamesMixForms] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1738,6 +1775,8 @@ export function App() {
     if (miniView) setMiniView(null);
     if (tab === "games" && id !== "games") {
       setGamesStackId(null);
+      setGamesMulti(false);
+      setGamesStackIds([]);
       setGamesMixForms(false);
     }
     setTab(id);
@@ -1903,13 +1942,17 @@ export function App() {
           gamesStackId || (gamesStacks.find((s) => s.id !== "__favorites__") || gamesStacks[0])?.id
         }
         onChangeStackId={setGamesStackId}
+        multi={gamesMulti}
+        stackIds={gamesStackIds}
+        onChangeMulti={setGamesMulti}
+        onChangeStackIds={setGamesStackIds}
         mixForms={gamesMixForms}
         onChangeMixForms={setGamesMixForms}
         onStart={(type, stack, direction, level, mixForms) =>
           setGame({
             type,
             stack:
-              stack && stack.id === "__favorites__"
+              stack && (stack.id === "__favorites__" || stack.id === MULTI_STACK_ID)
                 ? {
                     ...stack,
                     words: shuffle(stack.words),
@@ -2002,6 +2045,10 @@ export function App() {
         learningLanguage={learningLanguage}
         onSetNativeLanguage={updateNativeLanguage}
         onSetLearningLanguage={updateLearningLanguage}
+        uiLanguage={uiLanguage}
+        uiLanguageCustom={!!uiLanguageChoice}
+        onSetUiLanguage={updateUiLanguage}
+        onResetUiLanguage={resetUiLanguage}
         initialSection={settingsInitialSection}
         onConsumeInitialSection={() => setSettingsInitialSection(null)}
         isPremium={isPremium}

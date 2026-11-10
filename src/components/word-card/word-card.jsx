@@ -22,7 +22,8 @@ import {
 } from "../icons/icons";
 import { DmBadgeLock } from "../icons/settings-icons";
 import { SwipeableRow } from "../swipeable-row/swipeable-row";
-import { WordFormsLine, stripArticle } from "../word-forms/word-forms";
+import { PickableFormsLine } from "../word-forms/form-pick";
+import { stripArticle } from "../word-forms/word-forms";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
 export function WordCard({
@@ -31,6 +32,7 @@ export function WordCard({
   displayMode,
   showForms,
   formAudio,
+  formPick, // the form chosen for this word's type (from the FORMS filter menu), or undefined
   onToggleFav,
   onEdit,
   onSpeak,
@@ -310,11 +312,11 @@ export function WordCard({
               </FitText>
             )}
             {showTranslationPill && <span className="dm-peek-translation">{peekValue}</span>}
-            {hideWordForForms && <WordFormsLine w={w} showAudio={!!formAudio} inline />}
+            {hideWordForForms && <PickableFormsLine w={w} showAudio={!!formAudio} pick={formPick} />}
           </span>
           {showMetaBelow &&
             (isFormsMode || peekForms ? (
-              <WordFormsLine w={w} showAudio={!!formAudio} />
+              <PickableFormsLine w={w} showAudio={!!formAudio} pick={formPick} />
             ) : (
               <WordMeta w={w} />
             ))}

@@ -2,7 +2,7 @@
  * GamesHub (game selection screen) and ReviewGamePicker.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IconBtn } from "../common/common";
 import { ChevronDown, TableIcon, Type, X } from "../icons/icons";
 import { LockIcon } from "../icons/settings-icons";
@@ -18,6 +18,7 @@ import {
   getGameCooldownUntil,
 } from "../stack-select/stack-select";
 import { isRealNoun, isRealVerb } from "./cases-game";
+import { MULTI_STACK_ID, combineStacks } from "./combine-stacks";
 import {
   DIRECTION_GAMES,
   FORMS_ONLY_GAMES,
@@ -37,6 +38,11 @@ export function GamesHub({
   onOpenPremium,
   stackId,
   onChangeStackId,
+  // Playing with several stacks at once (optional): the mode, and the picked stack ids.
+  multi = false,
+  stackIds = [],
+  onChangeMulti,
+  onChangeStackIds,
   mixForms,
   onChangeMixForms,
 }) {
@@ -71,7 +77,32 @@ export function GamesHub({
     const t = setTimeout(() => setBarSettled(true), 480);
     return () => clearTimeout(t);
   }, [setupCollapsed]);
-  const stack = stacks.find((s) => s.id === stackId) || stacks[0];
+  const baseStack = stacks.find((s) => s.id === stackId) || stacks[0];
+  // The stack the games play: the single chosen stack, or all picked stacks merged into one.
+  const stack = useMemo(() => {
+    if (!multi) return baseStack;
+    const picked = (stackIds || []).map((id) => stacks.find((s) => s.id === id)).filter(Boolean);
+    return picked.length > 1 ? combineStacks(picked) : picked[0] || baseStack;
+  }, [multi, stackIds, stacks, baseStack]);
+  const isCombined = !!stack && stack.id === MULTI_STACK_ID;
+  const canMulti = !!onChangeMulti && !!onChangeStackIds;
+  const toggleMulti = (on) => {
+    if (on) {
+      onChangeStackIds(baseStack ? [baseStack.id] : []);
+      onChangeMulti(true);
+    } else {
+      // back to one stack: keep the first of the picked ones
+      const first = (stackIds || []).find((id) => stacks.some((s) => s.id === id));
+      if (first) setStackId(first);
+      onChangeMulti(false);
+    }
+  };
+  const multiProps = {
+    multi,
+    values: stackIds,
+    onMultiChange: canMulti ? toggleMulti : undefined,
+    onChangeValues: onChangeStackIds,
+  };
   const nounCount = stack ? stack.words.filter(isRealNoun).length : 0;
   const verbCount = stack ? stack.words.filter(isRealVerb).length : 0;
   const adjCount = stack ? stack.words.filter((w) => w.type === "adj" && w.de).length : 0;
@@ -135,6 +166,7 @@ export function GamesHub({
                 onChange={setStackId}
                 variant="dropdown"
                 active={setupCollapsed}
+                {...multiProps}
               />
               <button
                 type="button"
@@ -166,13 +198,14 @@ export function GamesHub({
           <div className="dm-gsetup-collapse-inner">
             <div className="dm-gsetup-body">
               <div className="dm-gsetup-stack">
-                <label className="dm-label">Practice stack</label>
+                <label className="dm-label">{multi && canMulti ? "Practice stacks" : "Practice stack"}</label>
                 <StackSelect
                   stacks={stacks}
                   value={stackId}
                   onChange={setStackId}
                   variant="rail"
                   active={!setupCollapsed}
+                  {...multiProps}
                 />
               </div>
               <div className="dm-gsetup-mode">
@@ -215,7 +248,7 @@ export function GamesHub({
                 <p className="dm-formsmode-hint">
                   {mixForms
                     ? "Every game asks for each word’s key forms — genitive, plural, tense and comparative — instead of whole words."
-                    : "Every game asks for the words in this stack, the way you saved them."}
+                    : `Every game asks for the words in ${isCombined ? "these stacks" : "this stack"}, the way you saved them.`}
                 </p>
               </div>
             </div>
@@ -307,7 +340,7 @@ export function GamesHub({
             adjCount,
             formsCapableCount,
             total: stack ? stack.words.length : 0,
-            scope: "this stack",
+            scope: isCombined ? "these stacks" : "this stack",
           })}
           onClose={() => setUnavailableGame(null)}
         />

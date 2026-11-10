@@ -1,0 +1,115 @@
+/* components/stack-view/form-pick-modal.css
+ * The "Choose form" menu (long press on the FORMS filter) and the small marks that go with it.
+ */
+.dm-formpick-hint {
+  margin: 2px 0 6px;
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+}
+.dm-formpick-empty {
+  padding: 18px 0;
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+.dm-formpick-type {
+  margin-top: 18px;
+}
+.dm-formpick-type-title {
+  margin-bottom: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.dm-formpick-group {
+  margin-top: 12px;
+}
+.dm-formpick-group-title {
+  margin-bottom: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+.dm-formpick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dm-formpick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.dm-formpick-chip:active {
+  transform: scale(0.96);
+}
+.dm-formpick-chip:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-formpick-chip.is-active {
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.12);
+  border-color: rgba(var(--cyan-rgb), 0.55);
+}
+.dm-formpick-default {
+  width: 100%;
+  justify-content: flex-start;
+}
+.dm-formpick .dm-modal-actions {
+  margin-top: 22px;
+}
+.dm-formpick-reset {
+  width: 100%;
+  justify-content: center;
+}
+.dm-formpick-reset:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* On the FORMS filter: a dot shows that a non-default form is chosen. */
+.dm-seg-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(var(--cyan-rgb), 0.7);
+}
+/* The FORMS filter is long-pressed: no text selection or iOS callout while holding it. */
+.dm-seg-holdable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* The chosen form on a card: a small label before the form itself. */
+.dm-meta-tag {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.12);
+  border-radius: 6px;
+}

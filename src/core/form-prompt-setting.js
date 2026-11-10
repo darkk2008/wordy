@@ -5,6 +5,12 @@
  * form questions are built outside React (games, decks).
  */
 export let translateFormPrompts = true;
+/* The language of the word meanings (w.en): the person's NATIVE language. The prompt is built from
+ * that meaning (сжигал), so it must not follow the interface language, which can be a different one. */
+export let nativeFormLangCode = "en";
+export function setNativeFormLangCode(code) {
+  nativeFormLangCode = code || "en";
+}
 export function setTranslateFormPrompts(val) {
   translateFormPrompts = val !== false;
 }

@@ -67,6 +67,10 @@ export function SettingsView({
   learningLanguage,
   onSetNativeLanguage,
   onSetLearningLanguage,
+  uiLanguage,
+  uiLanguageCustom,
+  onSetUiLanguage,
+  onResetUiLanguage,
   initialSection,
   onConsumeInitialSection,
   isPremium,
@@ -199,6 +203,10 @@ export function SettingsView({
         learningLanguage={learningLanguage}
         onSetNativeLanguage={onSetNativeLanguage}
         onSetLearningLanguage={onSetLearningLanguage}
+        uiLanguage={uiLanguage}
+        uiLanguageCustom={uiLanguageCustom}
+        onSetUiLanguage={onSetUiLanguage}
+        onResetUiLanguage={onResetUiLanguage}
       />
     );
   if (section === "about") return <AppAboutSettings onBack={() => setSection(null)} />;

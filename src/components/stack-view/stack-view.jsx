@@ -2,7 +2,7 @@
  * StackView: the screen showing one stack's words.
  */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { FREE_FAVORITE_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
@@ -27,11 +27,16 @@ import {
 } from "../icons/icons";
 import { getLangAbbr } from "../language-settings/language-settings";
 import { QRShareModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
+import { FormPickModal } from "./form-pick-modal";
 import { RenameStackModal } from "./rename-stack-modal";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 import { WordCard } from "../word-card/word-card";
+import { FORM_TYPES } from "../word-forms/form-pick";
 import { AllFormsModal, stripArticle } from "../word-forms/word-forms";
 import { WordModal, buildShareHTML } from "../word-modal/word-modal";
+
+// How long the FORMS filter must be held to open the "Choose form" menu.
+const FORMS_HOLD_MS = 450;
 
 export function StackView({
   stack,
@@ -62,6 +67,63 @@ export function StackView({
   const stackIdOf = (w) => (isVirtual ? w.stackId : stack.id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState("BOTH");
+  // Form chosen for the FORMS filter per word type ({ noun, adj, verb }), from the menu that opens
+  // when the FORMS filter is held. Lives only as long as this screen: leaving the stack and opening
+  // it again starts from the default forms.
+  const [formPicks, setFormPicks] = useState({});
+  const [showFormPick, setShowFormPick] = useState(false);
+  const hasFormPick = FORM_TYPES.some((t) => formPicks[t]);
+  const formsHold = useRef({ timer: null, resetTimer: null, fired: false, x: 0, y: 0 });
+  const stopFormsHold = () => {
+    if (formsHold.current.timer) {
+      clearTimeout(formsHold.current.timer);
+      formsHold.current.timer = null;
+    }
+  };
+  const startFormsHold = (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const h = formsHold.current;
+    stopFormsHold();
+    if (h.resetTimer) clearTimeout(h.resetTimer);
+    h.resetTimer = null;
+    h.fired = false;
+    h.x = e.clientX;
+    h.y = e.clientY;
+    h.timer = setTimeout(() => {
+      h.timer = null;
+      h.fired = true; // the click that ends this press must not also switch the filter
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        try {
+          navigator.vibrate(12);
+        } catch (err) {}
+      }
+      setShowFormPick(true);
+    }, FORMS_HOLD_MS);
+  };
+  const moveFormsHold = (e) => {
+    const h = formsHold.current;
+    if (h.timer && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 10) stopFormsHold();
+  };
+  const endFormsHold = () => {
+    const h = formsHold.current;
+    stopFormsHold();
+    // the click of a long press comes right after the release; forget the press shortly after
+    if (h.fired) {
+      if (h.resetTimer) clearTimeout(h.resetTimer);
+      h.resetTimer = setTimeout(() => {
+        h.fired = false;
+        h.resetTimer = null;
+      }, 300);
+    }
+  };
+  useEffect(
+    () => () => {
+      const h = formsHold.current;
+      if (h.timer) clearTimeout(h.timer);
+      if (h.resetTimer) clearTimeout(h.resetTimer);
+    },
+    []
+  );
   const [query, setQuery] = useState("");
   const [modalWord, setModalWord] = useState(undefined);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -482,19 +544,45 @@ ${lines}`;
         </div>
       </div>
       <div className="dm-segmented dm-display-toggle">
-        {["GER", "ENG", "BOTH", "FORMS"].map((m) => (
-          <button
-            key={m}
-            className={`dm-seg ${displayMode === m ? "dm-seg-active" : ""}`}
-            onClick={() => setDisplayMode(m)}
-          >
-            {m === "GER"
-              ? getLangAbbr(learningLanguage)
-              : m === "ENG"
-                ? getLangAbbr(nativeLanguage)
-                : m}
-          </button>
-        ))}
+        {["GER", "ENG", "BOTH", "FORMS"].map((m) => {
+          // The FORMS filter can be held (or right-clicked) to choose which form the cards show.
+          const holdable = m === "FORMS";
+          return (
+            <button
+              key={m}
+              className={`dm-seg ${displayMode === m ? "dm-seg-active" : ""}${holdable ? " dm-seg-holdable" : ""}`}
+              title={holdable ? "Hold to choose a form" : undefined}
+              onClick={() => {
+                if (holdable && formsHold.current.fired) {
+                  formsHold.current.fired = false;
+                  return;
+                }
+                setDisplayMode(m);
+              }}
+              onPointerDown={holdable ? startFormsHold : undefined}
+              onPointerMove={holdable ? moveFormsHold : undefined}
+              onPointerUp={holdable ? endFormsHold : undefined}
+              onPointerCancel={holdable ? endFormsHold : undefined}
+              onPointerLeave={holdable ? stopFormsHold : undefined}
+              onContextMenu={
+                holdable
+                  ? (e) => {
+                      e.preventDefault();
+                      formsHold.current.fired = true;
+                      setShowFormPick(true);
+                    }
+                  : undefined
+              }
+            >
+              {m === "GER"
+                ? getLangAbbr(learningLanguage)
+                : m === "ENG"
+                  ? getLangAbbr(nativeLanguage)
+                  : m}
+              {holdable && hasFormPick && <span className="dm-seg-dot" aria-hidden="true" />}
+            </button>
+          );
+        })}
       </div>
       <div
         className="dm-list"
@@ -543,6 +631,7 @@ ${lines}`;
             displayMode={displayMode}
             showForms={displayMode === "FORMS" ? true : showForms}
             formAudio={showForms}
+            formPick={formPicks[w.type]}
             onToggleFav={toggleFav}
             onEdit={(word) => setModalWord(word)}
             onSpeak={onSpeak}
@@ -643,6 +732,26 @@ ${lines}`;
           onClose={() => setFormsWord(undefined)}
           isPremium={isPremium}
           onOpenPremium={onOpenPremium}
+        />
+      )}
+      {showFormPick && (
+        <FormPickModal
+          words={stack.words}
+          picks={formPicks}
+          onPick={(type, pick) => {
+            setFormPicks((prev) => {
+              const next = { ...prev };
+              if (pick) next[type] = pick;
+              else delete next[type];
+              return next;
+            });
+            setDisplayMode("FORMS");
+          }}
+          onReset={() => {
+            setFormPicks({});
+            setDisplayMode("FORMS");
+          }}
+          onClose={() => setShowFormPick(false)}
         />
       )}
       {showQRModal && <QRShareModal stack={stack} onClose={() => setShowQRModal(false)} />}

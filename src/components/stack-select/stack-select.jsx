@@ -4,7 +4,31 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatedIcon } from "../common/common";
+import { uniqueWordCount } from "../games/combine-stacks";
 import { Check, ChevronDown, Layers, X } from "../icons/icons";
+
+/* The "Select multiple stacks" switch shown in both pickers (the sheet and the rail). */
+function MultiSwitch({ on, onChange, compact }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      className={`dm-ss-multi${on ? " is-on" : ""}${compact ? " dm-ss-multi-compact" : ""}`}
+      onClick={() => onChange(!on)}
+    >
+      <span className="dm-ss-multi-text">
+        <span className="dm-ss-multi-title">Select multiple stacks</span>
+        {!compact && (
+          <span className="dm-ss-multi-sub">Play games with several stacks at once</span>
+        )}
+      </span>
+      <span className="dm-ss-multi-track" aria-hidden="true">
+        <span className="dm-ss-multi-thumb" />
+      </span>
+    </button>
+  );
+}
 
 export function StackSelect({
   stacks,
@@ -12,6 +36,12 @@ export function StackSelect({
   onChange,
   variant,
   active = true,
+  // Several stacks at once (optional): `multi` is the mode, `values` the picked stack ids. The switch
+  // only shows when onMultiChange is given and there is more than one stack to choose from.
+  multi = false,
+  values = [],
+  onMultiChange,
+  onChangeValues,
 }) {
   const showDropdown = variant !== "rail";
   const showRail = variant !== "dropdown";
@@ -24,6 +54,19 @@ export function StackSelect({
   const ref = useRef(null);
   const railRef = useRef(null);
   const current = stacks.find((s) => s.id === value) || stacks[0];
+  const canMulti = typeof onMultiChange === "function" && stacks.length > 1;
+  const multiOn = multi && canMulti;
+  const picked = multiOn ? values.map((id) => stacks.find((s) => s.id === id)).filter(Boolean) : [];
+  const pickedIds = picked.map((s) => s.id);
+  const manyPicked = multiOn && picked.length > 1;
+  const pickedWords = manyPicked ? uniqueWordCount(picked) : 0;
+  const allPicked = multiOn && picked.length === stacks.length;
+  const isOn = (id) => (multiOn ? pickedIds.includes(id) : id === value);
+  const toggleValue = (id) => {
+    const has = pickedIds.includes(id);
+    if (has && pickedIds.length <= 1) return; // there is always at least one stack
+    onChangeValues(has ? pickedIds.filter((v) => v !== id) : [...pickedIds, id]);
+  };
   useEffect(() => {
     const onDoc = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
@@ -113,12 +156,14 @@ export function StackSelect({
           aria-expanded={open}
         >
           <span className="dm-stackselect-emoji">
-            <AnimatedIcon id={current?.emoji} size={22} />
+            {manyPicked ? <Layers size={20} /> : <AnimatedIcon id={(multiOn && picked[0] ? picked[0] : current)?.emoji} size={22} />}
           </span>
           <span className="dm-stackselect-info">
-            <span className="dm-stackselect-name">{current?.name}</span>
+            <span className="dm-stackselect-name">
+              {manyPicked ? `${picked.length} stacks` : (multiOn && picked[0] ? picked[0] : current)?.name}
+            </span>
             <span className="dm-stackselect-count">
-              {current?.words.length}
+              {manyPicked ? pickedWords : (multiOn && picked[0] ? picked[0] : current)?.words.length}
               {" words"}
             </span>
           </span>
@@ -138,10 +183,16 @@ export function StackSelect({
           >
             <div className="dm-ss-head">
               <div className="dm-ss-head-text">
-                <div className="dm-ss-title">Practice stack</div>
+                <div className="dm-ss-title">{multiOn ? "Practice stacks" : "Practice stack"}</div>
                 <div className="dm-ss-sub">
-                  {stacks.length}
-                  {stacks.length === 1 ? " stack" : " stacks"}
+                  {multiOn ? (
+                    `${picked.length} selected · ${uniqueWordCount(picked)} words`
+                  ) : (
+                    <>
+                      {stacks.length}
+                      {stacks.length === 1 ? " stack" : " stacks"}
+                    </>
+                  )}
                 </div>
               </div>
               <button
@@ -153,9 +204,15 @@ export function StackSelect({
                 <X size={18} />
               </button>
             </div>
-            <div className="dm-ss-list" role="listbox" ref={listRef}>
+            {canMulti && <MultiSwitch on={multiOn} onChange={onMultiChange} />}
+            <div
+              className="dm-ss-list"
+              role="listbox"
+              aria-multiselectable={multiOn || undefined}
+              ref={listRef}
+            >
               {stacks.map((s) => {
-                const on = s.id === value;
+                const on = isOn(s.id);
                 return (
                   <button
                     key={s.id}
@@ -164,6 +221,10 @@ export function StackSelect({
                     aria-selected={on}
                     className={`dm-ss-opt ${on ? "dm-ss-opt-active" : ""}`}
                     onClick={() => {
+                      if (multiOn) {
+                        toggleValue(s.id);
+                        return;
+                      }
                       onChange(s.id);
                       setOpen(false);
                     }}
@@ -178,23 +239,43 @@ export function StackSelect({
                         {s.words.length === 1 ? " word" : " words"}
                       </span>
                     </span>
-                    <span className="dm-ss-opt-mark" aria-hidden="true">
+                    <span
+                      className={`dm-ss-opt-mark${multiOn ? " dm-ss-opt-mark-box" : ""}`}
+                      aria-hidden="true"
+                    >
                       {on && <Check size={14} />}
                     </span>
                   </button>
                 );
               })}
             </div>
+            {multiOn && (
+              <div className="dm-ss-foot">
+                <button
+                  type="button"
+                  className="dm-ss-foot-link"
+                  onClick={() => onChangeValues(allPicked ? pickedIds.slice(0, 1) : stacks.map((s) => s.id))}
+                >
+                  {allPicked ? "Deselect all" : "Select all"}
+                </button>
+                <button type="button" className="dm-ss-done" onClick={() => setOpen(false)}>
+                  <Check size={16} />
+                  {manyPicked ? ` Done · ${picked.length} stacks` : " Done"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
+      {showRail && canMulti && <MultiSwitch on={multiOn} onChange={onMultiChange} compact />}
       {showRail && (
         <div
           ref={railRef}
           className={`dm-stackrail${edges.t ? " dm-stackrail-fade-t" : ""}${edges.b ? " dm-stackrail-fade-b" : ""}`}
-          role="radiogroup"
-          aria-label="Practice stack"
+          role={multiOn ? "group" : "radiogroup"}
+          aria-label={multiOn ? "Practice stacks" : "Practice stack"}
           onKeyDown={(e) => {
+            if (multiOn) return;
             if (
               e.key !== "ArrowRight" &&
               e.key !== "ArrowLeft" &&
@@ -215,29 +296,37 @@ export function StackSelect({
             if (el) el.focus();
           }}
         >
-          {stacks.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              role="radio"
-              data-stack-id={s.id}
-              aria-checked={s.id === value}
-              tabIndex={s.id === value ? 0 : -1}
-              className={`dm-stackrail-item ${s.id === value ? "dm-stackrail-item-active" : ""}`}
-              onClick={() => onChange(s.id)}
-            >
-              <span className="dm-stackrail-emoji">
-                <AnimatedIcon id={s.emoji} size={22} />
-              </span>
-              <span className="dm-stackrail-text">
-                <span className="dm-stackrail-name">{s.name}</span>
-                <span className="dm-stackrail-count">
-                  {s.words.length}
-                  {s.words.length === 1 ? " word" : " words"}
+          {stacks.map((s) => {
+            const on = isOn(s.id);
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role={multiOn ? "checkbox" : "radio"}
+                data-stack-id={s.id}
+                aria-checked={on}
+                tabIndex={multiOn || on ? 0 : -1}
+                className={`dm-stackrail-item ${on ? "dm-stackrail-item-active" : ""}${multiOn ? " dm-stackrail-item-multi" : ""}`}
+                onClick={() => (multiOn ? toggleValue(s.id) : onChange(s.id))}
+              >
+                <span className="dm-stackrail-emoji">
+                  <AnimatedIcon id={s.emoji} size={22} />
                 </span>
-              </span>
-            </button>
-          ))}
+                <span className="dm-stackrail-text">
+                  <span className="dm-stackrail-name">{s.name}</span>
+                  <span className="dm-stackrail-count">
+                    {s.words.length}
+                    {s.words.length === 1 ? " word" : " words"}
+                  </span>
+                </span>
+                {multiOn && (
+                  <span className="dm-stackrail-check" aria-hidden="true">
+                    {on && <Check size={12} />}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
