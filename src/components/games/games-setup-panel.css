@@ -433,3 +433,12 @@
   .dm-stackrail-item:active,
   .dm-game-card:not(:disabled):hover { transform: none; }
 }
+
+/* Whole words / Word forms switch inside the stack's game picker modal */
+.dm-picker-formsmode { margin: 4px 0 14px; max-width: none; }
+.dm-picker-formsmode .dm-formsmode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

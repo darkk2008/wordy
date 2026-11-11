@@ -1,0 +1,334 @@
+/* components/colors/colors.css */
+.dm-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.dm-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--sw);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-swatch:hover {
+  transform: scale(1.08);
+}
+.dm-swatch-on {
+  box-shadow:
+    0 0 0 2px var(--bg, #0b0e17),
+    0 0 0 4px var(--sw);
+}
+.dm-swatches-sm {
+  gap: 7px;
+}
+.dm-swatches-sm .dm-swatch {
+  width: 26px;
+  height: 26px;
+}
+
+.dm-color-dot {
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: none;
+}
+.dm-card-badges .dm-color-dot {
+  align-self: center;
+}
+
+/* Word modal row */
+.dm-modal-color-row {
+  margin: 4px 0 6px;
+}
+
+/* Colours screen */
+.dm-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.dm-color-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+  padding: 16px 14px;
+  min-height: 104px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--sw) 40%, transparent);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--sw) 24%, transparent),
+    color-mix(in srgb, var(--sw) 6%, transparent)
+  );
+  color: var(--text);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-color-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--sw) 25%, transparent);
+}
+.dm-color-tile-empty {
+  opacity: 0.62;
+}
+.dm-color-tile-bubble {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: none;
+}
+.dm-color-tile-name {
+  font-weight: 700;
+  font-size: var(--fs-md, 16px);
+}
+.dm-color-tile-count {
+  font-size: var(--fs-sm, 13px);
+  color: var(--text-dim);
+}
+.dm-colors-hint {
+  margin: 6px 0 0;
+  color: var(--text-dim);
+  font-size: var(--fs-sm, 13px);
+  line-height: 1.45;
+}
+
+/* Colour title on the colour stack screen */
+.dm-color-title-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: none;
+  flex: none;
+}
+
+/* Mistakes button on the results screen + the modal */
+.dm-game-play.dm-game-done > .dm-done-mistakes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: none;
+  width: auto;
+  height: auto;
+  min-height: 44px;
+  padding: 10px 18px;
+  margin: 12px auto 0;
+  z-index: 1;
+}
+.dm-mistakes-modal {
+  max-width: 460px;
+  width: 100%;
+  max-height: min(86vh, 720px);
+  display: flex;
+  flex-direction: column;
+}
+.dm-mistakes-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 0 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* A mistake shown as a word card: word + translation on the left, icon buttons on the right. */
+.dm-mcard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.dm-mcard[style*="--sw"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--sw);
+}
+.dm-mcard-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.dm-mcard-de {
+  font-weight: 700;
+  font-size: var(--fs-md, 16px);
+  overflow-wrap: anywhere;
+}
+.dm-mcard-en {
+  color: var(--text-dim);
+  font-size: var(--fs-sm, 13px);
+  overflow-wrap: anywhere;
+}
+.dm-mcard-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dm-mcard-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-mcard-btn:hover {
+    background: var(--surface-strong);
+    color: var(--text);
+  }
+}
+.dm-mcard-btn:active {
+  transform: scale(0.92);
+}
+.dm-mcard-btn:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 1px;
+}
+.dm-mcard-btn-fav {
+  color: #ffb020;
+  background: rgba(255, 176, 32, 0.12);
+}
+.dm-mcard-btn-colored {
+  color: var(--sw);
+  background: color-mix(in srgb, var(--sw) 14%, transparent);
+}
+.dm-mcard-btn-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: none;
+}
+
+/* The colour picker modal, on top of the Mistakes modal */
+.dm-colorpick-backdrop {
+  z-index: 1100;
+}
+.dm-colorpick {
+  max-width: 420px;
+}
+.dm-colorpick-word {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 16px;
+  text-align: center;
+}
+.dm-colorpick-word b {
+  font-size: var(--fs-lg, 18px);
+  overflow-wrap: anywhere;
+}
+.dm-colorpick-word span {
+  color: var(--text-dim);
+  font-size: var(--fs-sm, 13px);
+  overflow-wrap: anywhere;
+}
+.dm-colorpick-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.dm-colorpick-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-colorpick-opt:hover {
+    background: var(--surface);
+  }
+}
+.dm-colorpick-opt:active {
+  transform: scale(0.95);
+}
+.dm-colorpick-opt-on {
+  background: color-mix(in srgb, var(--sw) 14%, transparent);
+  border-color: color-mix(in srgb, var(--sw) 45%, transparent);
+  color: var(--text);
+}
+.dm-colorpick-dot {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--sw);
+  box-shadow: none;
+}
+.dm-colorpick-name {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 600;
+}
+.dm-colorpick-clear {
+  width: 100%;
+}
+@media (max-width: 360px) {
+  .dm-colorpick-dot {
+    width: 32px;
+    height: 32px;
+  }
+}

@@ -358,7 +358,9 @@ export function ReviewGamePicker({
   isPremium,
   onOpenPremium,
   translationsOnly = false,
+  showFormsToggle = false,
 }) {
+  const [mixForms, setMixForms] = useState(false);
   const [pendingGame, setPendingGame] = useState(null);
   const [pendingLevelGame, setPendingLevelGame] = useState(null);
   const [unavailableGame, setUnavailableGame] = useState(null);
@@ -385,8 +387,9 @@ export function ReviewGamePicker({
     (g) =>
       (!g.germanOnly || learningLanguage === "de") &&
       (!g.nonGermanOnly || learningLanguage !== "de") &&
-      !(translationsOnly && FORMS_REQUIRED_GAMES.includes(g.id))
+      !(translationsOnly && !(showFormsToggle && mixForms) && FORMS_REQUIRED_GAMES.includes(g.id))
   );
+  const withForms = (id) => FORMS_ONLY_GAMES.includes(id) && mixForms;
   const isGameUnavailable = (g) => !!g.soon || !isPlayable(g);
   const orderedGames = [
     ...visibleGames.filter((g) => !isGameUnavailable(g)),
@@ -401,6 +404,30 @@ export function ReviewGamePicker({
             <X size={18} />
           </IconBtn>
         </div>
+        {showFormsToggle && formsCapableCount > 0 && (
+          <div className="dm-formsmode dm-picker-formsmode" role="radiogroup" aria-label="What you practice">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!mixForms}
+              className={`dm-formsmode-btn ${mixForms ? "" : "dm-formsmode-btn-active"}`}
+              onClick={() => setMixForms(false)}
+            >
+              <Type size={15} />
+              {" Whole words"}
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={mixForms}
+              className={`dm-formsmode-btn ${mixForms ? "dm-formsmode-btn-active" : ""}`}
+              onClick={() => setMixForms(true)}
+            >
+              <TableIcon size={15} />
+              {" Word forms"}
+            </button>
+          </div>
+        )}
         <div className="dm-game-grid">
           {orderedGames.map((g) => {
             const locked = !!g.premium && !isPremium;
@@ -419,7 +446,7 @@ export function ReviewGamePicker({
                         ? setPendingGame(g.id)
                         : LEVEL_GAMES.includes(g.id)
                           ? setPendingLevelGame(g.id)
-                          : onStart(g.id)
+                          : onStart(g.id, undefined, undefined, withForms(g.id))
                 }
               >
                 {g.soon && <div className="dm-game-soon">Soon</div>}
@@ -442,7 +469,7 @@ export function ReviewGamePicker({
             learningLanguage={learningLanguage}
             nativeLanguage={nativeLanguage}
             onPick={(direction) => {
-              onStart(pendingGame, direction);
+              onStart(pendingGame, direction, undefined, withForms(pendingGame));
               setPendingGame(null);
             }}
           />

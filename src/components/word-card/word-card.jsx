@@ -6,6 +6,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { HideArticlesContext, ShowLevelBadgeContext } from "../../core/contexts";
 import { useRomanizationEnabled } from "../../core/speech-voices";
 import { LEVEL_COLOR } from "../../core/srs-and-seed-data";
+import { colorById } from "../../core/word-colors";
+import { ColorDot } from "../colors/color-swatches";
 import { FitText, IconBtn, WordMeta } from "../common/common";
 import {
   Check,
@@ -199,18 +201,17 @@ export function WordCard({
       onClick: () => onDrill(w),
     });
   }
-  const downActions = [
-    {
+  const downActions = [];
+  if (onToggleMiniStack) {
+    downActions.push({
       key: "ministack",
       label: isInMiniStack ? "Remove from mini stack" : "Add to mini stack",
       tone: isInMiniStack ? "green" : "default",
       active: isInMiniStack,
       icon: isInMiniStack ? <Check size={18} /> : <MiniStackIcon size={18} />,
-      onClick: () => {
-        if (onToggleMiniStack) onToggleMiniStack(w);
-      },
-    },
-  ];
+      onClick: () => onToggleMiniStack(w),
+    });
+  }
   if (onEnterMultiPick) {
     downActions.push({
       key: "multipick",
@@ -273,9 +274,10 @@ export function WordCard({
                 }
           }
         >
-          {(index !== undefined || (showLevelBadge && w.level)) && (
+          {(index !== undefined || (showLevelBadge && w.level) || colorById(w.color)) && (
             <div className="dm-card-badges">
               {index !== undefined && <span className="dm-card-index">{index}</span>}
+              <ColorDot id={w.color} />
               {showLevelBadge && w.level && (
                 <span
                   className="dm-level-badge"

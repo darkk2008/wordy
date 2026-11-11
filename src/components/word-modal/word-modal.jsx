@@ -19,6 +19,8 @@ import {
 import { ARTICLE_COLOR, LEVELS, LEVEL_COLOR } from "../../core/srs-and-seed-data";
 import { dmGroqFetch, dmLowResourceNote, dmParseJson } from "../../services/ai-groq";
 import { dmSafeIcon } from "../../services/config-and-validation";
+import { isWordColor } from "../../core/word-colors";
+import { ColorSwatches } from "../colors/color-swatches";
 import { IconBtn } from "../common/common";
 import { Input } from "../common/Input";
 import { Check, Loader2, Sparkles, Trash2, X } from "../icons/icons";
@@ -30,6 +32,16 @@ import {
   buildModeBarHtml,
   buildStackTablesHtml,
 } from "../../core/share-forms-html";
+
+// Editing an existing word (the card's ⋮ button): focus the field right away only where there is a
+// real keyboard and mouse. On phones focusing would pop the on-screen keyboard open unasked.
+function canAutoFocus() {
+  try {
+    return !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  } catch (e) {
+    return false;
+  }
+}
 
 export function WordModal({
   initial,
@@ -45,6 +57,7 @@ export function WordModal({
   const [en, setEn] = useState(initial?.en || "");
   const [type, setType] = useState(initial?.type || "other");
   const [level, setLevel] = useState(initial?.level || "");
+  const [color, setColor] = useState(isWordColor(initial?.color) ? initial.color : "");
   const genderOptions = GENDER_SETS[currentLearningLangCode] || null;
   const [article, setArticle] = useState(
     initial?.article || initial?.gender || (genderOptions ? genderOptions[0] : "")
@@ -166,6 +179,7 @@ export function WordModal({
       komparativ: type === "adj" ? komparativ : "",
       superlativ: type === "adj" ? superlativ : "",
       favorite: initial?.favorite || false,
+      ...(isWordColor(color) ? { color } : {}),
       srs: initial?.srs || {
         level: 0,
         next: Date.now(),
@@ -199,7 +213,7 @@ export function WordModal({
           value={de}
           onChange={(e) => setDe(e.target.value)}
           placeholder={currentLearningLangCode === "de" ? "z.B. anbieten" : "e.g. anbieten"}
-          autoFocus
+          autoFocus={!initial || canAutoFocus()}
           onKeyDown={wordFieldKeyDown}
         />
         <button
@@ -253,6 +267,10 @@ export function WordModal({
               {t === "noun" ? "Noun" : t === "verb" ? "Verb" : t === "adj" ? "Adj." : "Other"}
             </button>
           ))}
+        </div>
+        <label className="dm-label">Colour</label>
+        <div className="dm-modal-color-row">
+          <ColorSwatches value={color} onChange={setColor} />
         </div>
         <label className="dm-label">Level (CEFR)</label>
         <div className="dm-segmented dm-level-segmented">

@@ -3,6 +3,7 @@
  */
    import "../boot/config.js"; // must run first: it sets window.DM_CONFIG read just below
 import { uid } from "../core/constants";
+import { isWordColor } from "../core/word-colors";
 import { initAnalytics } from "./analytics-presence";
 
 export const DM_PROXY_URL = (window.DM_CONFIG && window.DM_CONFIG.proxyUrl) || "";
@@ -105,6 +106,8 @@ function dmSanitizeWord(w) {
   });
   out.auxiliary = w.auxiliary === "sein" || w.auxiliary === "haben" ? w.auxiliary : "";
   out.favorite = !!w.favorite;
+  if (isWordColor(w.color)) out.color = w.color;
+  else delete out.color;
   if ("trennbar" in w) out.trennbar = !!w.trennbar;
   if ("reflexiv" in w) out.reflexiv = !!w.reflexiv;
   const sr = w.srs && typeof w.srs === "object" && !Array.isArray(w.srs) ? w.srs : {};

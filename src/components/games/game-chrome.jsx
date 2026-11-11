@@ -4,11 +4,15 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IconBtn } from "../common/common";
-import { ArrowRight, RotateCcw, X } from "../icons/icons";
+import { ArrowRight, PaletteIcon, RotateCcw, X } from "../icons/icons";
+import { MistakesModal } from "../colors/mistakes-modal";
 import { getLangAbbr } from "../language-settings/language-settings";
 
 // The results screen button says where "back" leads: games (default), the stack, etc.
 export const GameBackLabelContext = createContext("Back to games");
+// The words answered wrong in the current round, so the results screen can offer to colour them:
+// { words: [{ id, de, en, color, _stackId }], onSetColor(stackId, wordId, colorId) } or null.
+export const GameMistakesContext = createContext(null);
 export function GameTopBar({
   onExit,
   progress,
@@ -50,6 +54,8 @@ export function GameDone({
   playAgainLabel = "Play again",
 }) {
   const backLabel = useContext(GameBackLabelContext);
+  const mistakes = useContext(GameMistakesContext);
+  const [showMistakes, setShowMistakes] = useState(false);
   let percent = null;
   if (score) {
     const m = /^(\d+)\/(\d+)$/.exec(score);
@@ -224,6 +230,14 @@ export function GameDone({
           </>
         )}
       </p>
+      {showMistakes && mistakes && (
+        <MistakesModal
+          words={mistakes.words}
+          onSetColor={mistakes.onSetColor}
+          onToggleFav={mistakes.onToggleFav}
+          onClose={() => setShowMistakes(false)}
+        />
+      )}
       <div className="dm-done-btn-row">
         {onNext ? (
           <button className="dm-btn-secondary dm-done-again dm-done-exit-only" onClick={onExit}>
@@ -243,6 +257,16 @@ export function GameDone({
           </>
         )}
       </div>
+      {mistakes && mistakes.words.length > 0 && !onNext && (
+        <button
+          type="button"
+          className="dm-btn-secondary dm-done-mistakes"
+          onClick={() => setShowMistakes(true)}
+        >
+          <PaletteIcon size={16} />
+          {` Mistakes (${mistakes.words.length})`}
+        </button>
+      )}
     </div>
   );
 }

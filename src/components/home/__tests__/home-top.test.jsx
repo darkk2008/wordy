@@ -114,16 +114,17 @@ describe("Home header", () => {
 });
 
 describe("Home toolbar", () => {
-  it("shows the counts as plain text, with the right singular and plural", () => {
-    const { el } = mount();
-    const counts = el.querySelector(".dm-ht-counts");
-    // (the gap between the two parts is CSS, not a space character)
-    expect(counts.textContent).toBe("2 stacks5 words");
-    expect(counts.getAttribute("aria-label")).toBe("2 stacks, 5 words");
-    document.body.innerHTML = "";
-    const one = mount({ stacks: [mk("a", 1)] }).el.querySelector(".dm-ht-counts");
-    expect(one.textContent).toBe("1 stack1 word");
-    expect(one.getAttribute("aria-label")).toBe("1 stack, 1 word");
+  it("has a Colours button that opens a dropdown and picks a colour", () => {
+    const onOpenColor = vi.fn();
+    const { el } = mount({ onOpenColor });
+    expect(el.querySelector(".dm-ht-counts")).toBeNull();
+    expect(el.querySelector(".dm-ht-colors-menu")).toBeNull();
+    click(el.querySelector(".dm-ht-colors-btn"));
+    const items = el.querySelectorAll(".dm-ht-colors-item");
+    expect(items.length).toBe(5);
+    click(items[0]);
+    expect(onOpenColor).toHaveBeenCalledWith("red");
+    expect(el.querySelector(".dm-ht-colors-menu")).toBeNull();
   });
 
   it("the theme button switches in both directions", () => {

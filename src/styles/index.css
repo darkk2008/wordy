@@ -54,6 +54,7 @@
 /* Games screen, same minimal look. Keep last. */
 @import "../components/games/games-hub-v2.css";
 @import "../components/home/home-top.css";
+@import "layer-motion.css";
 
 /* Accessibility: visible keyboard focus, and bigger touch areas that do not change the look. */
 button:focus-visible,

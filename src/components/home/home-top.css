@@ -166,6 +166,85 @@
   background: currentColor;
   opacity: 0.55;
 }
+.dm-ht-colors {
+  position: relative;
+  flex: none;
+}
+.dm-ht-colors-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-ht-colors-chev {
+  transition: transform 0.15s ease;
+}
+.dm-ht-colors-btn-open .dm-ht-colors-chev {
+  transform: rotate(180deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-ht-colors-btn:hover {
+    background: var(--surface);
+  }
+}
+.dm-ht-colors-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-solid, var(--modal-bg, var(--bg)));
+  isolation: isolate;
+  box-shadow: var(--shadow-md);
+}
+.dm-ht-colors-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: start;
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-ht-colors-item:hover {
+    background: var(--surface);
+  }
+}
+.dm-ht-colors-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--sw);
+}
+.dm-ht-colors-name {
+  flex: 1;
+}
+.dm-ht-colors-n {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
 .dm-ht-theme {
   position: relative;
   flex: none;
@@ -232,12 +311,6 @@
 }
 .dm-ht-new-compact .dm-ht-new-label {
   display: none;
-}
-.dm-ht:has(.dm-ht-new-compact) .dm-ht-counts {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Phones: there is room for the logo or the name, not both next to five actions, so the logo stands

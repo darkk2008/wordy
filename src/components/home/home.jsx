@@ -16,6 +16,7 @@ import {
   Clock,
   Flame,
   Moon,
+  PaletteIcon,
   Plus,
   Search,
   Sparkles,
@@ -30,6 +31,7 @@ import { StreakModal } from "../pickers/pickers";
 import { DueBadge } from "./due-badge";
 import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 import { STACK_LOOK, StackCard, StackTile } from "../stack-card/stack-card";
+import { WORD_COLORS, countByColor } from "../../core/word-colors";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
@@ -62,6 +64,7 @@ export function HomeView({
   isPremium,
   account,
   onOpenAccount,
+  onOpenColor,
 }) {
   const totalWords = stacks.reduce((n, st) => n + ((st.words && st.words.length) || 0), 0);
   const [creating, setCreating] = useState(false);
@@ -293,6 +296,24 @@ export function HomeView({
       armSecretTimeout();
     }
   };
+  const [colorsOpen, setColorsOpen] = useState(false);
+  const colorsRef = useRef(null);
+  useEffect(() => {
+    if (!colorsOpen) return;
+    const onDown = (e) => {
+      if (colorsRef.current && !colorsRef.current.contains(e.target)) setColorsOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setColorsOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [colorsOpen]);
+  const colorCounts = useMemo(() => countByColor(stacks), [stacks]);
   const statsRowRef = useRef(null);
   useLayoutEffect(() => {
     const row = statsRowRef.current;
@@ -519,18 +540,43 @@ export function HomeView({
         </div>
       </header>
       <div className="dm-ht" ref={statsRowRef}>
-        <div
-          className="dm-ht-counts"
-          role="group"
-          aria-label={`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}, ${totalWords} ${totalWords === 1 ? "word" : "words"}`}
-        >
-          <span>
-            <b>{stacks.length.toLocaleString()}</b> {stacks.length === 1 ? "stack" : "stacks"}
-          </span>
-          <span className="dm-ht-dot" aria-hidden="true" />
-          <span>
-            <b>{totalWords.toLocaleString()}</b> {totalWords === 1 ? "word" : "words"}
-          </span>
+        <div className="dm-ht-colors" ref={colorsRef}>
+          <button
+            type="button"
+            className={`dm-ht-colors-btn${colorsOpen ? " dm-ht-colors-btn-open" : ""}`}
+            aria-haspopup="menu"
+            aria-expanded={colorsOpen}
+            title="Colours"
+            onClick={() => setColorsOpen((o) => !o)}
+          >
+            <PaletteIcon size={16} />
+            <span>Colours</span>
+            <ChevronDown size={14} className="dm-ht-colors-chev" />
+          </button>
+          {colorsOpen && (
+            <div className="dm-ht-colors-menu" role="menu">
+              {WORD_COLORS.map((c) => {
+                const n = colorCounts[c.id] || 0;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    role="menuitem"
+                    className="dm-ht-colors-item"
+                    style={{ "--sw": c.hex }}
+                    onClick={() => {
+                      setColorsOpen(false);
+                      if (onOpenColor) onOpenColor(c.id);
+                    }}
+                  >
+                    <span className="dm-ht-colors-dot" />
+                    <span className="dm-ht-colors-name">{c.name}</span>
+                    <span className="dm-ht-colors-n">{n}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
         <button
           className="dm-ht-theme"

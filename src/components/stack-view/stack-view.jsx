@@ -4,6 +4,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
+import { withColor } from "../../core/word-colors";
 import { FREE_FAVORITE_LIMIT } from "../../services/premium-status";
 import { AnimatedIcon, IconBtn } from "../common/common";
 import { FormsAudioToggle } from "../games/setup-controls";
@@ -61,9 +62,10 @@ export function StackView({
   isPremium,
   isFavorites = false, // the virtual "Favorites" stack: words come from many stacks (each has .stackId)
   isMini = false, // a mini stack: also virtual, but without the AI / mini stack buttons
+  colorGroup = null, // a colour (see core/word-colors): virtual like Favorites, words tagged with that colour
   onAddClick,
 }) {
-  const isVirtual = isFavorites || isMini;
+  const isVirtual = isFavorites || isMini || !!colorGroup;
   const stackIdOf = (w) => (isVirtual ? w.stackId : stack.id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState("BOTH");
@@ -269,6 +271,14 @@ export function StackView({
       cancelMultiPick();
       return;
     }
+    if (colorGroup) {
+      // In a colour "remove" only takes the colour off; the words stay in their own stacks.
+      stack.words
+        .filter((w) => pickedIds.has(w.id))
+        .forEach((w) => onUpdateWord(w.stackId, w.id, (word) => withColor(word, "")));
+      cancelMultiPick();
+      return;
+    }
     if (isMini) {
       stack.words
         .filter((w) => pickedIds.has(w.id))
@@ -435,7 +445,7 @@ ${lines}`;
                 <Bot size={18} />
               </IconBtn>
             )}
-            {!isMini && (
+            {!isMini && !colorGroup && (
               <IconBtn
                 title={
                   miniStack && miniStack.words.length
@@ -499,7 +509,9 @@ ${lines}`;
         )}
         <IconBtn
           className="dm-topbar-fixed-btn"
-          title={isFavorites ? "Add favorites" : isMini ? "Add words" : undefined}
+          title={
+            isFavorites ? "Add favorites" : isMini ? "Add words" : colorGroup ? "Add words to this colour" : undefined
+          }
           onClick={() => (onAddClick ? onAddClick() : setShowAddModal(true))}
         >
           <Plus size={20} />
@@ -517,7 +529,11 @@ ${lines}`;
           tabIndex={isVirtual ? undefined : 0}
           title={isVirtual ? undefined : "Double-click to rename or change the icon"}
         >
-          <AnimatedIcon id={isFavorites ? "star" : stack.emoji} size={24} className="dm-stack-title-emoji" />
+          {colorGroup ? (
+            <span className="dm-color-title-dot" style={{ "--sw": colorGroup.hex }} />
+          ) : (
+            <AnimatedIcon id={isFavorites ? "star" : stack.emoji} size={24} className="dm-stack-title-emoji" />
+          )}
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
         <div className="dm-stack-title-tools">
@@ -603,12 +619,20 @@ ${lines}`;
                 <Plus size={26} />
               </div>
               <div className="dm-empty-stack-title">
-                {isFavorites ? "No favorites yet" : isMini ? "Mini stack is empty" : "No words yet"}
+                {isFavorites
+                  ? "No favorites yet"
+                  : isMini
+                    ? "Mini stack is empty"
+                    : colorGroup
+                      ? `No ${colorGroup.name.toLowerCase()} words yet`
+                      : "No words yet"}
               </div>
               <div className="dm-empty-stack-sub">
                 {isFavorites
                   ? "Star words to collect them here."
-                  : isMini
+                  : colorGroup
+                    ? "Add words here, or colour them from their ⋮ menu or the Mistakes list after a game."
+                    : isMini
                     ? "Add words with +, or swipe a word card down."
                     : "Add your first word to start practicing."}
               </div>
@@ -617,7 +641,7 @@ ${lines}`;
                 onClick={() => (onAddClick ? onAddClick() : setShowAddModal(true))}
               >
                 <Plus size={16} />
-                {isFavorites ? "Add favorites" : isMini ? "Add words" : "Add a word"}
+                {isFavorites ? "Add favorites" : isMini || colorGroup ? "Add words" : "Add a word"}
               </button>
             </div>
           ) : (
@@ -648,7 +672,10 @@ ${lines}`;
                       : onDrillWord(word, stack.id, stack.words)
                 : undefined
             }
-            onToggleMiniStack={(word) =>
+            onToggleMiniStack={
+              colorGroup
+                ? undefined
+                : (word) =>
               onToggleMiniStackWord &&
               onToggleMiniStackWord({
                 ...word,
@@ -673,15 +700,17 @@ ${lines}`;
               <X size={16} />
               {" Cancel"}
             </button>
-            <button
-              type="button"
-              className="dm-btn-secondary"
-              disabled={pickedIds.size === 0}
-              onClick={allPickedInMiniStack ? removePickedFromMiniStack : addPickedToMiniStack}
-            >
-              <CardsIcon size={16} />
-              {allPickedInMiniStack ? " Remove from mini stack" : " Add to mini stack"}
-            </button>
+            {!colorGroup && (
+              <button
+                type="button"
+                className="dm-btn-secondary"
+                disabled={pickedIds.size === 0}
+                onClick={allPickedInMiniStack ? removePickedFromMiniStack : addPickedToMiniStack}
+              >
+                <CardsIcon size={16} />
+                {allPickedInMiniStack ? " Remove from mini stack" : " Add to mini stack"}
+              </button>
+            )}
             <button
               type="button"
               className="dm-btn-danger"
@@ -689,7 +718,7 @@ ${lines}`;
               onClick={deletePicked}
             >
               {isFavorites ? <Star size={16} /> : <Trash2 size={16} />}
-              {isFavorites ? " Unstar" : " Delete"}
+              {isFavorites ? " Unstar" : colorGroup ? " Remove colour" : " Delete"}
             </button>
           </div>
         </div>

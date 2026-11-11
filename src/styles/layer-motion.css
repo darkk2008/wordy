@@ -1,0 +1,179 @@
+/* styles/layer-motion.css
+ * One motion language for everything that appears: a soft rise + fade on an "ease-out-expo" curve,
+ * short staggers on lists and grids, sheets that glide up, dialogs that settle in, menus that unfold
+ * from their button. Loaded LAST so it overrides the older, snappier or bouncier entrances.
+ * Closing animations (the *-closing classes) are left alone on purpose.
+ */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+@keyframes dm-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-soft-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dm-sheet-glide {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-dialog-settle {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-menu-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dm-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Screens ---- */
+.dm-view:not(.dm-appearance-view) {
+  animation: dm-rise-in 0.5s var(--ease-out) backwards;
+}
+.dm-game-play {
+  animation: dm-rise-in 0.5s var(--ease-out) backwards;
+}
+
+/* ---- Grids and lists: each tile rises in, one after the other (delays come from the older
+   nth-child rules, so only the curve and the motion change here) ---- */
+.dm-game-grid > .dm-game-card,
+.dm-settings-grid > .dm-settings-card {
+  animation-name: dm-rise-in;
+  animation-duration: 0.55s;
+  animation-timing-function: var(--ease-out);
+}
+.dm-stack-grid > .dm-stack-cell {
+  animation-duration: 0.5s;
+  animation-timing-function: var(--ease-out);
+}
+.dm-stack-grid > .dm-stack-cell > .dm-stack-cell-inner {
+  animation: dm-rise-in 0.55s var(--ease-out) backwards;
+}
+.dm-stack-grid > .dm-stack-cell:nth-child(2) > .dm-stack-cell-inner { animation-delay: 0.06s; }
+.dm-stack-grid > .dm-stack-cell:nth-child(3) > .dm-stack-cell-inner { animation-delay: 0.1s; }
+.dm-stack-grid > .dm-stack-cell:nth-child(4) > .dm-stack-cell-inner { animation-delay: 0.14s; }
+.dm-stack-grid > .dm-stack-cell:nth-child(5) > .dm-stack-cell-inner { animation-delay: 0.18s; }
+.dm-stack-grid > .dm-stack-cell:nth-child(6) > .dm-stack-cell-inner { animation-delay: 0.22s; }
+.dm-stack-grid > .dm-stack-cell:nth-child(n + 7) > .dm-stack-cell-inner { animation-delay: 0.26s; }
+.dm-list > .dm-swipe-outer {
+  animation-name: dm-rise-in;
+  animation-duration: 0.5s;
+  animation-timing-function: var(--ease-out);
+}
+/* A newly added stack settles in without the old bounce */
+.dm-stack-cell-entering .dm-stack-card {
+  animation: dm-rise-in 0.5s var(--ease-out) both;
+}
+.dm-home-filter-fade {
+  animation-duration: 0.4s !important;
+  animation-timing-function: var(--ease-out) !important;
+}
+
+/* ---- Modals ---- */
+.dm-modal-backdrop:not(.dm-modal-backdrop-closing) {
+  animation: dm-soft-fade 0.32s ease both;
+}
+.dm-modal:not(.dm-modal-closing) {
+  animation: dm-sheet-glide 0.45s var(--ease-out) backwards;
+}
+@media (min-width: 900px) {
+  .dm-modal:not(.dm-modal-closing) {
+    animation: dm-dialog-settle 0.4s var(--ease-out) both;
+  }
+}
+
+/* ---- Menus and dropdowns ---- */
+.dm-ht-colors-menu {
+  transform-origin: top left;
+  animation: dm-menu-unfold 0.24s var(--ease-out) both;
+}
+.dm-ht-colors-item {
+  animation: dm-item-in 0.28s var(--ease-out) backwards;
+}
+.dm-ht-colors-item:nth-child(1) { animation-delay: 0.02s; }
+.dm-ht-colors-item:nth-child(2) { animation-delay: 0.05s; }
+.dm-ht-colors-item:nth-child(3) { animation-delay: 0.08s; }
+.dm-ht-colors-item:nth-child(4) { animation-delay: 0.11s; }
+.dm-ht-colors-item:nth-child(5) { animation-delay: 0.14s; }
+.dm-stackselect-menu {
+  animation-duration: 0.26s;
+  animation-timing-function: var(--ease-out);
+}
+
+/* ---- Mistakes + colour picker ---- */
+.dm-mcard {
+  animation: dm-rise-in 0.45s var(--ease-out) backwards;
+}
+.dm-mcard:nth-child(1) { animation-delay: 0.08s; }
+.dm-mcard:nth-child(2) { animation-delay: 0.12s; }
+.dm-mcard:nth-child(3) { animation-delay: 0.16s; }
+.dm-mcard:nth-child(4) { animation-delay: 0.2s; }
+.dm-mcard:nth-child(n + 5) { animation-delay: 0.24s; }
+.dm-colorpick-opt {
+  animation: dm-rise-in 0.4s var(--ease-out) backwards;
+}
+.dm-colorpick-opt:nth-child(1) { animation-delay: 0.08s; }
+.dm-colorpick-opt:nth-child(2) { animation-delay: 0.11s; }
+.dm-colorpick-opt:nth-child(3) { animation-delay: 0.14s; }
+.dm-colorpick-opt:nth-child(4) { animation-delay: 0.17s; }
+.dm-colorpick-opt:nth-child(5) { animation-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dm-view,
+  .dm-game-play,
+  .dm-game-grid > .dm-game-card,
+  .dm-settings-grid > .dm-settings-card,
+  .dm-stack-grid > .dm-stack-cell,
+  .dm-stack-grid > .dm-stack-cell > .dm-stack-cell-inner,
+  .dm-list > .dm-swipe-outer,
+  .dm-modal-backdrop,
+  .dm-modal,
+  .dm-ht-colors-menu,
+  .dm-ht-colors-item,
+  .dm-mcard,
+  .dm-colorpick-opt {
+    animation: none !important;
+  }
+}

@@ -6,6 +6,7 @@ import { Fragment, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useS
 import { BottomNav } from "../components/bottom-nav/bottom-nav";
 import { AppLogo } from "../components/common/common";
 import { LazyFallback } from "../components/lazy-fallback/lazy-fallback";
+import { ColorsView } from "../components/colors/colors-view";
 import { FavoritesView } from "../components/favorites/favorites";
 import { FAVORITES_PARENT_ID, MiniStackView } from "../components/mini-stack/mini-stack";
 import { FORMS_ONLY_GAMES } from "../components/games/games-config";
@@ -47,7 +48,8 @@ import {
   touchLastActive,
   track,
 } from "../services/analytics-presence";
-import { GameBackLabelContext } from "../components/games/game-chrome";
+import { GameBackLabelContext, GameMistakesContext } from "../components/games/game-chrome";
+import { withColor } from "../core/word-colors";
 import { dmSanitizeBackup } from "../services/config-and-validation";
 import {
   FREE_FAVORITE_LIMIT,
@@ -295,6 +297,9 @@ export function App() {
   const [settingsInitialSection, setSettingsInitialSection] = useState(null);
   const [settingsMountKey, setSettingsMountKey] = useState(0);
   const [openStackId, setOpenStackId] = useState(null);
+  const [openColorId, setOpenColorId] = useState(null); // the colour open on the Colours tab
+  // Words answered wrong in the current game round: { key: <round key>, ids: [wordId] }.
+  const [mistakeLog, setMistakeLog] = useState({ key: null, ids: [] });
   // Which mini stack screen is open: a stack id, FAVORITES_PARENT_ID, or null. It replaces the screen
   // of that stack / of Favorites until Back (or "remove all words") returns to it.
   const [miniView, setMiniView] = useState(null);
@@ -1438,6 +1443,15 @@ export function App() {
       words: favoriteWords,
     });
   };
+  // Games for a colour: every word with that colour, each keeping its own stack id.
+  const startColorPlay = (st, color) => {
+    if (!st || !st.words.length) return;
+    setStackPlayPick({
+      stackId: `__color_${color.id}__`,
+      name: color.name,
+      words: st.words.map((w) => ({ ...w, _stackId: w.stackId })),
+    });
+  };
   // Games for a mini stack screen (words arrive with their own stack id).
   const startMiniPlay = (st) => {
     if (!st || !st.words.length) return;
@@ -1447,7 +1461,7 @@ export function App() {
       words: st.words.map((w) => ({ ...w, _stackId: w.stackId })),
     });
   };
-  const startStackPlayGame = (gameType, direction, level) => {
+  const startStackPlayGame = (gameType, direction, level, mixForms) => {
     if (!stackPlayPick) return;
     setGame({
       type: gameType,
@@ -1458,8 +1472,11 @@ export function App() {
       },
       direction: direction || "de2en",
       level,
+      mixForms: !!mixForms,
       backLabel:
-        stackPlayPick.stackId === "__favorites__" || stackPlayPick.stackId === "__mini__"
+        stackPlayPick.stackId === "__favorites__" ||
+        stackPlayPick.stackId === "__mini__" ||
+        stackPlayPick.stackId.startsWith("__color_")
           ? "Done"
           : "Back to stack",
     });
@@ -1779,6 +1796,7 @@ export function App() {
     if (game) setGame(null);
     if (openStackId) setOpenStackId(null);
     if (miniView) setMiniView(null);
+    if (openColorId) setOpenColorId(null);
     if (tab === "games" && id !== "games") {
       setGamesStackId(null);
       setGamesMulti(false);
@@ -1788,6 +1806,33 @@ export function App() {
     setTab(id);
   };
   let content;
+  // One key per game round; "play again" bumps runId, so the mistakes list starts over.
+  const roundKey = game
+    ? `${game.type}-${game.stack.id}-${game.direction || "de2en"}-${game.mixForms ? "mix" : "std"}-${game.runId || 0}`
+    : null;
+  // The words missed in this round (as they are now, so a colour just given shows up), for the
+  // "Mistakes" button on the results screen.
+  const mistakesForGame = (() => {
+    if (!game || mistakeLog.key !== roundKey) return null;
+    const words = [];
+    mistakeLog.ids.forEach((id) => {
+      const src = game.stack.words.find((w) => w.id === id);
+      const hinted = src && src._stackId;
+      const owner =
+        activeStacks.find((st) => st.id === hinted && st.words.some((w) => w.id === id)) ||
+        activeStacks.find((st) => st.id === game.stack.id && st.words.some((w) => w.id === id)) ||
+        activeStacks.find((st) => st.words.some((w) => w.id === id));
+      if (!owner) return;
+      words.push({ ...owner.words.find((w) => w.id === id), _stackId: owner.id });
+    });
+    return {
+      words,
+      onSetColor: (stackId, wordId, colorId) =>
+        updateWordInStack(stackId, wordId, (w) => withColor(w, colorId)),
+      onToggleFav: (stackId, wordId) =>
+        updateWordInStack(stackId, wordId, (w) => ({ ...w, favorite: !w.favorite })),
+    };
+  })();
   const miniOnStack = !!(openStack && miniView === openStack.id);
   const miniOnFavorites = !openStack && tab === "favorites" && miniView === FAVORITES_PARENT_ID;
   const viewKey = game
@@ -1817,7 +1862,7 @@ export function App() {
     const formsPool = wantsFormsOnly ? buildFormWordPool(game.stack.words) : null;
     const effectiveWords = formsPool && formsPool.length ? formsPool : game.stack.words;
     const props = {
-      key: `${game.type}-${game.stack.id}-${game.direction || "de2en"}-${game.mixForms ? "mix" : "std"}-${game.runId || 0}`,
+      key: roundKey,
       words: effectiveWords,
       pool: game.pool || effectiveWords,
       mixForms: game.mixForms,
@@ -1828,6 +1873,14 @@ export function App() {
         const srcWord = game.stack.words.find((w) => w.id === wordId);
         const srcStackId = (srcWord && srcWord._stackId) || game.stack.id;
         registerAnswer(srcStackId, wordId, correct);
+        if (!correct) {
+          setMistakeLog((prev) => {
+            const ids = prev.key === roundKey ? prev.ids : [];
+            return ids.includes(wordId) && prev.key === roundKey
+              ? prev
+              : { key: roundKey, ids: [...ids.filter((x) => x !== wordId), wordId] };
+          });
+        }
       },
       onExit: () => {
         if (!isPremium && game) recordGameCooldown(game.type);
@@ -1938,6 +1991,10 @@ export function App() {
         isPremium={isPremium}
         account={account}
         onOpenAccount={openAccountEntry}
+        onOpenColor={(id) => {
+          setOpenColorId(id);
+          setTab("colors");
+        }}
       />
     );
   } else if (tab === "games") {
@@ -2003,6 +2060,28 @@ export function App() {
         miniStack={favMiniStack}
         onOpenMiniStack={() => setMiniView(FAVORITES_PARENT_ID)}
         onToggleMiniStackWord={toggleFavMiniStackWord}
+        nativeLanguage={nativeLanguage}
+        learningLanguage={learningLanguage}
+        isPremium={isPremium}
+        onOpenPremium={openPremium}
+      />
+    );
+  } else if (tab === "colors") {
+    content = (
+      <ColorsView
+        stacks={activeStacks}
+        openColorId={openColorId}
+        onOpenColor={(id) => {
+          setOpenColorId(id);
+          if (!id) setTab("home");
+        }}
+        onUpdateWord={updateWordInStack}
+        onDeleteWord={deleteWordFromStack}
+        onPlayGames={startColorPlay}
+        onSpeak={speak}
+        apiKey={apiKey}
+        onOpenAI={openAI}
+        onDrillWord={drillWord}
         nativeLanguage={nativeLanguage}
         learningLanguage={learningLanguage}
         isPremium={isPremium}
@@ -2100,7 +2179,9 @@ export function App() {
           <div className={`dm-content ${openStack && !game ? "dm-content-noreserve" : ""}`}>
             <Fragment key={viewKey}>
               <GameBackLabelContext.Provider value={(game && game.backLabel) || "Back to games"}>
-                <Suspense fallback={<LazyFallback />}>{content}</Suspense>
+                <GameMistakesContext.Provider value={mistakesForGame}>
+                  <Suspense fallback={<LazyFallback />}>{content}</Suspense>
+                </GameMistakesContext.Provider>
               </GameBackLabelContext.Provider>
             </Fragment>
           </div>
@@ -2177,6 +2258,7 @@ export function App() {
               onClose={() => setStackPlayPick(null)}
               onStart={startStackPlayGame}
               translationsOnly
+              showFormsToggle
               learningLanguage={learningLanguage}
               nativeLanguage={nativeLanguage}
               isPremium={isPremium}
