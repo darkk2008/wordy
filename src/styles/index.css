@@ -8,6 +8,7 @@
 @import "tokens-extra.css";
 @import "base-layout.css";
 @import "../components/home/home-header.css";
+@import "../components/home/due-badge.css";
 @import "../components/stack-card/stack-card.css";
 @import "../components/stack-view/stack-topbar.css";
 @import "../components/word-card/word-card.css";
@@ -52,6 +53,7 @@
 @import "../components/stack-card/stack-card-v2.css";
 /* Games screen, same minimal look. Keep last. */
 @import "../components/games/games-hub-v2.css";
+@import "../components/home/home-top.css";
 
 /* Accessibility: visible keyboard focus, and bigger touch areas that do not change the look. */
 button:focus-visible,

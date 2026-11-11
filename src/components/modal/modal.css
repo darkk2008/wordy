@@ -44,7 +44,6 @@ body,
 .dm-tr-stackpick-menu,
 .dm-ai-messages,
 .dm-forms-modal-table,
-.dm-stats-row,
 .dm-admin-body,
 .dm-admin-code-list {
   scrollbar-width: none;
@@ -57,7 +56,6 @@ body::-webkit-scrollbar,
 .dm-tr-stackpick-menu::-webkit-scrollbar,
 .dm-ai-messages::-webkit-scrollbar,
 .dm-forms-modal-table::-webkit-scrollbar,
-.dm-stats-row::-webkit-scrollbar,
 .dm-admin-body::-webkit-scrollbar,
 .dm-admin-code-list::-webkit-scrollbar {
   display: none;

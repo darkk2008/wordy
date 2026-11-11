@@ -111,67 +111,6 @@
   font-family: "Sora", sans-serif;
   box-shadow: 0 0 16px rgba(255, 59, 92, 0.1);
 }
-.dm-count-pill {
-  flex: 0 0 auto;
-  padding: 6px 12px;
-  font-size: var(--fs-sm);
-  white-space: nowrap;
-}
-.dm-count-pill svg {
-  flex-shrink: 0;
-}
-.dm-stats-row {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 22px;
-  align-items: stretch;
-}
-.dm-stat-newstack {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  background: var(--surface-strong);
-  border: 1px solid rgba(var(--cyan-rgb), 0.35);
-  color: var(--cyan);
-  padding: 6px 10px;
-  min-height: 44px;
-  border-radius: 11px;
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1 1 0;
-  min-width: 0;
-  box-shadow: var(--shadow-xs);
-}
-.dm-theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  padding: 6px 9px;
-  min-height: 44px;
-  border-radius: 11px;
-  cursor: pointer;
-  transition:
-    all 0.15s ease,
-    transform 0.15s ease;
-  flex: 1 1 0;
-  min-width: 0;
-  box-shadow: var(--shadow-xs);
-}
-.dm-theme-toggle:active {
-  transform: scale(0.88);
-}
-.dm-theme-toggle svg {
-  animation: dm-theme-spin-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
 @keyframes dm-theme-spin-in{
   from {
     transform: rotate(-100deg) scale(0.4);
@@ -180,18 +119,6 @@
   to {
     transform: rotate(0deg) scale(1);
     opacity: 1;
-  }
-}
-@media (hover: hover) and (pointer: fine){.dm-theme-toggle:hover {
-    color: var(--gold);
-    border-color: rgba(var(--gold-rgb), 0.35);
-    box-shadow: var(--shadow-sm);
-  }
-}
-@media (hover: hover) and (pointer: fine){.dm-stat-newstack:hover {
-    background: rgba(var(--cyan-rgb), 0.14);
-    border-color: rgba(var(--cyan-rgb), 0.55);
-    box-shadow: var(--shadow-sm);
   }
 }
 .dm-stat-chip {
@@ -213,64 +140,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: var(--shadow-xs);
-}
-.dm-due-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(var(--gold-rgb), 0.14),
-    rgba(var(--gold-rgb), 0.05)
-  );
-  border: 1px solid rgba(var(--gold-rgb), 0.3);
-  border-radius: 16px;
-  padding: 13px 15px;
-  margin-bottom: 20px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s ease;
-  color: var(--text);
-  box-shadow: var(--shadow-sm);
-}
-@media (hover: hover) and (pointer: fine){.dm-due-banner:hover {
-    border-color: rgba(var(--gold-rgb), 0.5);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
-  }
-}
-.dm-due-banner:active {
-  transform: scale(0.98);
-}
-.dm-due-banner-icon {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(var(--gold-rgb), 0.16);
-  color: var(--gold);
-}
-.dm-due-banner-text {
-  flex: 1;
-  min-width: 0;
-}
-.dm-due-banner-title {
-  font-family: "Sora", sans-serif;
-  font-weight: 700;
-  font-size: var(--fs-base);
-}
-.dm-due-banner-sub {
-  font-size: var(--fs-sm);
-  color: var(--text-dim);
-  margin-top: 1px;
-}
-.dm-due-banner svg:last-child {
-  flex-shrink: 0;
-  color: var(--text-dim);
 }
 .dm-section-title {
   font-family: "Sora", sans-serif;

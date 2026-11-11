@@ -1,0 +1,296 @@
+/* components/home/home-top.css
+ * The top of Home: a plain header row (logo + name on the left, actions on the right) and a slim
+ * toolbar (counts, theme switch, New stack). This is the only stylesheet for these classes: nothing
+ * else styles .dm-hh or .dm-ht, so the layout is the same on phone, tablet and desktop.
+ */
+
+/* ---------- Header row ---------- */
+.dm-hh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  margin: 0 0 14px;
+}
+.dm-hh-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.dm-hh-logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-hh-logo:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-hh-word {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  white-space: nowrap;
+}
+.dm-hh-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Round icon buttons: no box, no shadow; a soft tint on hover. */
+.dm-hh .dm-iconbtn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-dim);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-hh .dm-iconbtn:hover {
+    background: var(--surface);
+    color: var(--text);
+    transform: none;
+    box-shadow: none;
+  }
+}
+.dm-hh .dm-iconbtn:active {
+  transform: scale(0.94);
+  box-shadow: none !important;
+}
+.dm-hh .dm-iconbtn.dm-iconbtn-active {
+  background: rgba(var(--gold-rgb), 0.12);
+  color: var(--gold);
+}
+.dm-hh .dm-iconbtn:focus-visible,
+.dm-hh-pro:focus-visible,
+.dm-hh-streak:focus-visible,
+.dm-ht-theme:focus-visible,
+.dm-ht-new:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-hh .dm-account-dot {
+  top: 8px;
+  right: 8px;
+}
+
+/* Pills: Premium ("Pro") and the streak */
+.dm-hh-pro,
+.dm-hh-streak {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+.dm-hh-pro {
+  margin-inline-end: 4px;
+  padding: 0 11px 0 9px;
+  border: 1px solid rgba(var(--gold-rgb), 0.4);
+  background: rgba(var(--gold-rgb), 0.1);
+}
+.dm-hh-pro svg {
+  color: var(--gold);
+}
+.dm-hh-streak {
+  margin-inline-start: 4px;
+  padding: 0 11px 0 9px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-hh-streak:hover {
+    background: var(--surface);
+  }
+  .dm-hh-pro:hover {
+    background: rgba(var(--gold-rgb), 0.18);
+  }
+}
+.dm-hh-pro:active,
+.dm-hh-streak:active,
+.dm-ht-new:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Toolbar: counts, theme switch, New stack ---------- */
+.dm-ht {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 0 12px;
+}
+.dm-ht-counts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.dm-ht-counts b {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dm-ht-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+.dm-ht-theme {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-ht-theme:hover {
+    background: var(--surface);
+    color: var(--text);
+  }
+}
+
+/* New stack: a calm tinted button (readable in every theme), not a loud gradient. */
+.dm-ht-new {
+  position: relative;
+  flex: none;
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px 0 13px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cyan) 13%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+.dm-ht-new svg {
+  color: var(--cyan);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-ht-new:hover {
+    background: color-mix(in srgb, var(--cyan) 21%, transparent);
+    border-color: color-mix(in srgb, var(--cyan) 60%, var(--border));
+  }
+}
+/* No room for the label: keep just the "+" (home.jsx adds this class when the row would overflow). */
+.dm-ht-new-compact {
+  width: 40px;
+  padding: 0;
+}
+.dm-ht-new-compact .dm-ht-new-label {
+  display: none;
+}
+.dm-ht:has(.dm-ht-new-compact) .dm-ht-counts {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Phones: there is room for the logo or the name, not both next to five actions, so the logo stands
+   alone (it is the app icon). Tablets and desktops show the name too. */
+@media (max-width: 480px) {
+  .dm-hh-word {
+    display: none;
+  }
+}
+/* Very narrow phones: slightly tighter actions so nothing is pushed off the screen. */
+@media (max-width: 380px) {
+  .dm-hh .dm-iconbtn {
+    width: 36px;
+    height: 36px;
+  }
+  .dm-hh .dm-account-dot {
+    top: 6px;
+    right: 6px;
+  }
+  .dm-hh-pro {
+    margin-inline-end: 2px;
+    padding: 0 9px;
+  }
+  .dm-hh-pro span {
+    display: none;
+  }
+  .dm-hh-streak {
+    margin-inline-start: 2px;
+    padding: 0 9px 0 8px;
+  }
+}
+
+/* Small buttons keep a 44px touch area without looking bigger. */
+@media (pointer: coarse) {
+  .dm-hh-pro::after,
+  .dm-hh-streak::after,
+  .dm-ht-theme::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-hh-pro,
+  .dm-hh-streak,
+  .dm-ht-theme,
+  .dm-ht-new {
+    transition: none;
+  }
+  .dm-hh-pro:active,
+  .dm-hh-streak:active,
+  .dm-ht-new:active,
+  .dm-hh .dm-iconbtn:active {
+    transform: none;
+  }
+}

@@ -19,8 +19,7 @@
 }
 
 /* Settings cards still tilt in 3D, so their grid keeps a perspective stage */
-.dm-settings-grid,
-.dm-stats-row {
+.dm-settings-grid {
   perspective: 1200px;
 }
 
@@ -227,9 +226,8 @@
   filter: drop-shadow(0 3px 6px rgba(30, 34, 50, 0.2));
 }
 
-/* Due banner & AI CTA: slightly stronger elevation + tilt on hover for consistency */
+/* AI CTA: slightly stronger elevation + tilt on hover */
 @media (hover: hover) and (pointer: fine) {
-  .dm-due-banner:hover,
   .dm-gstat-ai-cta:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);

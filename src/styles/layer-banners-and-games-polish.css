@@ -1,17 +1,6 @@
 /* styles/layer-banners-and-games-polish.css
  * LAYER: stack screen, unavailable games, game tap targets, streak.
  */
-/* ===== Stack screen: quiet Premium button (same look as on Home), the "+" stays the one bright action ===== */
-.dm-topbar .dm-topbar-premium-btn:not(.dm-home-premium-btn) {
-  background: rgba(var(--gold-rgb), 0.12);
-  border: 1px solid rgba(var(--gold-rgb), 0.32);
-  color: var(--gold);
-  box-shadow: none;
-}
-.dm-topbar .dm-topbar-premium-btn:not(.dm-home-premium-btn)::after { display: none; }
-.dm-topbar .dm-topbar-premium-btn:not(.dm-home-premium-btn) svg { animation: none; fill: rgba(var(--gold-rgb), 0.28); }
-@media (hover: hover) and (pointer: fine){.dm-topbar .dm-topbar-premium-btn:not(.dm-home-premium-btn):hover { background: rgba(var(--gold-rgb), 0.2); box-shadow: none; }
-}
 /* ===== Unavailable game cards: dimmed but tappable; tap explains why ===== */
 .dm-game-card.dm-game-card-unavailable { opacity: 0.45; cursor: pointer; animation: none; }
 @media (hover: hover) and (pointer: fine){.dm-game-card.dm-game-card-unavailable:hover { opacity: 0.7; }
@@ -51,9 +40,6 @@
 .dm-stack-grid .dm-swipe-outer,
 .dm-stack-grid .dm-swipe-content,
 .dm-stack-grid .dm-stack-card { height: 100%; }
-/* ===== Stack top bar: Pro + "+" stay together on the right, whatever the menu is doing ===== */
-.dm-topbar:has(.dm-topbar-morph) > .dm-topbar-premium-btn:not(.dm-home-premium-btn) { margin-left: auto; }
-.dm-topbar:has(.dm-topbar-morph) > .dm-topbar-premium-btn:not(.dm-home-premium-btn) + .dm-topbar-fixed-btn { margin-left: 6px; }
 /* ===== Store filters toggle ===== */
 /* ===== Streak details ===== */
 button.dm-streak { font: inherit; color: inherit; cursor: pointer; appearance: none; -webkit-appearance: none; }

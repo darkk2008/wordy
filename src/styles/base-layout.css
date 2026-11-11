@@ -278,18 +278,6 @@ body:not(.dm-scroll-locked) {
 .dm-logo-loading .dm-book-stage {
   perspective: 800px;
 }
-.dm-header-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1 1 auto;
-  position: relative;
-  z-index: 1;
-}
-.dm-header-logo {
-  align-self: center;
-}
 .dm-logo-motion {
   position: relative;
   width: 100%;
@@ -415,15 +403,6 @@ body:not(.dm-scroll-locked) {
 }
 .dm-header-text {
   min-width: 0;
-}
-.dm-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 10000;
-  min-width: 0;
-  position: relative;
-  z-index: 1;
 }
 @keyframes dm-logo-glow-pulse {
   0%,

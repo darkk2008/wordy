@@ -2,24 +2,6 @@
  * LAYER: banners, type scale, settings, spacing, phone games.
  */
 /* ===================== Design pass: banners, type scale, settings, spacing, phone games ===================== */
-/* 1. Home banners: neutral surface, colour only in the icon tile and a thin accent edge */
-.dm-home-view > .dm-due-banner {
-  --banner-accent: var(--gold);
-}
-.dm-home-view > .dm-due-banner {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow:
-    inset 2px 0 0 var(--banner-accent),
-    var(--shadow-sm);
-}
-@media (hover: hover) and (pointer: fine){.dm-home-view > .dm-due-banner:hover {
-    border-color: color-mix(in srgb, var(--banner-accent) 45%, var(--border));
-    box-shadow:
-      inset 2px 0 0 var(--banner-accent),
-      var(--shadow-md);
-  }
-}
 /* 2. Type scale: clearer section labels, no unreadable captions */
 .dm-section-title {
   font-size: var(--fs-xl);
@@ -124,18 +106,6 @@
 .dm-settings-grid > .dm-settings-card-premium:hover:not(:disabled) {
     border-color: rgba(var(--gold-rgb), 0.65);
   }
-}
-/* 5. Home vertical rhythm: 16px between rows, 12px between the two banners, 24px before a section */
-.dm-home-view > .dm-header {
-  margin-bottom: 16px;
-}
-.dm-home-view > .dm-stats-row {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-.dm-home-view > .dm-due-banner {
-  margin-top: 0;
-  margin-bottom: 12px;
 }
 .dm-home-view .dm-section-title {
   margin-top: 24px;

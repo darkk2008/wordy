@@ -155,38 +155,6 @@
 .dm-topbar-premium-btn:active {
   transform: scale(0.95);
 }
-/* On the home screen this button sits among fixed-size icon buttons (not a flex-growing
-   row like the stack topbar), so give it its own natural content-based width and match
-   the standard button height used there instead of collapsing to near-zero. */
-.dm-home-premium-btn {
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  min-width: 0;
-  gap: 0;
-  border-radius: 13px;
-}
-.dm-home-premium-btn .dm-topbar-premium-label-full,
-.dm-home-premium-btn .dm-topbar-premium-label-short {
-  display: none !important;
-}
-.dm-home-premium-btn svg {
-  width: 20px;
-  height: 20px;
-}
-@media (max-width: 460px) {
-  .dm-home-premium-btn {
-    flex-basis: 72px;
-    width: 72px;
-    height: 48px;
-    border-radius: 15px;
-  }
-  .dm-home-premium-btn svg {
-    width: 22px;
-    height: 22px;
-  }
-}
 .dm-topbar-premium-btn::after {
   content: "";
   position: absolute;
@@ -615,16 +583,6 @@
     filter: brightness(1.08);
     box-shadow: 0 9px 20px -6px rgba(var(--cyan-rgb), 0.8);
   }
-}
-
-/* Premium CTA inside the dock */
-.dm-topbar:has(.dm-topbar-morph)
-  .dm-topbar-premium-btn:not(.dm-home-premium-btn) {
-  height: var(--dk);
-  border-radius: 14px;
-  margin-left: 6px;
-  flex: 0 1 auto;
-  min-width: var(--dk);
 }
 @media (max-width: 430px) {
   .dm-topbar:has(.dm-topbar-morph) {

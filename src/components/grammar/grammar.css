@@ -233,50 +233,16 @@
      on. Nothing here shrinks pre-emptively; it only shrinks inside the
      @container rule below, and only once there truly isn't room. */
 .dm-header { padding: 20px 24px; flex-wrap: nowrap; gap: 14px; }
-.dm-header-logo { width: 88px !important; height: 88px !important; }
-.dm-header .dm-home-hero-copy { display: block; flex: 1 1 auto; min-width: 0; margin-left: -4px; }
-.dm-home-hero-title {
-    margin: 0;
-    font-family: 'Sora', sans-serif; font-weight: 800; letter-spacing: -0.01em;
-    font-size: var(--fs-4xl);
-    background: linear-gradient(90deg, var(--cyan), var(--gold), var(--green), var(--cyan));
-    background-size: 300% 100%;
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    animation: dm-brand-shimmer 6s linear infinite;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
 .dm-home-hero-sub { margin-top: 2px; font-size: var(--fs-sm); color: var(--text-dim); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dm-home-view > .dm-header .dm-header-brand { flex: 0 0 auto; }
-.dm-home-view > .dm-header .dm-header-actions { gap: 10px; }
-.dm-home-view > .dm-header .dm-iconbtn,
-.dm-home-view > .dm-header .dm-home-premium-btn { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 16px; }
-.dm-home-view > .dm-header .dm-iconbtn svg,
-.dm-home-view > .dm-header .dm-home-premium-btn svg { width: 23px; height: 23px; }
-.dm-home-view > .dm-header .dm-streak { padding: 0 18px; height: 52px; font-size: var(--fs-lg); gap: 8px; border-radius: 16px; }
-.dm-home-view > .dm-header .dm-streak svg { width: 23px; height: 23px; }
-.dm-home-view > .dm-header .dm-account-btn .dm-account-dot { width: 7px; height: 7px; }
 /* Once the row genuinely can't fit the name/counter at full size,
      don't shrink it — drop straight to the mobile layout instead: hide
      the name + counter and let the logo/icons/streak fall back to
      their normal mobile sizing (measured against the header's real
      container width, not the viewport). */
 @container dm-shell (max-width: 580px){.dm-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
-.dm-header-logo { width: 84px !important; height: 84px !important; }
-.dm-header .dm-home-hero-copy { display: none; }
-.dm-home-view > .dm-header .dm-header-actions { gap: 8px; }
-.dm-home-view > .dm-header .dm-iconbtn,
-.dm-home-view > .dm-header .dm-home-premium-btn { width: 44px; height: 44px; border-radius: 13px; }
-.dm-home-view > .dm-header .dm-iconbtn svg,
-.dm-home-view > .dm-header .dm-home-premium-btn svg { width: 20px; height: 20px; }
-.dm-home-view > .dm-header .dm-streak { padding: 8px 12px; height: auto; font-size: inherit; gap: 6px; border-radius: 14px; }
-.dm-home-view > .dm-header .dm-streak svg { width: 20px; height: 20px; }
 }
 /* Fallback for engines without container query support: hide the
      name/counter below a viewport width instead, same end result. */
-@supports not (container-type: inline-size){@media (max-width: 720px){.dm-home-hero-copy { display: none; }
-.dm-header-logo { width: 84px !important; height: 84px !important; }
-}
-}
 .dm-stack-grid,
 .dm-game-grid,
 .dm-settings-grid {
@@ -287,9 +253,8 @@
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 12px;
   }
-/* Word lists and banners stop stretching edge-to-edge at this width */
-.dm-list,
-.dm-due-banner {
+/* Word lists stop stretching edge-to-edge at this width */
+.dm-list {
     max-width: 560px;
     margin-left: auto;
     margin-right: auto;
@@ -309,12 +274,8 @@
 }
 @media (max-width: 460px){.dm-header { flex-wrap: nowrap; padding: 12px 14px; border-radius: 18px; }
 .dm-header::after { top: -60%; right: -20%; width: 140px; height: 140px; }
-.dm-header-logo { width: 60px !important; height: 60px !important; }
-.dm-header-brand { gap: 8px; }
 .dm-eyebrow { font-size: var(--fs-2xs); letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 .dm-h1 { font-size: clamp(13px, 4.2vw, 17px); }
-.dm-header-actions { gap: 5px; }
-.dm-header-actions .dm-iconbtn { width: 42px; height: 42px; border-radius: 13px; }
 .dm-streak { padding: 8px 11px; gap: 5px; font-size: var(--fs-md); }
 /* AI Tutor now lives in the stack topbar's default row on all screen sizes */
 }

@@ -15,7 +15,6 @@ import {
   ChevronRight,
   Clock,
   Flame,
-  Layers,
   Moon,
   Plus,
   Search,
@@ -23,12 +22,12 @@ import {
   Star,
   Sun,
   Trash2,
-  Type,
   UserIcon,
   X,
 } from "../icons/icons";
 import { ArchiveIcon } from "../icons/settings-icons";
 import { StreakModal } from "../pickers/pickers";
+import { DueBadge } from "./due-badge";
 import { QRScanModal, QR_SHARING_ENABLED } from "../qr-share/qr-share";
 import { STACK_LOOK, StackCard, StackTile } from "../stack-card/stack-card";
 import { dmListClickGuard } from "../swipeable-row/swipeable-row";
@@ -299,11 +298,12 @@ export function HomeView({
     const row = statsRowRef.current;
     if (!row) return;
     const fit = () => {
-      const btn = row.querySelector(".dm-stat-newstack");
+      const btn = row.querySelector(".dm-ht-new");
       if (!btn) return;
-      btn.classList.remove("dm-newstack-compact");
-      const overflows = row.scrollWidth > row.clientWidth + 1 || btn.scrollWidth > btn.clientWidth + 1;
-      if (overflows) btn.classList.add("dm-newstack-compact");
+      // Not enough room for the label: keep just the "+" (the button keeps its title and aria-label).
+      btn.classList.remove("dm-ht-new-compact");
+      const overflows = row.scrollWidth > row.clientWidth + 1;
+      if (overflows) btn.classList.add("dm-ht-new-compact");
     };
     fit();
     let ro = null;
@@ -441,34 +441,31 @@ export function HomeView({
   const goalReached = goalN > 0 && doneN >= goalN;
   return (
     <div className="dm-view dm-home-view">
-      <div className="dm-mobile-brand notranslate" translate="no">
-        <span className="dm-brand-ww">ww</span>ordy
-      </div>
-      <div className="dm-header">
-        <div role="button" tabIndex={0} onKeyDown={activateOnKey} className="dm-header-brand" onClick={handleLogoClick}>
-          <AppLogo
-            size={84}
-            className="dm-header-logo"
-            animated
-            learningLanguage={learningLanguage}
-          />
-        </div>
-        <div className="dm-home-hero-copy">
-          <h1 className="dm-h1 dm-home-hero-title">
+      <header className="dm-hh">
+        <div className="dm-hh-brand">
+          <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={activateOnKey}
+            className="dm-hh-logo"
+            onClick={handleLogoClick}
+          >
+            <AppLogo size={36} animated learningLanguage={learningLanguage} />
+          </div>
+          <h1 className="dm-hh-word notranslate" translate="no">
             <span className="dm-brand-ww">ww</span>ordy
           </h1>
         </div>
-        <div className="dm-header-actions">
+        <div className="dm-hh-actions">
           {!isPremium && (
             <button
               type="button"
-              className="dm-topbar-premium-btn dm-home-premium-btn"
+              className="dm-hh-pro"
               title="Upgrade to Premium"
               onClick={() => onOpenPremium && onOpenPremium()}
             >
-              <Star size={19} />
-              <span className="dm-topbar-premium-label-full">Premium</span>
-              <span className="dm-topbar-premium-label-short">Pro</span>
+              <Star size={15} />
+              <span>Pro</span>
             </button>
           )}
           <IconBtn
@@ -502,12 +499,12 @@ export function HomeView({
           )}
           <button
             type="button"
-            className="dm-streak"
+            className="dm-hh-streak"
             title="Streak details"
             aria-label={`Streak: ${streak} ${streak === 1 ? "day" : "days"}. Show details`}
             onClick={() => setStreakOpen(true)}
           >
-            <Flame size={20} color="#FF3B5C" />
+            <Flame size={16} color="#FF3B5C" />
             <span>{streak}</span>
           </button>
           {streakOpen && (
@@ -520,60 +517,41 @@ export function HomeView({
             />
           )}
         </div>
-      </div>
-      <div className="dm-stats-row" ref={statsRowRef}>
-        <div className="dm-stats-group">
-          <div
-            className="dm-count-pill"
-            role="group"
-            aria-label={`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}, ${totalWords} ${totalWords === 1 ? "word" : "words"}`}
-          >
-            <span className="dm-count-item">
-              <Layers size={14} />
-              <b>{stacks.length.toLocaleString()}</b>
-              <span className="dm-count-label">{stacks.length === 1 ? "stack" : "stacks"}</span>
-            </span>
-            <span className="dm-count-sep" aria-hidden="true" />
-            <span className="dm-count-item">
-              <Type size={14} />
-              <b>{totalWords.toLocaleString()}</b>
-              <span className="dm-count-label">{totalWords === 1 ? "word" : "words"}</span>
-            </span>
-          </div>
-          <button
-            className="dm-theme-toggle"
-            onClick={onToggleTheme}
-            type="button"
-            title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-          >
-            {theme === "light" ? <Moon size={12} /> : <Sun size={12} />}
-          </button>
+      </header>
+      <div className="dm-ht" ref={statsRowRef}>
+        <div
+          className="dm-ht-counts"
+          role="group"
+          aria-label={`${stacks.length} ${stacks.length === 1 ? "stack" : "stacks"}, ${totalWords} ${totalWords === 1 ? "word" : "words"}`}
+        >
+          <span>
+            <b>{stacks.length.toLocaleString()}</b> {stacks.length === 1 ? "stack" : "stacks"}
+          </span>
+          <span className="dm-ht-dot" aria-hidden="true" />
+          <span>
+            <b>{totalWords.toLocaleString()}</b> {totalWords === 1 ? "word" : "words"}
+          </span>
         </div>
         <button
-          className="dm-stat-newstack"
+          className="dm-ht-theme"
+          onClick={onToggleTheme}
+          type="button"
+          title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+        >
+          {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+        </button>
+        <button
+          className="dm-ht-new"
           onClick={() => setCreating(true)}
           type="button"
           title="New stack"
           aria-label="New stack"
         >
-          <Plus size={14} />
-          <span className="dm-newstack-label">New stack</span>
+          <Plus size={16} />
+          <span className="dm-ht-new-label">New stack</span>
         </button>
       </div>
-      {dueCount > 0 && (
-        <button className="dm-due-banner" onClick={onStartReview} type="button">
-          <div className="dm-due-banner-icon">
-            <Clock size={18} />
-          </div>
-          <div className="dm-due-banner-text">
-            <div className="dm-due-banner-title">
-              {`${dueCount} word${dueCount === 1 ? "" : "s"} due for review`}
-            </div>
-            <div className="dm-due-banner-sub">Tap to review now</div>
-          </div>
-          <ChevronRight size={18} />
-        </button>
-      )}
+      <DueBadge count={dueCount} onClick={onStartReview} />
       {searchOpen && (
         <div className="dm-search-row dm-home-filter-fade">
           <Search size={16} className="dm-search-row-icon" />

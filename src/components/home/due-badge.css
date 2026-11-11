@@ -1,0 +1,75 @@
+/* components/home/due-badge.css
+ * The "words due for review" row on Home. This is its only stylesheet: no other file styles .dm-due,
+ * so it looks the same on phone, tablet and desktop (it takes the width of the toolbar above it).
+ */
+.dm-due {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  margin: 0 0 12px;
+  padding: 0 10px 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+.dm-due-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(var(--gold-rgb), 0.16);
+}
+.dm-due-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+.dm-due-go {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: color 0.15s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-due:hover {
+    border-color: color-mix(in srgb, var(--gold) 45%, var(--border));
+  }
+  .dm-due:hover .dm-due-go {
+    color: var(--gold);
+  }
+}
+.dm-due:active {
+  transform: scale(0.985);
+}
+.dm-due:focus-visible {
+  outline: 2px solid rgba(var(--gold-rgb), 0.6);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-due {
+    transition: none;
+  }
+  .dm-due:active {
+    transform: none;
+  }
+}

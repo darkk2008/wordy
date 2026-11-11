@@ -34,7 +34,7 @@ export function initHapticsAndConfetti() {
       pattern: [10, 30, 10],
     },
     {
-      sel: ".dm-theme-toggle",
+      sel: ".dm-ht-theme",
       pattern: 9,
     },
     {
@@ -47,7 +47,7 @@ export function initHapticsAndConfetti() {
     },
   ];
   const GENERIC_SELECTOR =
-    "button, .dm-navbtn, .dm-iconbtn, .dm-seg, .dm-stack-card, .dm-game-card, .dm-settings-card, .dm-card, .dm-due-banner, .dm-stackselect-trigger, .dm-tr-stackpick-trigger, [role='button']";
+    "button, .dm-navbtn, .dm-iconbtn, .dm-seg, .dm-stack-card, .dm-game-card, .dm-settings-card, .dm-card, .dm-due, .dm-stackselect-trigger, .dm-tr-stackpick-trigger, [role='button']";
   document.addEventListener(
     "click",
     function (e) {
@@ -236,15 +236,15 @@ export function initHapticsAndConfetti() {
                 spread: 1.1,
               });
             }
-          } else if (node.matches(".dm-streak")) {
+          } else if (node.matches(".dm-streak, .dm-hh-streak")) {
             maybeCelebrateStreak(node);
           }
         }
         if (node.querySelector) {
           var streakEl =
-            node.classList && node.classList.contains("dm-streak")
+            node.matches && node.matches(".dm-streak, .dm-hh-streak")
               ? node
-              : node.querySelector(".dm-streak");
+              : node.querySelector(".dm-streak, .dm-hh-streak");
           if (streakEl) maybeCelebrateStreak(streakEl);
         }
       }

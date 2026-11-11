@@ -10,6 +10,7 @@ import { FavoritesView } from "../components/favorites/favorites";
 import { FAVORITES_PARENT_ID, MiniStackView } from "../components/mini-stack/mini-stack";
 import { FORMS_ONLY_GAMES } from "../components/games/games-config";
 import { setNativeFormLangCode } from "../core/form-prompt-setting";
+import { useMinuteClock } from "../core/use-minute-clock";
 import { readUiLanguageChoice, resolveUiLanguage, saveUiLanguageChoice } from "../core/ui-language";
 import { MULTI_STACK_ID } from "../components/games/combine-stacks";
 import { GamesHub, ReviewGamePicker } from "../components/games/games-hub";
@@ -1252,6 +1253,9 @@ export function App() {
         : activeStacks,
     [favoriteWords, activeStacks]
   );
+  // A word becomes due as time passes, so the due list is recomputed every minute and when the app
+  // comes back to the foreground (not only when the stacks change).
+  const dueClock = useMinuteClock();
   const dueWords = useMemo(() => {
     const now = Date.now();
     const list = [];
@@ -1265,7 +1269,9 @@ export function App() {
       })
     );
     return list;
-  }, [activeStacks]);
+    // dueClock only makes this run again as time passes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStacks, dueClock]);
   // Every stack has a mini stack by default: it is created the first time a word is pinned.
   const toggleMiniStackWord = (stackId, word) => {
     if (!stackId) return;
