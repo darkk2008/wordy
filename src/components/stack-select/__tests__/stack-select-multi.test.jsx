@@ -61,7 +61,7 @@ describe("StackSelect: several stacks at once", () => {
     mount({ withSwitch: false });
     open();
     expect(sw()).toBeNull();
-    expect(el.querySelector(".dm-ss-foot")).toBeNull();
+    expect(el.querySelector(".dm-ss-head-actions")).toBeNull();
   });
 
   it("the switch turns on multi mode; rows become checkboxes that toggle and keep the sheet open", () => {
@@ -87,19 +87,50 @@ describe("StackSelect: several stacks at once", () => {
     expect(opts()[2].getAttribute("aria-selected")).toBe("true");
   });
 
-  it("Select all / Deselect all, and Done closes with a summary on the trigger", () => {
+  it("Select all (a check box) and Done sit in the title row, between the title and the close button", () => {
+    mount();
+    open();
+    expect(el.querySelector(".dm-ss-head-actions")).toBeNull(); // single mode: nothing extra
+    click(sw());
+    const head = el.querySelector(".dm-ss-head");
+    expect([...head.children].map((c) => c.className.split(" ")[0])).toEqual([
+      "dm-ss-head-text",
+      "dm-ss-head-actions",
+      "dm-ss-close",
+    ]);
+    expect(el.querySelector(".dm-ss-foot")).toBeNull(); // no footer that makes the sheet taller
+  });
+
+  it("Select all is a check box: it ticks when every stack is picked, and unticking keeps one", () => {
     mount();
     open();
     click(sw());
-    const link = () => el.querySelector(".dm-ss-foot-link");
-    expect(link().textContent).toBe("Select all");
-    click(link());
+    const all = () => el.querySelector(".dm-ss-all");
+    expect(all().getAttribute("role")).toBe("checkbox");
+    expect(all().getAttribute("aria-label")).toBe("Select all");
+    expect(all().textContent).toBe("All");
+    expect(all().getAttribute("aria-checked")).toBe("false");
+    expect(all().querySelector("svg")).toBeNull(); // empty box
+    click(all());
     expect(sub()).toBe("3 selected · 14 words");
-    expect(link().textContent).toBe("Deselect all");
-    expect(el.querySelector(".dm-ss-done").textContent).toContain("3 stacks");
-    click(link());
+    expect(all().getAttribute("aria-checked")).toBe("true");
+    expect(all().querySelector(".dm-ss-all-box svg")).toBeTruthy(); // the check mark
+    expect(all().textContent).toBe("All"); // the label stays, the box shows the state
+    click(all());
     expect(sub()).toBe("1 selected · 10 words");
-    click(link());
+    expect(all().getAttribute("aria-checked")).toBe("false");
+    // picking every row by hand ticks it too
+    click(opts()[1]);
+    click(opts()[2]);
+    expect(all().getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("Done closes the sheet and the trigger shows a summary", () => {
+    mount();
+    open();
+    click(sw());
+    click(el.querySelector(".dm-ss-all"));
+    expect(el.querySelector(".dm-ss-done").getAttribute("aria-label")).toBe("Done");
     click(el.querySelector(".dm-ss-done"));
     expect(el.querySelector(".dm-ss-sheet")).toBeNull();
     expect(el.querySelector(".dm-stackselect-name").textContent).toBe("3 stacks");
@@ -117,7 +148,7 @@ describe("StackSelect: several stacks at once", () => {
     open();
     click(sw());
     expect(el.querySelector('[role="listbox"]').getAttribute("aria-multiselectable")).toBeNull();
-    expect(el.querySelector(".dm-ss-foot")).toBeNull();
+    expect(el.querySelector(".dm-ss-head-actions")).toBeNull();
     expect(opts()[1].getAttribute("aria-selected")).toBe("true"); // keeps the first picked stack
     click(opts()[2]); // single mode again: picks and closes
     expect(el.querySelector(".dm-ss-sheet")).toBeNull();

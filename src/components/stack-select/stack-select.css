@@ -397,46 +397,75 @@
 .dm-ss-multi-compact .dm-ss-multi-title { font-size: var(--fs-sm); }
 /* Rows become checkboxes (rounded squares) while several stacks can be picked. */
 .dm-ss-opt-mark-box { border-radius: 7px; }
-.dm-ss-foot {
+/* "Select all" (a check box) and "Done" sit in the sheet's title row, between the title and the close
+   button, so turning the switch on does not make the sheet taller. */
+.dm-ss-head-actions {
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-  padding: 12px 6px 0;
-  border-top: 1px solid var(--border);
+  gap: 6px;
 }
-.dm-ss-foot-link {
-  padding: 8px 4px;
+.dm-ss-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 11px 0 9px;
   border: 0;
-  background: transparent;
-  color: var(--cyan);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  color: var(--text);
   font: inherit;
   font-size: var(--fs-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
-.dm-ss-done {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 42px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: 14px;
+.dm-ss-all-box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  border: 1.5px solid color-mix(in srgb, var(--text) 30%, transparent);
+  color: transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.dm-ss-all.is-on .dm-ss-all-box {
+  border-color: var(--cyan);
   background: var(--cyan);
   color: #04141a;
-  font: inherit;
-  font-weight: 700;
+}
+/* "Done" is a round check button, the same size as the close button, to leave room for the title. */
+.dm-ss-done {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #04141a;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
-.dm-ss-done:active { transform: scale(0.97); }
-.dm-ss-foot-link:focus-visible,
+.dm-ss-done:active,
+.dm-ss-all:active { transform: scale(0.97); }
+.dm-ss-all:focus-visible,
 .dm-ss-done:focus-visible {
   outline: 2px solid rgba(var(--cyan-rgb), 0.6);
   outline-offset: 2px;
+}
+/* A long title gives way to the buttons instead of pushing them out. */
+.dm-ss-head-text .dm-ss-title,
+.dm-ss-head-text .dm-ss-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* In the rail (the open practice settings) each chip gets a check box at its end. */
 .dm-stackrail-check {

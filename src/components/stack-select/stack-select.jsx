@@ -186,7 +186,9 @@ export function StackSelect({
                 <div className="dm-ss-title">{multiOn ? "Practice stacks" : "Practice stack"}</div>
                 <div className="dm-ss-sub">
                   {multiOn ? (
-                    `${picked.length} selected · ${uniqueWordCount(picked)} words`
+                    `${picked.length} selected · ${uniqueWordCount(picked)} ${
+                      uniqueWordCount(picked) === 1 ? "word" : "words"
+                    }`
                   ) : (
                     <>
                       {stacks.length}
@@ -195,6 +197,35 @@ export function StackSelect({
                   )}
                 </div>
               </div>
+              {multiOn && (
+                // Between the title and the close button, so the sheet does not get taller.
+                <div className="dm-ss-head-actions">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={allPicked}
+                    aria-label="Select all"
+                    className={`dm-ss-all${allPicked ? " is-on" : ""}`}
+                    onClick={() =>
+                      onChangeValues(allPicked ? pickedIds.slice(0, 1) : stacks.map((s) => s.id))
+                    }
+                  >
+                    <span className="dm-ss-all-box" aria-hidden="true">
+                      {allPicked && <Check size={12} />}
+                    </span>
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    className="dm-ss-done"
+                    aria-label="Done"
+                    title="Done"
+                    onClick={() => setOpen(false)}
+                  >
+                    <Check size={18} />
+                  </button>
+                </div>
+              )}
               <button
                 type="button"
                 className="dm-ss-close"
@@ -249,21 +280,6 @@ export function StackSelect({
                 );
               })}
             </div>
-            {multiOn && (
-              <div className="dm-ss-foot">
-                <button
-                  type="button"
-                  className="dm-ss-foot-link"
-                  onClick={() => onChangeValues(allPicked ? pickedIds.slice(0, 1) : stacks.map((s) => s.id))}
-                >
-                  {allPicked ? "Deselect all" : "Select all"}
-                </button>
-                <button type="button" className="dm-ss-done" onClick={() => setOpen(false)}>
-                  <Check size={16} />
-                  {manyPicked ? ` Done · ${picked.length} stacks` : " Done"}
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
