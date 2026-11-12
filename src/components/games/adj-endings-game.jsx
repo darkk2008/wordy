@@ -13,6 +13,7 @@ import {
 import { GameDone, GameTopBar } from "./game-chrome";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
+import { useOptionKeys } from "../../behaviors/option-keys";
 export function AdjEndingsGame({
   words,
   onAnswer,
@@ -28,6 +29,7 @@ export function AdjEndingsGame({
   const [deck] = useState(() => shuffle(words.flatMap(buildAdjEndingQuestions)).slice(0, 15));
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   const [sentence, setSentence] = useState(null);
   const [sentenceLoading, setSentenceLoading] = useState(false);

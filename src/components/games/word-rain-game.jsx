@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 export function WordRainGame({
   words,
@@ -32,6 +33,7 @@ export function WordRainGame({
   const [streak, setStreak] = useState(0);
   const [status, setStatus] = useState(null);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(round);
   const [timeLeft, setTimeLeft] = useState(GAME_SECONDS);
   const [done, setDone] = useState(false);
   const timerRef = useRef(null);

@@ -39,14 +39,20 @@ self.addEventListener("fetch", (event) => {
 
   // Page loads: network first, cached shell when offline.
   if (req.mode === "navigate") {
+    // Only the app itself is stored as the "/" shell. Static pages (/privacy.html, /welcome.html...)
+    // are cached under their own URL: caching them as "/" used to make an offline launch show the
+    // privacy page instead of the app. Failed responses (404/500) are never cached.
+    const isStaticPage = /\.[a-z0-9]+$/i.test(url.pathname);
     event.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put("/", copy));
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(isStaticPage ? req : "/", copy));
+          }
           return res;
         })
-        .catch(() => caches.match("/").then((r) => r || Response.error()))
+        .catch(() => caches.match(req).then((r) => r || caches.match("/")).then((r) => r || Response.error()))
     );
     return;
   }

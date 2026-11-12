@@ -8,6 +8,7 @@ import {
   DM_DE_SPELLING_RULES,
   GENDER_SETS,
   ROMAN_LANGS,
+  SPEECH_LANG_CODES,
   uid,
   usesGenderTag,
 } from "../../core/constants";
@@ -414,7 +415,7 @@ export function genderClass(article) {
   if (article === "das") return "g-das";
   return "g-none";
 }
-export function buildShareHTML(stackData) {
+export function buildShareHTML(stackData, opts) {
   const words = stackData.words.map((w) => ({
     de: w.article ? `${w.article} ${stripArticle(w.de || "")}` : w.de || "",
     en: w.en || "",
@@ -432,10 +433,19 @@ export function buildShareHTML(stackData) {
         .join("")
     : `<div class="empty">No words in this stack yet.</div>`;
   const tablesHtml = buildStackTablesHtml(stackData.words);
+  // Labels and the speech voice follow the language being learned (they used to be fixed to German).
+  let nativeCode = "en";
+  try {
+    nativeCode = window.localStorage.getItem("deutschmaster-native-lang") || "en";
+  } catch (e) {}
+  const learnCode = (opts && opts.learningLang) || currentLearningLangCode || "de";
   let dataJson = JSON.stringify({
     name: stackData.name || "Vocabulary",
     emoji,
     words,
+    learnName: getLangName(learnCode),
+    nativeName: getLangName((opts && opts.nativeLang) || nativeCode),
+    speechLang: SPEECH_LANG_CODES[learnCode] || "de-DE",
   });
   dataJson = dataJson.replace(/</g, "\\u003C").replace(/>/g, "\\u003E");
   return `<!doctype html>
@@ -522,7 +532,9 @@ ${SHARE_TOGGLE_CSS}
     var order = words.map(function (_, i) { return i; });
     var idx = 0;
     var flipped = false;
-    studyArea.innerHTML = '<div class="card-area"><div class="card" id="card"><div class="face front"><div class="hint">German</div><div class="word" id="frontWord"></div></div><div class="face back"><div class="hint">English</div><div class="translation" id="backWord"></div></div></div></div><div class="nav-row"><button class="nbtn" id="prevBtn" aria-label="Previous">‹</button><div class="counter" id="counter"></div><button class="nbtn" id="nextBtn" aria-label="Next">›</button></div><div class="dots" id="dots"></div><div class="toolbar"><button class="tbtn" id="flipBtn">⟲ Flip</button><button class="tbtn" id="shuffleBtn">⥂ Shuffle</button><button class="tbtn" id="speakBtn">🔊 Listen</button></div>';
+    studyArea.innerHTML = '<div class="card-area"><div class="card" id="card"><div class="face front"><div class="hint" id="frontHint"></div><div class="word" id="frontWord"></div></div><div class="face back"><div class="hint" id="backHint"></div><div class="translation" id="backWord"></div></div></div></div><div class="nav-row"><button class="nbtn" id="prevBtn" aria-label="Previous">‹</button><div class="counter" id="counter"></div><button class="nbtn" id="nextBtn" aria-label="Next">›</button></div><div class="dots" id="dots"></div><div class="toolbar"><button class="tbtn" id="flipBtn">⟲ Flip</button><button class="tbtn" id="shuffleBtn">⥂ Shuffle</button><button class="tbtn" id="speakBtn">🔊 Listen</button></div>';
+    document.getElementById("frontHint").textContent = DATA.learnName || "";
+    document.getElementById("backHint").textContent = DATA.nativeName || "";
     var cardEl = document.getElementById("card");
     var frontWord = document.getElementById("frontWord");
     var backWord = document.getElementById("backWord");
@@ -559,7 +571,7 @@ ${SHARE_TOGGLE_CSS}
       try {
         var w = words[order[idx]];
         var utter = new SpeechSynthesisUtterance(w.de);
-        utter.lang = "de-DE";
+        utter.lang = DATA.speechLang || "de-DE";
         window.speechSynthesis.speak(utter);
       } catch (e) {}
     });

@@ -2,7 +2,7 @@
  * Write-the-answer game plus the shared form-question builders.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { currentLearningLangCode, speak } from "../../core/speech-voices";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { Input } from "../common/Input";
@@ -11,6 +11,16 @@ import { computeAdjForms, computeNounForms, computeVerbForms } from "../word-for
 import { nativeFormLangCode, translateFormPrompts } from "../../core/form-prompt-setting";
 import { nativeFormPhrase } from "./english-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
+
+// Case-insensitive comparison that also treats composed and decomposed accents as equal
+// ("ä" typed as one character or as "a" + combining mark, common on iOS/macOS keyboards).
+export function normalizeAnswer(s) {
+  return String(s || "")
+    .normalize("NFC")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
 
 export function WriteGame({
   words,
@@ -29,8 +39,23 @@ export function WriteGame({
   const [status, setStatus] = useState(null);
   const w = deck[idx];
   const done = idx >= deck.length;
+  const timers = useRef([]);
+  const later = (fn, ms) => {
+    timers.current.push(setTimeout(fn, ms));
+  };
+  // Cancel pending timers when the game is left, so nothing is spoken or counted afterwards.
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+      timers.current = [];
+    },
+    []
+  );
   useEffect(() => {
-    if (w) setTimeout(() => speak(w.de), 200);
+    if (!w) return undefined;
+    const t = setTimeout(() => speak(w.de), 200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
   if (done)
     return (
@@ -45,11 +70,14 @@ export function WriteGame({
       />
     );
   const check = () => {
-    const correct = val.trim().toLowerCase() === w.de.trim().toLowerCase();
+    // Enter used to skip the button's disabled state: an empty field counted as a wrong answer and
+    // a second Enter during the feedback delay answered the same word twice.
+    if (status || !val.trim()) return;
+    const correct = normalizeAnswer(val) === normalizeAnswer(w.de);
     setStatus(correct ? "correct" : "wrong");
     onAnswer(w.id, correct);
     if (correct) setScore((s) => s + 1);
-    setTimeout(() => {
+    later(() => {
       setVal("");
       setStatus(null);
       setIdx((i) => i + 1);
@@ -71,7 +99,7 @@ export function WriteGame({
         value={val}
         onChange={(e) => setVal(e.target.value)}
         placeholder="Type what you hear…"
-        onKeyDown={(e) => e.key === "Enter" && check()}
+        onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && check()}
         autoFocus
       />
       {status === "wrong" && (

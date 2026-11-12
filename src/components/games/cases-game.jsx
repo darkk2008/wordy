@@ -8,6 +8,7 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { Volume2 } from "../icons/icons";
 import { computeNounForms } from "../word-forms/word-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 export const CASE_INFO = {
   Nominativ: {
@@ -80,6 +81,7 @@ export function CasesGame({
   const [deck] = useState(() => shuffle(words.flatMap(buildCaseQuestions)).slice(0, 15));
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   const q = deck[idx];
   const done = idx >= deck.length;

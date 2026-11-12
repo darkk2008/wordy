@@ -9,6 +9,7 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { Volume2 } from "../icons/icons";
 import { stripArticle } from "../word-forms/word-forms";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 function buildMixQuestion(w, words) {
   const pool = words.filter((x) => x.id !== w.id);
@@ -94,6 +95,7 @@ export function DailyMixGame({ words, pool, onAnswer, onExit, onPlayAgain, title
   );
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   const q = deck[idx];
   const done = idx >= deck.length;

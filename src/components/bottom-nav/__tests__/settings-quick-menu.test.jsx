@@ -20,11 +20,13 @@ const fireEvent = {
   keyDown: (el, i) => fire("keydown", el, i),
 };
 
+const roots = [];
 async function mount(props) {
   const host = document.createElement("div");
   host.className = "dm-app";
   document.body.appendChild(host);
   const root = createRoot(host);
+  roots.push(root);
   await act(async () => root.render(<BottomNav tab="home" hidden={false} {...props} />));
   return { host, root };
 }
@@ -33,7 +35,9 @@ const menu = () => document.querySelector(".dm-nav-quickmenu");
 
 describe("Settings long-press quick menu", () => {
   beforeEach(() => vi.useFakeTimers());
-  afterEach(() => {
+  afterEach(async () => {
+    // unmount so a menu left open by one test cannot keep its document listeners for the next
+    await act(async () => roots.splice(0).forEach((r) => r.unmount()));
     vi.useRealTimers();
     document.body.innerHTML = "";
   });
@@ -137,6 +141,28 @@ describe("Settings long-press quick menu", () => {
     expect(menu().className).toContain("dm-nav-quickmenu-closing");
     await act(async () => vi.advanceTimersByTime(300));
     expect(menu()).toBeNull();
+  });
+
+  it("while the menu is open, other buttons only close it and do not act", async () => {
+    const setTab = vi.fn();
+    await mount({ setTab });
+    await act(async () => {
+      fireEvent.pointerDown(settingsBtn(), { button: 0 });
+      vi.advanceTimersByTime(500);
+    });
+    const home = document.querySelector('button[aria-label="Home"]');
+    await act(async () => {
+      fireEvent.pointerDown(home, { button: 0 });
+      fireEvent.pointerUp(home);
+      home.click();
+    });
+    expect(setTab).not.toHaveBeenCalled();
+    expect(menu().className).toContain("dm-nav-quickmenu-closing");
+    await act(async () => vi.advanceTimersByTime(300));
+    expect(menu()).toBeNull();
+    // afterwards the buttons work again
+    await act(async () => home.click());
+    expect(setTab).toHaveBeenCalledWith("home");
   });
 
   it("one corner next to the Settings icon is marked sharp", async () => {

@@ -36,20 +36,10 @@
   display: none;
 }
 
-/* ===== Word colour: the line after the number takes the colour (no separate dot any more) =====
-   Uncoloured words keep the thin fading cyan line. A coloured word gets a longer, thicker, solid line
-   with a soft glow, so the colour reads at a glance. */
+/* ===== Word colour: the line after the number keeps its normal shape and fade, in the word's colour ===== */
 .dm-card-index-colored::after,
 .dm-card-colorline {
-  background: var(--sw);
-}
-.dm-card-index-colored::after {
-  width: 28px;
-  height: 3px;
-  border-radius: 3px;
-  box-shadow: 0 0 9px -1px color-mix(in srgb, var(--sw) 75%, transparent);
-  transform-origin: left center;
-  animation: dm-card-line-grow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sw) 70%, transparent), transparent);
 }
 /* a level badge normally removes the line; a coloured word keeps it so its colour stays visible */
 .dm-card-badges:has(.dm-level-badge) .dm-card-index-colored {
@@ -58,19 +48,10 @@
 .dm-card-badges:has(.dm-level-badge) .dm-card-index-colored::after {
   display: block;
 }
-/* a coloured word that shows no number: the line stands alone */
+/* a coloured word that shows no number: the same line on its own */
 .dm-card-colorline {
   display: inline-block;
   align-self: center;
-  width: 28px;
-  height: 3px;
-  border-radius: 3px;
-  box-shadow: 0 0 9px -1px color-mix(in srgb, var(--sw) 75%, transparent);
-}
-@keyframes dm-card-line-grow {
-  from { transform: scaleX(0.2); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .dm-card-index-colored::after { animation: none; }
+  width: 16px;
+  height: 1px;
 }

@@ -62,3 +62,14 @@ describe("share HTML: list / tables toggle", () => {
     expect(document.getElementById("counter").textContent).toBe("2 / 4");
   });
 });
+
+describe("share HTML follows the learning language", () => {
+  it("puts the language names and speech voice into the file instead of German/de-DE", () => {
+    const html = buildShareHTML({ name: "Comida", emoji: "book", words: [{ id: "1", de: "pan", en: "bread" }] }, { learningLang: "es", nativeLang: "ru" });
+    expect(html).toContain('"learnName":"Spanish"');
+    expect(html).toContain('"speechLang":"es-ES"');
+    expect(html).not.toContain('<div class="hint">German</div>');
+    const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://x.test/" });
+    expect(dom.window.document.getElementById("frontHint").textContent).toBe("Spanish");
+  });
+});

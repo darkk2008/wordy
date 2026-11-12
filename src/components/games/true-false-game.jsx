@@ -6,6 +6,7 @@ import { useState } from "react";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { Check, X } from "../icons/icons";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 function buildTFQuestion(pool, word, direction) {
   const isDE2EN = direction !== "en2de";
@@ -48,6 +49,7 @@ export function TrueFalseGame({
   );
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   const isDE2EN = direction !== "en2de";
   const done = idx >= deck.length;

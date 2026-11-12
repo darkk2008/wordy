@@ -142,6 +142,10 @@
 .dm-option-correct::before { background: var(--green); border-color: var(--green); color: #08201a; content: "✓"; }
 .dm-option-wrong { background: linear-gradient(180deg, rgba(255,59,92,0.16), rgba(255,59,92,0.08)); border-color: var(--red); color: var(--red); font-weight: 700; }
 .dm-option-wrong::before { background: var(--red); border-color: var(--red); color: #2a0a10; content: "✕"; }
+/* Option picked with the keyboard (Arrow keys + Enter): same cyan accent as hover. */
+.dm-option:focus-visible:not(.dm-option-correct):not(.dm-option-wrong),
+.dm-tf-btn:focus-visible:not(:disabled):not(.dm-tf-btn-correct):not(.dm-tf-btn-wrong) { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb),0.2), 0 4px 14px rgba(var(--cyan-rgb),0.1); }
+.dm-option:focus-visible:not(.dm-option-correct):not(.dm-option-wrong)::before { background: var(--cyan); border-color: var(--cyan); color: #04141a; }
 
 .dm-tf-card { display: flex; flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 16px; margin-top: 10px; box-shadow: var(--shadow-md); }
 .dm-tf-word { font-family: 'Sora', sans-serif; font-weight: 700; font-size: var(--fs-2xl); }

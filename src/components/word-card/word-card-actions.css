@@ -75,12 +75,24 @@
   width: 25%;
   height: 44px;
   pointer-events: none;
-  background:
-    linear-gradient(var(--cyan), var(--cyan)) 50% 100% / 30px 3px no-repeat,
-    radial-gradient(ellipse 52% 100% at 50% 100%, rgba(var(--cyan-rgb), 0.2), transparent 72%);
+  background: radial-gradient(ellipse 52% 100% at 50% 100%, rgba(var(--cyan-rgb), 0.2), transparent 72%);
   border-radius: 3px 3px 0 0;
   transform: translateX(calc(var(--i) * 100%));
   transition: transform 0.38s cubic-bezier(0.3, 1.2, 0.45, 1);
+}
+/* The light bar itself, on its own element so its ends can be rounded. */
+.dm-segmented.dm-display-toggle::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  bottom: -1px;
+  left: calc(12.5% + var(--i) * 25% - 15px);
+  width: 30px;
+  height: 3px;
+  pointer-events: none;
+  background: var(--cyan);
+  border-radius: 2px;
+  transition: left 0.38s cubic-bezier(0.3, 1.2, 0.45, 1);
 }
 .dm-segmented.dm-display-toggle:has(.dm-seg:nth-child(2).dm-seg-active) {
   --i: 1;
@@ -132,6 +144,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .dm-segmented.dm-display-toggle::before,
+  .dm-segmented.dm-display-toggle::after,
   .dm-segmented.dm-display-toggle .dm-seg {
     transition: none;
   }

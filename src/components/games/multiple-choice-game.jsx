@@ -8,6 +8,7 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { Volume2 } from "../icons/icons";
 import { GameDone, GameTopBar } from "./game-chrome";
 import { buildFormQuestions } from "./write-game";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 function buildMCQuestion(words, w) {
   const others = shuffle(words.filter((x) => x.id !== w.id)).slice(0, 3);
@@ -69,6 +70,7 @@ export function MultipleChoiceGame({
   const [deck] = useState(() => shuffle(words).map((w) => buildMCQuestion(distractorPool, w)));
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(8);
   const timerRef = useRef(null);

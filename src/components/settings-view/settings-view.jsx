@@ -236,139 +236,56 @@ export function SettingsView({
   const signedIn = !!(account && account.id);
   const archivedCount = (archivedStacks || []).length;
 
-  // Tiles of the bento grid (the wide ones span two columns on phones and half the row on desktop)
-  const TILES = [
-    { id: "languages", name: "Languages", tint: "#6aa8ff", icon: <GlobeIcon size={22} />, wide: true },
-    { id: "appearance", name: "Appearance", desc: "Theme and colors", tint: "#ff6b9d", icon: <PaletteIcon size={22} /> },
-    {
-      id: "notifications",
-      name: "Notifications",
-      desc: dailyGoal ? `Daily goal: ${dailyGoal}` : "Reminders and daily goal",
-      tint: "#fbbf24",
-      icon: <BellIcon size={22} />,
-    },
-    { id: "families", name: "Families", desc: "Organize your stacks", tint: "#a78bfa", icon: <UsersIcon size={22} /> },
-    {
-      id: "stats",
-      name: "Your Stats",
-      desc: streak > 0 ? `${streak} day streak` : "Progress, streaks & words",
-      tint: "#4ade80",
-      icon: <BarChartIcon size={22} />,
-    },
-    {
-      id: "archived",
-      name: "Archived Stacks",
-      desc: archivedCount ? `${archivedCount} archived` : "Nothing archived",
-      tint: "#94a3b8",
-      icon: <ArchiveIcon size={22} />,
-    },
-    {
-      id: "restrictions",
-      name: "Guardrails",
-      desc: "Privacy, layout & word display",
-      tint: "#2dd4bf",
-      icon: <ShieldIcon size={22} />,
-    },
+  // Minimal list: plain rows in a few groups. `value` is the small text on the right.
+  const GROUPS = [
+    [
+      { id: "account", name: "Account", icon: <UserIcon size={20} />, value: signedIn ? String(account.id) : "Sign in" },
+      { id: "premium", name: "Premium", icon: <CrownIcon size={20} />, value: isPremium ? "Active" : "Upgrade" },
+    ],
+    [
+      {
+        id: "languages",
+        name: "Languages",
+        icon: <GlobeIcon size={20} />,
+        value: (
+          <span className="dm-sx-langs">
+            <FlagIcon code={nativeLangObj.flagCode} className="dm-sx-flag" />
+            <ArrowRight size={12} />
+            <FlagIcon code={learningLangObj.flagCode} className="dm-sx-flag" />
+          </span>
+        ),
+      },
+      { id: "appearance", name: "Appearance", icon: <PaletteIcon size={20} /> },
+      { id: "notifications", name: "Notifications", icon: <BellIcon size={20} />, value: dailyGoal ? `Goal ${dailyGoal}` : null },
+      { id: "families", name: "Families", icon: <UsersIcon size={20} /> },
+    ],
+    [
+      { id: "stats", name: "Your Stats", icon: <BarChartIcon size={20} />, value: streak > 0 ? `${streak} day streak` : null },
+      { id: "archived", name: "Archived Stacks", icon: <ArchiveIcon size={20} />, value: archivedCount ? String(archivedCount) : null },
+      { id: "restrictions", name: "Guardrails", icon: <ShieldIcon size={20} /> },
+    ],
+    [
+      { id: "qrsync", name: "Sync via QR", icon: <QrCode size={20} /> },
+      { id: "data", name: "Data & Backup", icon: <DatabaseIcon size={20} /> },
+      { id: "about", name: "About", icon: <InfoIcon size={20} /> },
+      { id: "contacts", name: "Contacts", icon: <SendIcon size={20} /> },
+    ],
   ];
-  // Utility rows at the bottom
-  const ROWS = [
-    { id: "qrsync", name: "Sync via QR", desc: "Send stacks to another device", tint: "#6ee7f9", icon: <QrCode size={20} /> },
-    { id: "data", name: "Data & Backup", desc: "Export, import or reset", tint: "#fb923c", icon: <DatabaseIcon size={20} /> },
-    { id: "about", name: "About", desc: "How wwordy works", tint: "#94a3b8", icon: <InfoIcon size={20} /> },
-    { id: "contacts", name: "Contacts", desc: "Get in touch with us", tint: "#6aa8ff", icon: <SendIcon size={20} /> },
-  ];
-  const stagger = (n) => ({ "--i": n });
   return (
     <div className="dm-view dm-sx">
-      <h1 className="dm-sx-title" style={stagger(0)}>
-        Settings
-      </h1>
-
-      <div className="dm-sx-top" style={stagger(1)}>
-        <button type="button" className="dm-sx-account" onClick={() => setSection("account")}>
-          <span className={`dm-sx-avatar${signedIn ? " is-in" : ""}`}>
-            {signedIn ? String(account.id).trim().charAt(0).toUpperCase() : <UserIcon size={22} />}
-          </span>
-          <span className="dm-sx-account-text">
-            <span className="dm-sx-account-name">{signedIn ? "Account" : "Sign in"}</span>
-            <span className="dm-sx-account-desc">
-              {signedIn ? `Signed in as ${account.id}` : "Sign up or sign in to sync devices"}
-            </span>
-          </span>
-          <ChevronRight size={18} className="dm-sx-chev" />
-        </button>
-        <button
-          type="button"
-          className={`dm-sx-premium${isPremium ? " is-active" : ""}`}
-          onClick={() => setSection("premium")}
-        >
-          <span className="dm-sx-premium-icon">
-            <CrownIcon size={22} />
-          </span>
-          <span className="dm-sx-account-text">
-            <span className="dm-sx-account-name">Premium</span>
-            <span className="dm-sx-account-desc">{isPremium ? "Active · manage your plan" : "Plans, pricing & promo code"}</span>
-          </span>
-          <ChevronRight size={18} className="dm-sx-chev" />
-        </button>
-      </div>
-
-      <div className="dm-sx-bento">
-        {TILES.map((t, i) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`dm-sx-tile${t.wide ? " dm-sx-tile-wide" : ""}`}
-            style={{ "--tint": t.tint, ...stagger(i + 2) }}
-            onClick={() => setSection(t.id)}
-          >
-            <span className="dm-sx-tile-head">
-              <span className="dm-sx-chip">{t.icon}</span>
-              <ChevronRight size={16} className="dm-sx-tile-chev" />
-            </span>
-            {t.id === "languages" ? (
-              <span className="dm-sx-tile-foot">
-                <span className="dm-sx-tile-name">{t.name}</span>
-                <span className="dm-sx-langs">
-                  <span className="dm-sx-lang">
-                    <FlagIcon code={nativeLangObj.flagCode} className="dm-sx-flag" />
-                    {nativeLangObj.name}
-                  </span>
-                  <ArrowRight size={14} className="dm-sx-langs-arrow" />
-                  <span className="dm-sx-lang">
-                    <FlagIcon code={learningLangObj.flagCode} className="dm-sx-flag" />
-                    {learningLangObj.name}
-                  </span>
-                </span>
-              </span>
-            ) : (
-              <span className="dm-sx-tile-foot">
-                <span className="dm-sx-tile-name">{t.name}</span>
-                <span className="dm-sx-tile-desc">{t.desc}</span>
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      <div className="dm-sx-list" style={stagger(TILES.length + 2)}>
-        {ROWS.map((r) => (
-          <button
-            key={r.id}
-            type="button"
-            className="dm-sx-row"
-            style={{ "--tint": r.tint }}
-            onClick={() => setSection(r.id)}
-          >
-            <span className="dm-sx-chip dm-sx-chip-sm">{r.icon}</span>
-            <span className="dm-sx-account-text">
-              <span className="dm-sx-row-name">{r.name}</span>
-              <span className="dm-sx-row-desc">{r.desc}</span>
-            </span>
-            <ChevronRight size={16} className="dm-sx-chev" />
-          </button>
-        ))}
-      </div>
+      <h1 className="dm-sx-title">Settings</h1>
+      {GROUPS.map((rows, gi) => (
+        <div className="dm-sx-group" key={gi}>
+          {rows.map((r) => (
+            <button key={r.id} type="button" className="dm-sx-row" onClick={() => setSection(r.id)}>
+              <span className="dm-sx-icon">{r.icon}</span>
+              <span className="dm-sx-name">{r.name}</span>
+              {r.value ? <span className="dm-sx-value">{r.value}</span> : null}
+              <ChevronRight size={16} className="dm-sx-chev" />
+            </button>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

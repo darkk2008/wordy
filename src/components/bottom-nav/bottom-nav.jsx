@@ -19,6 +19,24 @@ const SETTINGS_QUICK_ITEMS = [
   { section: "appearance", label: "Appearance", Icon: PaletteIcon },
 ];
 
+// While the menu is open, everything outside it is only a "closer": the press that closes the menu
+// must not also trigger the button under the finger. Its pointerdown is stopped, and the click that
+// follows it is swallowed once (with a timeout in case no click ever comes).
+function swallowNextClick() {
+  const kill = (ev) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    cleanup();
+  };
+  let timer = null;
+  const cleanup = () => {
+    document.removeEventListener("click", kill, true);
+    clearTimeout(timer);
+  };
+  document.addEventListener("click", kill, true);
+  timer = setTimeout(cleanup, 800);
+}
+
 // A small menu next to the Settings icon. It is rendered in a portal inside .dm-app (the nav has
 // `contain: paint`, which would clip it, and the theme variables live on .dm-app) and positioned
 // from the icon's rectangle: to the right of it in the desktop sidebar, above it on the phone bar.
@@ -54,7 +72,11 @@ function SettingsQuickMenu({ anchorRect, closing, onPick, onClose, returnFocusRe
     const first = menuRef.current && menuRef.current.querySelector("button");
     if (first) first.focus({ preventScroll: true });
     const onDown = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) onClose();
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        e.stopPropagation();
+        swallowNextClick();
+        onClose();
+      }
     };
     const onKey = (e) => {
       if (e.key === "Escape") {

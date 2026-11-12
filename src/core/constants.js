@@ -3,8 +3,20 @@
  */
 
 export const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
-export const todayStr = () => new Date().toISOString().slice(0, 10);
 export const DAY = 864e5;
+// Calendar date (YYYY-MM-DD) in the user's LOCAL time zone. toISOString() is UTC, which made the
+// "day" roll over at e.g. 05:00 in UTC+5 and reset streaks / daily counters at the wrong moment.
+export const dateStr = (d = new Date()) => {
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+export const todayStr = () => dateStr();
+// Local date of the previous calendar day (setDate handles month/year borders and DST changes).
+export const yesterdayStr = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return dateStr(d);
+};
 export const SRS_STEPS = [10 / 1440, 1, 3, 7, 14, 30, 90];
 export const SPEECH_LANG_CODES = {
   en: "en-US",

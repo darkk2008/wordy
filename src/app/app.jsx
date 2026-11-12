@@ -24,7 +24,8 @@ import { recordGameCooldown } from "../components/stack-select/stack-select";
 import { StackView } from "../components/stack-view/stack-view";
 import { TranslationLoadingOverlay } from "../components/translation-overlay/translation-overlay";
 import { stripArticle } from "../components/word-forms/word-forms";
-import { DAY, ROMAN_LANGS, todayStr, uid } from "../core/constants";
+import { ROMAN_LANGS, todayStr, uid, yesterdayStr } from "../core/constants";
+import { mergeThreeWay, sameSnapshot, snapshot } from "../services/sync-merge";
 import { HideArticlesContext, ShowLevelBadgeContext } from "../core/contexts";
 import { setTranslateFormPrompts } from "../core/form-prompt-setting";
 import { FAMILY_ICON_IDS, MINISTACK_ICON_IDS } from "../core/icon-registry";
@@ -170,6 +171,29 @@ if (typeof window !== "undefined") {
   window.addEventListener("keydown", preloadLazyScreens, { once: true, capture: true });
 }
 
+// What the cloud held at this device's last sync, per account (hashes only, see services/sync-merge.js).
+// It lets the merge tell "changed here", "changed there" and "deleted" apart.
+const syncBaseKey = (id) => "wwordy-sync-base:" + id;
+function loadSyncBase(id) {
+  try {
+    const raw = id && window.localStorage.getItem(syncBaseKey(id));
+    const b = raw ? JSON.parse(raw) : null;
+    return b && b.s && b.f && b.m ? b : null;
+  } catch (e) {
+    return null;
+  }
+}
+function saveSyncBase(id, snap) {
+  try {
+    if (id) window.localStorage.setItem(syncBaseKey(id), JSON.stringify(snap));
+  } catch (e) {}
+}
+function clearSyncBase(id) {
+  try {
+    if (id) window.localStorage.removeItem(syncBaseKey(id));
+  } catch (e) {}
+}
+
 export function App() {
   // Admin page: opened by the secret gesture on the home screen, which sets the URL hash to #admin.
   const [adminPage, setAdminPage] = useState(() => typeof window !== "undefined" && window.location.hash === "#admin");
@@ -275,6 +299,7 @@ export function App() {
   };
   const handleDeleteAccount = async (password) => {
     await window.wwordyCloud.deleteAccount(account.id, password);
+    clearSyncBase(account.id);
     setAccount({
       id: null,
       checking: false,
@@ -704,7 +729,7 @@ export function App() {
       }
       const today = todayStr();
       if (data.lastActive !== today) {
-        const yesterday = new Date(Date.now() - DAY).toISOString().slice(0, 10);
+        const yesterday = yesterdayStr();
         data.streak = data.lastActive === yesterday ? (data.streak || 0) + 1 : 1;
         data.lastActive = today;
         data.todayReviews = {
@@ -767,6 +792,7 @@ export function App() {
   // updated_at of the cloud row this device last read or wrote. A push only succeeds while the row
   // still has this version, so a device with stale data can never overwrite a newer upload.
   const remoteVersionRef = useRef(null);
+  const syncBaseRef = useRef(null); // snapshot of what the cloud held at the last sync (this account)
   const pushSeqRef = useRef(0); // bumped when a push starts: a pull that began earlier is stale
   const pushBusyRef = useRef(false);
   const [syncTick, setSyncTick] = useState(0); // bumps the push effect once the first pull is done
@@ -857,6 +883,13 @@ export function App() {
     });
     if (fp === lastSyncedRef.current) return; // nothing new from the cloud
     lastSyncedRef.current = fp;
+    syncBaseRef.current = snapshot({
+      stacks: data.stacks || [],
+      families: data.families || [],
+      miniStacks: mini,
+      favMiniStack: fav,
+    });
+    saveSyncBase(account.id, syncBaseRef.current);
     setStacks(data.stacks || []);
     setMiniStacks(mini);
     setFavMiniStack(fav);
@@ -875,23 +908,24 @@ export function App() {
     const remoteMini = hasMini ? migrateMiniStacks(remote) : {};
     const remoteFav = hasMini ? remote.favMiniStack || null : null;
     const remoteStacks = remote.stacks || [];
-    const localStacks = L.stacks || [];
-    const remoteIds = new Set(remoteStacks.map((st) => st.id));
-    const mergedStacks = remoteStacks.map((rs) => {
-      const ls = localStacks.find((st) => st.id === rs.id);
-      if (!ls) return rs;
-      const have = new Set((rs.words || []).map((w) => w.id));
-      const extra = (ls.words || []).filter((w) => !have.has(w.id));
-      return extra.length ? { ...rs, words: [...(rs.words || []), ...extra] } : rs;
+    // Three-way merge against what the cloud held at the last sync (see services/sync-merge.js):
+    // edits, SRS progress and deletions from both devices are kept instead of the cloud winning.
+    const cloudMini = hasMini ? remoteMini : L.miniStacks || {};
+    const cloudFav = hasMini ? remoteFav : L.favMiniStack || null;
+    const base = syncBaseRef.current || loadSyncBase(account.id);
+    const merged = mergeThreeWay(
+      base,
+      { stacks: L.stacks, families: L.families, miniStacks: L.miniStacks, favMiniStack: L.favMiniStack },
+      { stacks: remoteStacks, families: remote.families || [], miniStacks: cloudMini, favMiniStack: cloudFav }
+    );
+    // The cloud still holds `remote` until the merged result is pushed, so that is the new base.
+    syncBaseRef.current = snapshot({
+      stacks: remoteStacks,
+      families: remote.families || [],
+      miniStacks: cloudMini,
+      favMiniStack: cloudFav,
     });
-    const localOnly = localStacks.filter((st) => !remoteIds.has(st.id));
-    const famIds = new Set((remote.families || []).map((f) => f.id));
-    const mergedFamilies = [
-      ...(remote.families || []),
-      ...(L.families || []).filter((f) => !famIds.has(f.id)),
-    ];
-    const mergedMini = { ...remoteMini, ...(L.miniStacks || {}) };
-    const mergedFav = L.favMiniStack || remoteFav;
+    saveSyncBase(account.id, syncBaseRef.current);
     const streakV = Math.max(L.streak || 1, remote.streak || 1);
     const best = Math.max(L.bestStreak || 0, remote.bestStreak || 0, streakV);
     const today = todayStr();
@@ -908,10 +942,10 @@ export function App() {
       reviews: remoteReviews,
       premium: premiumForSync(),
     });
-    setStacks([...localOnly, ...mergedStacks]);
-    setFamilies(mergedFamilies);
-    setMiniStacks(mergedMini);
-    setFavMiniStack(mergedFav);
+    setStacks(merged.stacks);
+    setFamilies(merged.families);
+    setMiniStacks(merged.miniStacks);
+    setFavMiniStack(merged.favMiniStack);
     setStreak(streakV);
     setBestStreak(best);
     setTodayReviews(Math.max(L.todayReviews || 0, remoteReviews));
@@ -934,6 +968,8 @@ export function App() {
       if (res.ok) {
         remoteVersionRef.current = res.updatedAt || remoteVersionRef.current;
         lastSyncedRef.current = fingerprintOfPayload(payload);
+        syncBaseRef.current = snapshot(payload);
+        saveSyncBase(account.id, syncBaseRef.current);
         return { ok: true };
       }
       if (res.conflict) {
@@ -976,6 +1012,7 @@ export function App() {
       syncReadyRef.current = false;
       lastSyncedRef.current = "";
       remoteVersionRef.current = null;
+      syncBaseRef.current = null;
       return;
     }
     const cloud = window.wwordyCloud;
@@ -1028,8 +1065,18 @@ export function App() {
       }
       remoteVersionRef.current = remote.updated_at || null;
       const p = remote.payload;
-      if (p && Array.isArray(p.stacks) && p.stacks.length) applyRemote(p);
-      else applySyncedPremium(p && p.premium); // cloud has no stacks yet: local data gets uploaded
+      if (p && Array.isArray(p.stacks) && p.stacks.length) {
+        // The cloud used to replace everything local here, losing edits made offline or before
+        // signing in. Replace only when this device has nothing the cloud has not seen; otherwise merge.
+        const L = latestRef.current;
+        const base = loadSyncBase(account.id);
+        syncBaseRef.current = base;
+        const nothingLocal =
+          !(L.stacks || []).some((st) => st && (st.words || []).length) && !(L.families || []).length;
+        const unchangedLocal = base ? sameSnapshot(base, snapshot(L)) : nothingLocal;
+        if (unchangedLocal) applyRemote(p);
+        else mergeRemote(p);
+      } else applySyncedPremium(p && p.premium); // cloud has no stacks yet: local data gets uploaded
       syncReadyRef.current = true;
       setSyncTick((n) => n + 1);
       unsub = cloud.subscribe((row) => {

@@ -7,6 +7,7 @@ import { speak } from "../../core/speech-voices";
 import { shuffle } from "../../core/srs-and-seed-data";
 import { dmBuildParadigmQuestions, dmFetchParadigm, dmHasParadigm } from "../../services/ai-groq";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 export function ParadigmGame({ words, onAnswer, onExit, onPlayAgain, apiKey, onOpenAI, title }) {
   const gameTitle = title || "Grammar Forms";
@@ -14,6 +15,7 @@ export function ParadigmGame({ words, onAnswer, onExit, onPlayAgain, apiKey, onO
   const [genError, setGenError] = useState("");
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(idx);
   const [score, setScore] = useState(0);
   useEffect(() => {
     let cancelled = false;

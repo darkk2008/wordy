@@ -9,6 +9,7 @@ import { Volume2 } from "../icons/icons";
 import { computeVerbForms } from "../word-forms/word-forms";
 import { isRealVerb } from "./cases-game";
 import { GameDone, GameTopBar } from "./game-chrome";
+import { useOptionKeys } from "../../behaviors/option-keys";
 
 export function ConjugationLadderGame({ words, onAnswer, onExit, onPlayAgain }) {
   const [verbs] = useState(() => {
@@ -17,6 +18,7 @@ export function ConjugationLadderGame({ words, onAnswer, onExit, onPlayAgain }) 
   const [verbIdx, setVerbIdx] = useState(0);
   const [personIdx, setPersonIdx] = useState(0);
   const [picked, setPicked] = useState(null);
+  useOptionKeys(`${verbIdx}-${personIdx}`);
   const [slipped, setSlipped] = useState(false);
   const [climbed, setClimbed] = useState(0);
   // Hooks must run on every render, so they sit above the early returns below.
