@@ -7,7 +7,7 @@ import { shuffle } from "../../core/srs-and-seed-data";
 import { GameDone, GameTopBar } from "./game-chrome";
 
 export function MatchingGame({ words, onAnswer, onExit, onPlayAgain }) {
-  const pool = shuffle(words).slice(0, Math.min(6, words.length));
+  const [pool] = useState(() => shuffle(words));
   const [left] = useState(() => shuffle(pool));
   const [right] = useState(() => shuffle(pool));
   const [selL, setSelL] = useState(null);

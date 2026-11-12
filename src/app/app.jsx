@@ -49,6 +49,8 @@ import {
   track,
 } from "../services/analytics-presence";
 import { GameBackLabelContext, GameMistakesContext } from "../components/games/game-chrome";
+import { GameRounds, ROUND_SIZES } from "../components/games/rounds";
+import { isRealVerb } from "../components/games/cases-game";
 import { withColor } from "../core/word-colors";
 import { dmSanitizeBackup } from "../services/config-and-validation";
 import {
@@ -68,7 +70,31 @@ import {
 // Heavy screens are loaded on demand so the first page load stays small.
 // Screens that are loaded on demand. Each one is declared once here: `lazy` for rendering, and the
 // same loader reused below for warming the chunk before anybody asks for it.
-const lazyNamed = (loader, name) => lazy(() => loader().then((m) => ({ default: m[name] })));
+// Lazy screen that renders at once when it has already been preloaded. Plain React.lazy always
+// suspends on its first render (and React holds a Suspense fallback back for a moment), so even a
+// cached chunk made the first open of Settings / the AI tutor feel delayed.
+const lazyNamed = (loader, name) => {
+  let Loaded = null;
+  const Lazy = lazy(() =>
+    loader().then((m) => {
+      Loaded = m[name];
+      return { default: Loaded };
+    })
+  );
+  const Screen = (props) => {
+    // Decide once per mount, so a chunk that finishes loading later never remounts a screen.
+    const ready = useRef(!!Loaded);
+    const Comp = ready.current ? Loaded : Lazy;
+    return <Comp {...props} />;
+  };
+  Screen.preload = () =>
+    loader()
+      .then((m) => {
+        Loaded = m[name];
+      })
+      .catch(() => {});
+  return Screen;
+};
 const AdjEndingsGame = lazyNamed(() => import("../components/games/adj-endings-game"), "AdjEndingsGame");
 const CasesGame = lazyNamed(() => import("../components/games/cases-game"), "CasesGame");
 const ConjugationLadderGame = lazyNamed(() => import("../components/games/conjugation-ladder-game"), "ConjugationLadderGame");
@@ -104,43 +130,42 @@ const preloadLazyScreens = (() => {
   return () => {
     if (started) return;
     started = true;
-    [
-      () => import("../components/account/account"),
-      () => import("../components/ai-modal/ai-modal"),
-      () => import("../components/settings-view/settings-view"),
-    ].forEach((load) => load().catch(() => {}));
+    [AuthModal, AiModal, SettingsView].forEach((c) => c.preload());
     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 600));
     idle(
       () =>
         [
-          () => import("../components/games/adj-endings-game"),
-          () => import("../components/games/cases-game"),
-          () => import("../components/games/conjugation-ladder-game"),
-          () => import("../components/games/daily-mix-game"),
-          () => import("../components/games/flashcards-game"),
-          () => import("../components/games/listening-dictation-game"),
-          () => import("../components/games/matching-game"),
-          () => import("../components/games/memory-game"),
-          () => import("../components/games/multiple-choice-game"),
-          () => import("../components/games/paradigm-game"),
-          () => import("../components/games/scramble-game"),
-          () => import("../components/games/sentence-practice-game"),
-          () => import("../components/games/speaking-game"),
-          () => import("../components/games/speed-forms-game"),
-          () => import("../components/games/tense-mixer-game"),
-          () => import("../components/games/true-false-game"),
-          () => import("../components/games/word-forms-game"),
-          () => import("../components/games/word-quiz-game"),
-          () => import("../components/games/word-rain-game"),
-        ].forEach((load) => load().catch(() => {})),
+          AdjEndingsGame,
+          CasesGame,
+          ConjugationLadderGame,
+          DailyMixGame,
+          FlashcardsGame,
+          ListeningDictationGame,
+          MatchingGame,
+          MemoryGame,
+          MultipleChoiceGame,
+          ParadigmGame,
+          ScrambleGame,
+          SentencePracticeGame,
+          SpeakingGame,
+          SpeedFormsGame,
+          TenseMixerGame,
+          TrueFalseGame,
+          WordFormsGame,
+          WordQuizGame,
+          WordRainGame,
+        ].forEach((c) => c.preload()),
       { timeout: 3000 }
     );
   };
 })();
 if (typeof window !== "undefined") {
-  const soon = () => setTimeout(preloadLazyScreens, 250);
-  if (document.readyState === "complete") soon();
-  else window.addEventListener("load", soon, { once: true });
+  // Start right after the first frame. Do NOT wait for window "load": that event is held back by the
+  // Supabase CDN script and any slow image/font, so on a slow network the warm-up began only after
+  // the person had already tapped Settings or the AI button (and saw the spinner).
+  const afterFirstPaint = () => requestAnimationFrame(() => setTimeout(preloadLazyScreens, 0));
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", afterFirstPaint, { once: true });
+  else afterFirstPaint();
   window.addEventListener("pointerdown", preloadLazyScreens, { once: true, capture: true, passive: true });
   window.addEventListener("keydown", preloadLazyScreens, { once: true, capture: true });
 }
@@ -309,6 +334,14 @@ export function App() {
     setPremiumReturnTab(tab === "settings" ? null : tab);
     setOpenStackId(null);
     setSettingsInitialSection("premium");
+    setSettingsMountKey((k) => k + 1);
+    setTab("settings");
+  };
+  // Settings keeps its open section in local state, which is lost while a stack or a game covers it.
+  // Coming back from an archived stack (or a game played from the archive) must land on the
+  // Archived stacks list, not on the Settings root.
+  const returnToArchivedList = () => {
+    setSettingsInitialSection("archived");
     setSettingsMountKey((k) => k + 1);
     setTab("settings");
   };
@@ -1420,6 +1453,7 @@ export function App() {
       direction: direction || "de2en",
       level,
       backLabel: "Done",
+      fromArchived: true,
     });
     setArchivedPlayPick(null);
   };
@@ -1805,6 +1839,12 @@ export function App() {
     }
     setTab(id);
   };
+  // Long press on the Settings tab: jump straight to one of its sections (archived stacks, families...).
+  const openSettingsSection = (section) => {
+    goTab("settings");
+    setSettingsInitialSection(section);
+    setSettingsMountKey((k) => k + 1);
+  };
   let content;
   // One key per game round; "play again" bumps runId, so the mistakes list starts over.
   const roundKey = game
@@ -1885,6 +1925,7 @@ export function App() {
       onExit: () => {
         if (!isPremium && game) recordGameCooldown(game.type);
         setGame(null);
+        if (game && game.fromArchived) returnToArchivedList();
       },
       onPlayAgain: () =>
         setGame((g) =>
@@ -1902,7 +1943,25 @@ export function App() {
       learningLanguage,
       nativeLanguage,
     };
-    if (game.type === "flashcards") content = <FlashcardsGame {...props} />;
+    const roundSize = ROUND_SIZES[game.type];
+    const roundWords = game.type === "ladder" ? effectiveWords.filter(isRealVerb) : effectiveWords;
+    const GameComp = {
+      matching: MatchingGame,
+      memory: MemoryGame,
+      ladder: ConjugationLadderGame,
+      paradigm: ParadigmGame,
+      dailymix: DailyMixGame,
+      listening: ListeningDictationGame,
+      speaking: SpeakingGame,
+    }[game.type];
+    if (roundSize && GameComp && roundWords.length > roundSize) {
+      // Big stacks play in rounds: first N words = round 1, next N = round 2, ...
+      content = (
+        <GameRounds words={roundWords} size={roundSize} runKey={roundKey}>
+          {(chunk, n) => <GameComp {...props} key={`${roundKey}-r${n}`} words={chunk} />}
+        </GameRounds>
+      );
+    } else if (game.type === "flashcards") content = <FlashcardsGame {...props} />;
     else if (game.type === "sprint") content = <MultipleChoiceGame {...props} timed />;
     else if (game.type === "quiz") content = <MultipleChoiceGame {...props} timed={false} />;
     else if (game.type === "matching") content = <MatchingGame {...props} />;
@@ -1940,7 +1999,11 @@ export function App() {
     content = (
       <StackView
         stack={openStack}
-        onBack={() => setOpenStackId(null)}
+        onBack={() => {
+          const wasArchived = !!openStack.archived;
+          setOpenStackId(null);
+          if (wasArchived) returnToArchivedList();
+        }}
         onUpdateStack={updateStack}
         onDeleteStack={deleteStack}
         onSpeak={speak}
@@ -2190,6 +2253,7 @@ export function App() {
             setTab={goTab}
             hidden={!!(game || openStack)}
             learningLanguage={learningLanguage}
+            onOpenSettingsSection={openSettingsSection}
           />
           <Suspense fallback={<LazyFallback />}>
           {aiOpen && (

@@ -269,3 +269,24 @@
   position: absolute;
   inset: -9px;
 }
+/* ===== Language dropdown: stay on top of the rows below it, fully opaque, always clickable =====
+   Each .dm-settings-grid has `perspective`, which makes it its own stacking layer. The list opens
+   downward over the NEXT grid (Interface language) and the hint under it, and because that grid
+   comes later in the page it was painted over the list: it stole the clicks and its frosted-glass
+   blur showed through, which looked see-through in light mode. */
+.dm-lang-wrap .dm-settings-grid {
+  perspective: none;
+  position: relative;
+}
+.dm-lang-wrap .dm-settings-grid:has(.dm-lang-card-open) {
+  z-index: 60;
+}
+/* Cards below the open list must not blur / tint it or catch the pointer through it */
+.dm-lang-wrap:has(.dm-lang-card-open) .dm-settings-grid:not(:has(.dm-lang-card-open)) {
+  z-index: 0;
+}
+.dm-lang-dropdown-panel {
+  background-color: var(--bg);
+  background-image: var(--modal-bg, none);
+  opacity: 1;
+}

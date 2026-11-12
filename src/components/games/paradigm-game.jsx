@@ -25,14 +25,14 @@ export function ParadigmGame({ words, onAnswer, onExit, onPlayAgain, apiKey, onO
         const items = [];
         cands
           .filter(dmHasParadigm)
-          .slice(0, 8)
+          
           .forEach((w) =>
             items.push({
               word: w,
               paradigm: w.paradigm,
             })
           );
-        const need = cands.filter((w) => !dmHasParadigm(w)).slice(0, Math.max(0, 6 - items.length));
+        const need = cands.filter((w) => !dmHasParadigm(w)).slice(0, Math.max(0, words.length - items.length));
         if (need.length && apiKey) {
           await Promise.all(
             need.map(async (w) => {

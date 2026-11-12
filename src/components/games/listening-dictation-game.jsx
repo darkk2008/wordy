@@ -39,7 +39,7 @@ export function ListeningDictationGame({
     (async () => {
       try {
         const pool = shuffle(words);
-        const count = Math.min(8, Math.max(1, pool.length));
+        const count = Math.max(1, pool.length);
         const targets = [];
         for (let i = 0; i < count; i++) targets.push(pool[i % pool.length]);
         const dictLang = getLangName(currentLearningLangCode);

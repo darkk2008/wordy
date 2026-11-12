@@ -7,6 +7,7 @@ import { IconBtn } from "../common/common";
 import { ArrowRight, PaletteIcon, RotateCcw, X } from "../icons/icons";
 import { MistakesModal } from "../colors/mistakes-modal";
 import { getLangAbbr } from "../language-settings/language-settings";
+import { useGameRounds } from "./rounds";
 
 // The results screen button says where "back" leads: games (default), the stack, etc.
 export const GameBackLabelContext = createContext("Back to games");
@@ -23,6 +24,7 @@ export function GameTopBar({
 }) {
   const learnAbbr = getLangAbbr(learningLanguage || "de");
   const nativeAbbr = getLangAbbr(nativeLanguage || "en");
+  const rounds = useGameRounds();
   return (
     <div className="dm-topbar">
       <IconBtn onClick={onExit}>
@@ -38,7 +40,9 @@ export function GameTopBar({
           </span>
         )}
       </div>
-      <div className="dm-progress-pill">{progress}</div>
+      <div className="dm-progress-pill">
+        {rounds && rounds.total > 1 ? `R${rounds.round}/${rounds.total} · ${progress}` : progress}
+      </div>
     </div>
   );
 }
@@ -55,6 +59,8 @@ export function GameDone({
 }) {
   const backLabel = useContext(GameBackLabelContext);
   const mistakes = useContext(GameMistakesContext);
+  const rounds = useGameRounds();
+  const hasNextRound = !!(rounds && rounds.hasNext && !onNext);
   const [showMistakes, setShowMistakes] = useState(false);
   let percent = null;
   if (score) {
@@ -222,6 +228,12 @@ export function GameDone({
       <p className="dm-done-sub">
         {subtitle ? (
           subtitle
+        ) : rounds && rounds.total > 1 ? (
+          <>
+            {label}
+            {` round ${rounds.round} of ${rounds.total} complete`}
+            {percent !== null ? ` — ${score} correct` : ""}.
+          </>
         ) : (
           <>
             {label}
@@ -246,14 +258,28 @@ export function GameDone({
           </button>
         ) : (
           <>
-            <button className="dm-btn-secondary dm-done-again" onClick={onPlayAgain}>
-              <RotateCcw size={16} />
-              {` ${playAgainLabel}`}
-            </button>
-            <button className="dm-btn-primary dm-done-back" onClick={onExit}>
-              <ArrowRight size={16} />
-              {` ${backLabel}`}
-            </button>
+            {hasNextRound ? (
+              <button className="dm-btn-secondary dm-done-again" onClick={onExit}>
+                <X size={16} />
+                {` ${backLabel}`}
+              </button>
+            ) : (
+              <button className="dm-btn-secondary dm-done-again" onClick={onPlayAgain}>
+                <RotateCcw size={16} />
+                {` ${playAgainLabel}`}
+              </button>
+            )}
+            {hasNextRound ? (
+              <button className="dm-btn-primary dm-done-back" onClick={rounds.onNextRound}>
+                <ArrowRight size={16} />
+                {` Next round (${rounds.round + 1}/${rounds.total})`}
+              </button>
+            ) : (
+              <button className="dm-btn-primary dm-done-back" onClick={onExit}>
+                <ArrowRight size={16} />
+                {` ${backLabel}`}
+              </button>
+            )}
           </>
         )}
       </div>

@@ -9,7 +9,7 @@ import { GameDone, GameTopBar } from "./game-chrome";
 
 export function MemoryGame({ words, onAnswer, onExit, onPlayAgain }) {
   const [cards] = useState(() => {
-    const pool = shuffle(words).slice(0, Math.min(6, words.length));
+    const pool = shuffle(words);
     return shuffle(
       pool.flatMap((w) => [
         {

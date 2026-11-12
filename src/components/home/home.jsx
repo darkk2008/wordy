@@ -462,7 +462,7 @@ export function HomeView({
   const goalReached = goalN > 0 && doneN >= goalN;
   return (
     <div className="dm-view dm-home-view">
-      <header className="dm-hh">
+      <header className="dm-hh dm-header">
         <div className="dm-hh-brand">
           <div
             role="button"
@@ -471,9 +471,9 @@ export function HomeView({
             className="dm-hh-logo"
             onClick={handleLogoClick}
           >
-            <AppLogo size={36} animated learningLanguage={learningLanguage} />
+            <AppLogo size={40} animated learningLanguage={learningLanguage} />
           </div>
-          <h1 className="dm-hh-word notranslate" translate="no">
+          <h1 className="dm-hh-word dm-brand-title notranslate" translate="no">
             <span className="dm-brand-ww">ww</span>ordy
           </h1>
         </div>

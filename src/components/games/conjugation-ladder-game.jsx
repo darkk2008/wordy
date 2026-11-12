@@ -12,8 +12,7 @@ import { GameDone, GameTopBar } from "./game-chrome";
 
 export function ConjugationLadderGame({ words, onAnswer, onExit, onPlayAgain }) {
   const [verbs] = useState(() => {
-    const pool = words.filter(isRealVerb);
-    return shuffle(pool).slice(0, Math.min(6, pool.length));
+    return shuffle(words.filter(isRealVerb));
   });
   const [verbIdx, setVerbIdx] = useState(0);
   const [personIdx, setPersonIdx] = useState(0);

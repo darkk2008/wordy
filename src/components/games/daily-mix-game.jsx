@@ -87,12 +87,10 @@ function buildMixQuestion(w, words) {
     correct: w.en,
   };
 }
-export function DailyMixGame({ words, onAnswer, onExit, onPlayAgain, title }) {
+export function DailyMixGame({ words, pool, onAnswer, onExit, onPlayAgain, title }) {
   const gameTitle = title || "Daily Mix";
   const [deck] = useState(() =>
-    shuffle(words)
-      .slice(0, Math.min(12, words.length))
-      .map((w) => buildMixQuestion(w, words))
+    shuffle(words).map((w) => buildMixQuestion(w, pool || words))
   );
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);

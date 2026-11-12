@@ -1,10 +1,18 @@
 /* components/stack-view/form-pick-modal.css
  * The "Choose form" menu (long press on the FORMS filter) and the small marks that go with it.
  */
+.dm-formpick-head {
+  align-items: flex-start;
+  gap: 12px;
+}
+.dm-formpick-head h3 {
+  margin: 0;
+}
 .dm-formpick-hint {
-  margin: 2px 0 6px;
+  margin: 4px 0 0;
   color: var(--text-dim);
   font-size: var(--fs-sm);
+  line-height: 1.4;
 }
 .dm-formpick-empty {
   padding: 18px 0;
@@ -12,39 +20,146 @@
   font-size: var(--fs-sm);
   text-align: center;
 }
+
+/* One card per word type */
 .dm-formpick-type {
-  margin-top: 18px;
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+.dm-formpick-type-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 .dm-formpick-type-title {
-  margin-bottom: 8px;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+/* what is chosen right now */
+.dm-formpick-current {
+  max-width: 55%;
+  padding: 3px 10px;
+  overflow: hidden;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-dim);
+  background: var(--surface-strong);
+  border-radius: 999px;
+}
+.dm-formpick-current.is-custom {
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.14);
+}
+
+/* The default form: a radio-style row */
+.dm-formpick-default {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.dm-formpick-default:active {
+  transform: scale(0.98);
+}
+.dm-formpick-radio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+}
+.dm-formpick-default-label {
+  font-weight: 700;
+}
+.dm-formpick-default-value {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.dm-formpick-default.is-active {
+  background: rgba(var(--cyan-rgb), 0.1);
+  border: 1px solid rgba(var(--cyan-rgb), 0.55);
+}
+.dm-formpick-default.is-active .dm-formpick-radio {
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+.dm-formpick-default.is-active .dm-formpick-default-label,
+.dm-formpick-default.is-active .dm-formpick-default-value {
+  color: var(--cyan);
+}
+
+.dm-formpick-group {
+  margin-top: 14px;
+}
+.dm-formpick-group-title {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
-.dm-formpick-group {
-  margin-top: 12px;
-}
-.dm-formpick-group-title {
-  margin-bottom: 6px;
-  font-size: var(--fs-sm);
-  color: var(--text-dim);
-}
+/* Chips sit in an even grid, so rows line up instead of ragged wrapping */
 .dm-formpick-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+.dm-formpick-chips[data-count="3"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 440px) {
+  .dm-formpick-chips[data-count="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .dm-formpick-chips[data-count="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .dm-formpick-chips[data-count="5"],
+  .dm-formpick-chips[data-count="6"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .dm-formpick-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 38px;
-  padding: 8px 14px;
+  justify-content: center;
+  gap: 5px;
+  min-height: 42px;
+  padding: 8px 8px;
   font: inherit;
   font-size: var(--fs-sm);
   font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -55,24 +170,29 @@
     border-color 0.15s ease,
     transform 0.15s ease;
 }
+@media (hover: hover) {
+  .dm-formpick-chip:hover,
+  .dm-formpick-default:hover {
+    border-color: rgba(var(--cyan-rgb), 0.45);
+    background: rgba(var(--cyan-rgb), 0.06);
+  }
+}
 .dm-formpick-chip:active {
   transform: scale(0.96);
 }
-.dm-formpick-chip:focus-visible {
+.dm-formpick-chip:focus-visible,
+.dm-formpick-default:focus-visible {
   outline: 2px solid rgba(var(--cyan-rgb), 0.6);
   outline-offset: 2px;
 }
 .dm-formpick-chip.is-active {
   color: var(--cyan);
-  background: rgba(var(--cyan-rgb), 0.12);
-  border-color: rgba(var(--cyan-rgb), 0.55);
-}
-.dm-formpick-default {
-  width: 100%;
-  justify-content: flex-start;
+  background: rgba(var(--cyan-rgb), 0.14);
+  border-color: rgba(var(--cyan-rgb), 0.6);
+  box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), 0.1);
 }
 .dm-formpick .dm-modal-actions {
-  margin-top: 22px;
+  margin-top: 16px;
 }
 .dm-formpick-reset {
   width: 100%;

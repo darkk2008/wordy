@@ -83,7 +83,7 @@ function scoreSpeechAttempt(target, heard) {
   return Math.max(0, Math.min(100, Math.round(ratio * 100)));
 }
 export function SpeakingGame({ words, onAnswer, onExit, onPlayAgain, learningLanguage }) {
-  const deck = useMemo(() => shuffle(words).slice(0, Math.min(12, words.length)), [words]);
+  const deck = useMemo(() => shuffle(words), [words]);
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [listening, setListening] = useState(false);

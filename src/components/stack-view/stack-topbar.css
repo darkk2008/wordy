@@ -747,63 +747,8 @@
     box-sizing: border-box;
   }
 
-  /* Card buttons are overlaid on the card's right side (transparent container, no extra box), so
-     they take no layout space: the card keeps exactly the same size whether buttons are shown or
-     hidden. A fixed right padding keeps the word text clear of them in both states. */
-  .dm-stack-screen.dm-stack-wide .dm-card {
-    position: relative;
-    padding-right: 176px;
-  }
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    z-index: 4;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(-50%);
-    transform-origin: 100% 50%;
-    transition:
-      opacity 0.22s ease,
-      transform 0.34s cubic-bezier(0.22, 1.2, 0.36, 1);
-  }
-  /* hidden (stack-wide or per-card switch): buttons slip away, the card does not change */
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions.dm-actions-collapsed {
-    gap: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) translateX(12px) scale(0.9);
-  }
-  /* the buttons inside keep their normal look; the pill itself does the show/hide */
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions .dm-iconbtn,
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions.dm-actions-collapsed .dm-iconbtn.dm-act-hide {
-    width: 34px;
-    min-width: 34px;
-    height: 34px;
-    min-height: 34px;
-    flex: 0 0 auto;
-    margin: 0;
-    border-width: 1px;
-    opacity: 1;
-    transform: none;
-  }
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions .dm-iconbtn:first-child,
-  .dm-stack-screen.dm-stack-wide .dm-card .dm-card-actions.dm-actions-collapsed .dm-iconbtn.dm-act-hide:first-child {
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
-  }
+  /* Card buttons in two-per-row mode are NOT restyled: they use exactly the same rules as in the
+     one-per-row list (word-card-actions.css), so the buttons look and behave the same in both modes. */
 }
 
 /* Double-click the title to rename / change the icon */

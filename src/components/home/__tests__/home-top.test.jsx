@@ -60,7 +60,7 @@ afterEach(() => {
 });
 
 describe("Home header", () => {
-  it("is one plain row: logo and name on the left, the actions on the right", () => {
+  it("is a header card: logo and name on the left, the actions in one pill on the right", () => {
     const { el } = mount();
     const head = el.querySelector("header.dm-hh");
     expect(head).toBeTruthy();

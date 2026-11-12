@@ -35,15 +35,17 @@ export function FormPickModal({ words, picks, onPick, onReset, onClose }) {
         aria-label="Choose form"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="dm-modal-head">
-          <h3>Choose form</h3>
+        <div className="dm-modal-head dm-formpick-head">
+          <div>
+            <h3>Choose form</h3>
+            <p className="dm-formpick-hint">
+              The FORMS filter shows this form on the cards instead of the default one.
+            </p>
+          </div>
           <IconBtn onClick={() => closeWithAnim()}>
             <X size={18} />
           </IconBtn>
         </div>
-        <p className="dm-formpick-hint">
-          The FORMS filter shows this form on the cards instead of the default one.
-        </p>
         {types.length === 0 && (
           <div className="dm-formpick-empty">Add nouns, adjectives or verbs to choose their forms.</div>
         )}
@@ -51,10 +53,15 @@ export function FormPickModal({ words, picks, onPick, onReset, onClose }) {
           const current = picks && picks[type];
           return (
             <section key={type} className="dm-formpick-type" data-type={type}>
-              <div className="dm-formpick-type-title">{FORM_TYPE_INFO[type].title}</div>
+              <div className="dm-formpick-type-head">
+                <div className="dm-formpick-type-title">{FORM_TYPE_INFO[type].title}</div>
+                <span className={`dm-formpick-current${current ? " is-custom" : ""}`}>
+                  {current ? current.label : "Default"}
+                </span>
+              </div>
               <button
                 type="button"
-                className={`dm-formpick-chip dm-formpick-default${current ? "" : " is-active"}`}
+                className={`dm-formpick-default${current ? "" : " is-active"}`}
                 aria-pressed={!current}
                 onClick={() => {
                   if (tooEarly()) return;
@@ -62,13 +69,14 @@ export function FormPickModal({ words, picks, onPick, onReset, onClose }) {
                   closeWithAnim();
                 }}
               >
-                {!current && <Check size={13} />}
-                {`Default: ${FORM_TYPE_INFO[type].defaultText}`}
+                <span className="dm-formpick-radio">{!current && <Check size={12} />}</span>
+                <span className="dm-formpick-default-label">Default</span>
+                <span className="dm-formpick-default-value">{FORM_TYPE_INFO[type].defaultText}</span>
               </button>
               {options[type].map((group) => (
                 <div key={group.title} className="dm-formpick-group">
                   {options[type].length > 1 && <div className="dm-formpick-group-title">{group.title}</div>}
-                  <div className="dm-formpick-chips">
+                  <div className="dm-formpick-chips" data-count={group.items.length}>
                     {group.items.map((it) => {
                       const active = samePick(current, it);
                       return (

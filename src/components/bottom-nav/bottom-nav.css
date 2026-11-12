@@ -117,3 +117,75 @@
   box-shadow: 0 0 14px rgba(var(--cyan-rgb), 0.15);
   transform: translateY(-1px);
 }
+
+/* Long press on Settings: quick-access menu next to the icon (rendered in a portal in .dm-app) */
+.dm-navbtn {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.dm-nav-quickmenu {
+  position: fixed;
+  z-index: 1050;
+  min-width: 216px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-solid, var(--modal-bg, var(--bg)));
+  box-shadow: var(--shadow-md);
+  isolation: isolate;
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+  animation: dm-navmenu-in 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.dm-nav-quickmenu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-base, 15px);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-nav-quickmenu-item svg {
+  flex: none;
+  color: var(--cyan);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dm-nav-quickmenu-item:hover {
+    background: var(--surface-strong);
+  }
+}
+.dm-nav-quickmenu-item:active {
+  background: var(--surface-strong);
+}
+.dm-nav-quickmenu-item:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: -2px;
+}
+@keyframes dm-navmenu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-nav-quickmenu {
+    animation: none;
+  }
+}

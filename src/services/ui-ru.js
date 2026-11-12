@@ -899,6 +899,29 @@ export const UI_RU_DICT = {
   "/ year": "/ год",
   "one-time": "разово",
   "+10% bonus": "+10% бонус",
+  "Settings shortcuts": "Быстрый доступ к настройкам",
+  // ---- Colours (word colour tags) ----
+  "Colours": "Цвета",
+  "Colour": "Цвет",
+  "Word colour": "Цвет слова",
+  "Group words across stacks": "Слова из разных наборов",
+  "Choose a colour": "Выберите цвет",
+  "Remove colour": "Убрать цвет",
+  "Add to a colour": "Добавить в цвет",
+  "Add words to this colour": "Добавить слова в этот цвет",
+  "Add to favorites": "В избранное",
+  "Remove from favorites": "Убрать из избранного",
+  "Red": "Красный",
+  "Orange": "Оранжевый",
+  "Green": "Зелёный",
+  "Blue": "Синий",
+  "Purple": "Фиолетовый",
+  "Mistakes ({{0}})": "Ошибки ({{0}})",
+  "Open a colour to see its words and play games with them.": "Откройте цвет, чтобы увидеть его слова и поиграть с ними.",
+  "Give a word a colour from its ⋮ menu, or from the Mistakes list after a game. Every colour becomes a list you can study and play with.": "Дайте слову цвет в его меню ⋮ или в списке ошибок после игры. Каждый цвет станет списком, который можно учить и в который можно играть.",
+  "Add words here, or colour them from their ⋮ menu or the Mistakes list after a game.": "Добавьте слова сюда или раскрасьте их в меню ⋮ либо в списке ошибок после игры.",
+  "{{0}} word": "Слов: {{0}}",
+  "{{0}} words": "Слов: {{0}}",
 };
 
 /* Extra-short labels for the bottom nav (Russian only; other languages keep their own translation). */
@@ -948,6 +971,13 @@ const TOPIC_RU = {
  "emergencies, safety, accidents and calling for help": "экстренные случаи, безопасность, аварии и вызов помощи"
 };
 export const UI_RU_PATTERNS = [
+  // Colours: names are inserted into template strings
+  [/^Add to (Red|Orange|Green|Blue|Purple)$/, (m, c) => "Добавить в цвет: " + ({ Red: "красный", Orange: "оранжевый", Green: "зелёный", Blue: "синий", Purple: "фиолетовый" }[c])],
+  [/^No (red|orange|green|blue|purple) words yet$/, (m, c) => "Пока нет слов цвета «" + ({ red: "красный", orange: "оранжевый", green: "зелёный", blue: "синий", purple: "фиолетовый" }[c]) + "»"],
+  [/^Choose a colour for (.+)$/, "Выберите цвет для «$1»"],
+  [/^Colour: (Red|Orange|Green|Blue|Purple)\. Change colour$/, (m, c) => "Цвет: " + ({ Red: "красный", Orange: "оранжевый", Green: "зелёный", Blue: "синий", Purple: "фиолетовый" }[c]) + ". Сменить цвет"],
+  [/^Colour: (Red|Orange|Green|Blue|Purple)$/, (m, c) => "Цвет: " + ({ Red: "красный", Orange: "оранжевый", Green: "зелёный", Blue: "синий", Purple: "фиолетовый" }[c])],
+  [/^(Red|Orange|Green|Blue|Purple) \(tap to remove\)$/, (m, c) => ({ Red: "Красный", Orange: "Оранжевый", Green: "Зелёный", Blue: "Синий", Purple: "Фиолетовый" }[c]) + " (нажмите, чтобы убрать)"],
   [/^Comparative of (.+)$/, "Сравнит. степень от $1"],
   [/^Superlative \(before noun\) of (.+)$/, "Превосх. степень (перед сущ.) от $1"],
   [/^Superlative of (.+)$/, "Превосх. степень от $1"],

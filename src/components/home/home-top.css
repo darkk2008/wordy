@@ -4,6 +4,94 @@
  * else styles .dm-hh or .dm-ht, so the layout is the same on phone, tablet and desktop.
  */
 
+/* ---------- Header card: logo + name on the left, the actions in one rounded pill on the right ---------- */
+.dm-hh.dm-header {
+  flex-wrap: nowrap;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 16px 18px 16px 20px;
+  border-radius: 26px;
+}
+.dm-hh.dm-header .dm-hh-brand {
+  flex: 1 1 auto;
+  gap: 14px;
+}
+.dm-hh.dm-header .dm-hh-word {
+  display: block;
+  font-size: clamp(26px, 7vw, 34px);
+}
+/* the actions share one rounded container */
+.dm-hh.dm-header .dm-hh-actions {
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.dm-hh.dm-header .dm-iconbtn,
+.dm-hh.dm-header .dm-hh-pro,
+.dm-hh.dm-header .dm-hh-streak {
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  border-radius: 15px;
+}
+.dm-hh.dm-header .dm-hh-pro {
+  padding: 0;
+  justify-content: center;
+}
+.dm-hh.dm-header .dm-hh-pro span {
+  display: none;
+}
+.dm-hh.dm-header .dm-hh-pro svg {
+  width: 20px;
+  height: 20px;
+}
+.dm-hh.dm-header .dm-hh-actions [title="AI Tutor"] {
+  color: var(--cyan);
+}
+.dm-hh.dm-header .dm-hh-streak {
+  width: auto;
+  min-width: 62px;
+  padding: 0 14px 0 12px;
+  gap: 7px;
+  justify-content: center;
+  font-family: "Sora", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  background: rgba(255, 59, 92, 0.12);
+  border: 1px solid rgba(255, 59, 92, 0.4);
+}
+.dm-hh.dm-header .dm-hh-streak svg {
+  width: 20px;
+  height: 20px;
+}
+/* Phones: logo alone next to the actions (the name does not fit), slightly tighter buttons. */
+@media (max-width: 480px) {
+  .dm-hh.dm-header {
+    padding: 12px 12px 12px 14px;
+  }
+  .dm-hh.dm-header .dm-hh-word {
+    display: none;
+  }
+  .dm-hh.dm-header .dm-iconbtn,
+  .dm-hh.dm-header .dm-hh-pro,
+  .dm-hh.dm-header .dm-hh-streak {
+    height: 38px;
+    border-radius: 13px;
+  }
+  .dm-hh.dm-header .dm-iconbtn,
+  .dm-hh.dm-header .dm-hh-pro {
+    width: 38px;
+  }
+  .dm-hh.dm-header .dm-hh-streak {
+    min-width: 54px;
+    padding: 0 10px;
+    font-size: 16px;
+  }
+}
+
 /* ---------- Header row ---------- */
 .dm-hh {
   display: flex;
