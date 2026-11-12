@@ -763,3 +763,38 @@
   outline-offset: 4px;
   border-radius: 10px;
 }
+
+/* ===== Mini stack button: top bar on desktop, title row on phones (< 900px) ===== */
+.dm-stack-title-row .dm-ministack-in-title {
+  display: none;
+}
+@media (max-width: 899px) {
+  .dm-topbar .dm-ministack-in-top {
+    display: none;
+  }
+  .dm-stack-title-row .dm-ministack-in-title {
+    display: flex;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    color: var(--gold);
+    border: 1px dashed rgba(var(--gold-rgb), 0.5);
+  }
+  .dm-stack-title-row .dm-ministack-in-title.dm-iconbtn-active {
+    background: rgba(var(--gold-rgb), 0.16);
+    border: 1px solid rgba(var(--gold-rgb), 0.35);
+    box-shadow: 0 0 14px -4px rgba(var(--gold-rgb), 0.55);
+    animation: none;
+  }
+  .dm-stack-title-row .dm-ministack-in-title .dm-ministack-badge,
+  .dm-stack-title-row .dm-ministack-in-title .dm-ministack-plus {
+    top: -5px;
+    right: -5px;
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+  /* keep the name centred: the spacer on the left is as wide as the two buttons on the right */
+  .dm-stack-screen .dm-stack-title-row .dm-stack-title-spacer-mini {
+    flex: 0 0 80px;
+    width: 80px;
+  }
+}

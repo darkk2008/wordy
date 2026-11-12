@@ -131,3 +131,53 @@
 @media (prefers-reduced-motion: reduce) {
   .dm-game-grid-v2 > .dm-game-card { transition: none; }
 }
+
+/* ===== Stack game picker (modal): the whole words / word forms chip sits next to the close button ===== */
+.dm-picker-modechip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 13px 0 10px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text-dim);
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-picker-modechip-on {
+  background: color-mix(in srgb, var(--cyan) 16%, transparent);
+  color: var(--text);
+}
+.dm-picker-modechip:active { transform: scale(0.95); }
+.dm-picker-modechip:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.6);
+  outline-offset: 2px;
+}
+.dm-picker-modechip-icon {
+  display: inline-flex;
+  animation: dm-gsetup-chip-pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dm-picker-modechip-short { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .dm-picker-modechip:hover { border-color: rgba(var(--cyan-rgb), 0.35); color: var(--text); }
+}
+@media (max-width: 460px) {
+  .dm-picker-modechip { padding: 0 11px 0 9px; gap: 6px; }
+  .dm-picker-modechip-full { display: none; }
+  .dm-picker-modechip-short { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-picker-modechip-icon { animation: none; }
+}

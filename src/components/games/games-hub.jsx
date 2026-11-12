@@ -400,35 +400,34 @@ export function ReviewGamePicker({
       <div className="dm-modal" onClick={(e) => e.stopPropagation()}>
         <div className="dm-modal-head">
           <h3>{title || "Choose a game"}</h3>
+          {showFormsToggle && formsCapableCount > 0 && (
+            <button
+              type="button"
+              className={`dm-picker-modechip${mixForms ? " dm-picker-modechip-on" : ""}`}
+              onClick={() => setMixForms((v) => !v)}
+              title={
+                mixForms
+                  ? "Practicing word forms – tap for whole words"
+                  : "Practicing whole words – tap for word forms"
+              }
+              aria-label={
+                mixForms
+                  ? "Practicing word forms. Switch to whole words"
+                  : "Practicing whole words. Switch to word forms"
+              }
+            >
+              <span key={mixForms ? "f" : "w"} className="dm-picker-modechip-icon">
+                {mixForms ? <TableIcon size={15} /> : <Type size={15} />}
+              </span>
+              <span className="dm-picker-modechip-full">{mixForms ? "Word forms" : "Whole words"}</span>
+              <span className="dm-picker-modechip-short">{mixForms ? "Forms" : "Words"}</span>
+            </button>
+          )}
           <IconBtn onClick={onClose}>
             <X size={18} />
           </IconBtn>
         </div>
-        {showFormsToggle && formsCapableCount > 0 && (
-          <div className="dm-formsmode dm-picker-formsmode" role="radiogroup" aria-label="What you practice">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={!mixForms}
-              className={`dm-formsmode-btn ${mixForms ? "" : "dm-formsmode-btn-active"}`}
-              onClick={() => setMixForms(false)}
-            >
-              <Type size={15} />
-              {" Whole words"}
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={mixForms}
-              className={`dm-formsmode-btn ${mixForms ? "dm-formsmode-btn-active" : ""}`}
-              onClick={() => setMixForms(true)}
-            >
-              <TableIcon size={15} />
-              {" Word forms"}
-            </button>
-          </div>
-        )}
-        <div className="dm-game-grid">
+        <div className="dm-game-grid dm-game-grid-v2">
           {orderedGames.map((g) => {
             const locked = !!g.premium && !isPremium;
             return (

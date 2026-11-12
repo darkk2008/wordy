@@ -417,6 +417,22 @@ ${lines}`;
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  // The mini stack button lives in the top bar on desktop and in the title row on phones (CSS shows one).
+  const showMiniBtn = !isMini && !colorGroup;
+  const miniBtn = (where) => (
+    <IconBtn
+      title={
+        miniStack && miniStack.words.length
+          ? `Mini stack · ${miniStack.words.length} word${miniStack.words.length === 1 ? "" : "s"}`
+          : "Mini stack"
+      }
+      active={!!(miniStack && miniStack.words.length)}
+      className={`dm-stack-title-ministack-btn dm-ministack-in-${where}`}
+      onClick={() => onOpenMiniStack && onOpenMiniStack()}
+    >
+      <MiniStackBtnContent miniStack={miniStack} />
+    </IconBtn>
+  );
   return (
     <div
       className={`dm-view dm-stack-screen notranslate${wideMode ? " dm-stack-wide" : ""}`}
@@ -445,20 +461,7 @@ ${lines}`;
                 <Bot size={18} />
               </IconBtn>
             )}
-            {!isMini && !colorGroup && (
-              <IconBtn
-                title={
-                  miniStack && miniStack.words.length
-                    ? `Mini stack · ${miniStack.words.length} word${miniStack.words.length === 1 ? "" : "s"}`
-                    : "Mini stack"
-                }
-                active={!!(miniStack && miniStack.words.length)}
-                className="dm-stack-title-ministack-btn"
-                onClick={() => onOpenMiniStack && onOpenMiniStack()}
-              >
-                <MiniStackBtnContent miniStack={miniStack} />
-              </IconBtn>
-            )}
+            {showMiniBtn && miniBtn("top")}
             <IconBtn title="Play games" onClick={() => onPlayGames && onPlayGames(stack)}>
               <Gamepad2 size={18} />
             </IconBtn>
@@ -518,7 +521,10 @@ ${lines}`;
         </IconBtn>
       </div>
       <div className="dm-stack-title-row">
-        <span className="dm-stack-title-spacer" aria-hidden="true" />
+        <span
+          className={`dm-stack-title-spacer${showMiniBtn ? " dm-stack-title-spacer-mini" : ""}`}
+          aria-hidden="true"
+        />
         <div
           className={`dm-stack-title-main${isVirtual ? "" : " dm-stack-title-editable"}`}
           onClick={onTitleClick}
@@ -537,6 +543,7 @@ ${lines}`;
           <span className="dm-stack-title-name">{stack.name}</span>
         </div>
         <div className="dm-stack-title-tools">
+          {showMiniBtn && miniBtn("title")}
           <button
             type="button"
             className={`dm-stack-actions-toggle dm-stack-wide-toggle${wideMode ? " is-on" : ""}`}

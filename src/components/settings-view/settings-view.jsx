@@ -2,7 +2,7 @@
  * SettingsView (settings menu).
  */
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AboutSettings, AppAboutSettings } from "../about-settings/about-settings";
 import { AccountSettings } from "../account/account";
 import { QRSyncSettings } from "../qr-sync-settings/qr-sync-settings";
@@ -11,7 +11,7 @@ import { ArchivedStacksSettings } from "../archived-stacks-settings/archived-sta
 import { ContactsSettings } from "../contacts-settings/contacts-settings";
 import { DataSettings } from "../data-settings/data-settings";
 import { FamiliesSettings } from "../families-settings/families-settings";
-import { ArrowRight, DatabaseIcon, QrCode, SendIcon, UserIcon } from "../icons/icons";
+import { ArrowRight, ChevronRight, DatabaseIcon, QrCode, SendIcon, UserIcon } from "../icons/icons";
 import {
   ArchiveIcon,
   BarChartIcon,
@@ -233,137 +233,142 @@ export function SettingsView({
     );
   const nativeLangObj = LANGUAGES.find((l) => l.code === nativeLanguage) || LANGUAGES[0];
   const learningLangObj = LANGUAGES.find((l) => l.code === learningLanguage) || LANGUAGES[1];
-  const SECTIONS = [
-    {
-      id: "premium",
-      name: "Premium",
-      desc: "Plans, pricing & promo code",
-      icon: <CrownIcon size={22} />,
-      premium: true,
-    },
-    {
-      id: "account",
-      name: "Account",
-      desc:
-        account && account.id ? `Signed in as ${account.id}` : "Sign up or sign in to sync devices",
-      icon: <UserIcon size={22} />,
-    },
-    {
-      id: "contacts",
-      name: "Contacts",
-      desc: "Get in touch with us",
-      icon: <SendIcon size={22} />,
-      contacts: true,
-    },
-    {
-      id: "appearance",
-      name: "Appearance",
-      desc: "Theme and colors",
-      icon: <PaletteIcon size={22} />,
-    },
-    {
-      id: "languages",
-      name: "Languages",
-      desc: (
-        <span className="dm-settings-flag-desc">
-          <FlagIcon code={nativeLangObj.flagCode} className="dm-settings-flag-desc-icon" />
-          <ArrowRight size={11} className="dm-settings-flag-desc-arrow" />
-          <FlagIcon code={learningLangObj.flagCode} className="dm-settings-flag-desc-icon" />
-        </span>
-      ),
-      icon: <GlobeIcon size={22} />,
-    },
-    {
-      id: "families",
-      name: "Families",
-      desc: "Organize your stacks",
-      icon: <UsersIcon size={22} />,
-    },
+  const signedIn = !!(account && account.id);
+  const archivedCount = (archivedStacks || []).length;
+
+  // Tiles of the bento grid (the wide ones span two columns on phones and half the row on desktop)
+  const TILES = [
+    { id: "languages", name: "Languages", tint: "#6aa8ff", icon: <GlobeIcon size={22} />, wide: true },
+    { id: "appearance", name: "Appearance", desc: "Theme and colors", tint: "#ff6b9d", icon: <PaletteIcon size={22} /> },
     {
       id: "notifications",
       name: "Notifications",
-      desc: "Reminders and daily goal",
+      desc: dailyGoal ? `Daily goal: ${dailyGoal}` : "Reminders and daily goal",
+      tint: "#fbbf24",
       icon: <BellIcon size={22} />,
     },
-    {
-      id: "restrictions",
-      name: "Guardrails",
-      desc: "Privacy, layout & word display",
-      icon: <ShieldIcon size={22} />,
-    },
+    { id: "families", name: "Families", desc: "Organize your stacks", tint: "#a78bfa", icon: <UsersIcon size={22} /> },
     {
       id: "stats",
       name: "Your Stats",
-      desc: "Progress, streaks & words",
+      desc: streak > 0 ? `${streak} day streak` : "Progress, streaks & words",
+      tint: "#4ade80",
       icon: <BarChartIcon size={22} />,
     },
     {
       id: "archived",
       name: "Archived Stacks",
-      desc: `${(archivedStacks || []).length} archived`,
+      desc: archivedCount ? `${archivedCount} archived` : "Nothing archived",
+      tint: "#94a3b8",
       icon: <ArchiveIcon size={22} />,
     },
     {
-      id: "qrsync",
-      name: "Sync via QR",
-      desc: "Send stacks to another device",
-      icon: <QrCode size={22} />,
-    },
-    {
-      id: "data",
-      name: "Data & Backup",
-      desc: "Export, import or reset",
-      icon: <DatabaseIcon size={22} />,
-    },
-    {
-      id: "about",
-      name: "About",
-      desc: "How wwordy works",
-      icon: <InfoIcon size={22} />,
+      id: "restrictions",
+      name: "Guardrails",
+      desc: "Privacy, layout & word display",
+      tint: "#2dd4bf",
+      icon: <ShieldIcon size={22} />,
     },
   ];
+  // Utility rows at the bottom
+  const ROWS = [
+    { id: "qrsync", name: "Sync via QR", desc: "Send stacks to another device", tint: "#6ee7f9", icon: <QrCode size={20} /> },
+    { id: "data", name: "Data & Backup", desc: "Export, import or reset", tint: "#fb923c", icon: <DatabaseIcon size={20} /> },
+    { id: "about", name: "About", desc: "How wwordy works", tint: "#94a3b8", icon: <InfoIcon size={20} /> },
+    { id: "contacts", name: "Contacts", desc: "Get in touch with us", tint: "#6aa8ff", icon: <SendIcon size={20} /> },
+  ];
+  const stagger = (n) => ({ "--i": n });
   return (
-    <div className="dm-view dm-settings-home">
-      <div className="dm-header">
-        <div>
-          <div className="dm-eyebrow">Customize</div>
-          <h1 className="dm-h1">Settings</h1>
-        </div>
+    <div className="dm-view dm-sx">
+      <h1 className="dm-sx-title" style={stagger(0)}>
+        Settings
+      </h1>
+
+      <div className="dm-sx-top" style={stagger(1)}>
+        <button type="button" className="dm-sx-account" onClick={() => setSection("account")}>
+          <span className={`dm-sx-avatar${signedIn ? " is-in" : ""}`}>
+            {signedIn ? String(account.id).trim().charAt(0).toUpperCase() : <UserIcon size={22} />}
+          </span>
+          <span className="dm-sx-account-text">
+            <span className="dm-sx-account-name">{signedIn ? "Account" : "Sign in"}</span>
+            <span className="dm-sx-account-desc">
+              {signedIn ? `Signed in as ${account.id}` : "Sign up or sign in to sync devices"}
+            </span>
+          </span>
+          <ChevronRight size={18} className="dm-sx-chev" />
+        </button>
+        <button
+          type="button"
+          className={`dm-sx-premium${isPremium ? " is-active" : ""}`}
+          onClick={() => setSection("premium")}
+        >
+          <span className="dm-sx-premium-icon">
+            <CrownIcon size={22} />
+          </span>
+          <span className="dm-sx-account-text">
+            <span className="dm-sx-account-name">Premium</span>
+            <span className="dm-sx-account-desc">{isPremium ? "Active · manage your plan" : "Plans, pricing & promo code"}</span>
+          </span>
+          <ChevronRight size={18} className="dm-sx-chev" />
+        </button>
       </div>
-      {[
-        ["Account", ["premium", "account", "qrsync"]],
-        ["Learning", ["languages", "families", "stats", "archived"]],
-        ["App", ["appearance", "notifications", "restrictions"]],
-        ["Data & help", ["data", "about", "contacts"]],
-      ].map(([groupLabel, ids], gi) => (
-        <Fragment key={groupLabel}>
-          <div
-            className="dm-settings-group-label"
-            style={{ animationDelay: `${Math.max(0, gi * 3 * 0.05 - 0.04)}s` }}
+
+      <div className="dm-sx-bento">
+        {TILES.map((t, i) => (
+          <button
+            key={t.id}
+            type="button"
+            className={`dm-sx-tile${t.wide ? " dm-sx-tile-wide" : ""}`}
+            style={{ "--tint": t.tint, ...stagger(i + 2) }}
+            onClick={() => setSection(t.id)}
           >
-            {groupLabel}
-          </div>
-          <div className="dm-settings-grid">
-            {ids
-              .map((id) => SECTIONS.find((x) => x.id === id))
-              .filter(Boolean)
-              .map((s, i) => (
-                <button
-                  key={s.id}
-                  className={`dm-settings-card ${s.premium ? "dm-settings-card-premium" : ""} ${s.contacts ? "dm-settings-card-contacts" : ""}`}
-                  style={{
-                    animationDelay: `${(gi * 3 + i) * 0.05}s`,
-                  }}
-                  onClick={() => setSection(s.id)}
-                >
-                  <div className="dm-settings-card-icon">{s.icon}</div>
-                  <div className="dm-settings-card-name">{s.name}</div>
-                  <div className="dm-settings-card-desc">{s.desc}</div>
-                </button>
-              ))}
-          </div>
-        </Fragment>
-      ))}
+            <span className="dm-sx-tile-head">
+              <span className="dm-sx-chip">{t.icon}</span>
+              <ChevronRight size={16} className="dm-sx-tile-chev" />
+            </span>
+            {t.id === "languages" ? (
+              <span className="dm-sx-tile-foot">
+                <span className="dm-sx-tile-name">{t.name}</span>
+                <span className="dm-sx-langs">
+                  <span className="dm-sx-lang">
+                    <FlagIcon code={nativeLangObj.flagCode} className="dm-sx-flag" />
+                    {nativeLangObj.name}
+                  </span>
+                  <ArrowRight size={14} className="dm-sx-langs-arrow" />
+                  <span className="dm-sx-lang">
+                    <FlagIcon code={learningLangObj.flagCode} className="dm-sx-flag" />
+                    {learningLangObj.name}
+                  </span>
+                </span>
+              </span>
+            ) : (
+              <span className="dm-sx-tile-foot">
+                <span className="dm-sx-tile-name">{t.name}</span>
+                <span className="dm-sx-tile-desc">{t.desc}</span>
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="dm-sx-list" style={stagger(TILES.length + 2)}>
+        {ROWS.map((r) => (
+          <button
+            key={r.id}
+            type="button"
+            className="dm-sx-row"
+            style={{ "--tint": r.tint }}
+            onClick={() => setSection(r.id)}
+          >
+            <span className="dm-sx-chip dm-sx-chip-sm">{r.icon}</span>
+            <span className="dm-sx-account-text">
+              <span className="dm-sx-row-name">{r.name}</span>
+              <span className="dm-sx-row-desc">{r.desc}</span>
+            </span>
+            <ChevronRight size={16} className="dm-sx-chev" />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

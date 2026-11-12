@@ -297,14 +297,36 @@ export function HomeView({
     }
   };
   const [colorsOpen, setColorsOpen] = useState(false);
+  // While the menu plays its closing animation it is still mounted but already "closing".
+  const [colorsClosing, setColorsClosing] = useState(false);
   const colorsRef = useRef(null);
+  const colorsTimer = useRef(null);
+  useEffect(() => () => clearTimeout(colorsTimer.current), []);
+  const openColors = () => {
+    clearTimeout(colorsTimer.current);
+    setColorsClosing(false);
+    setColorsOpen(true);
+  };
+  const closeColors = () => {
+    if (!colorsOpen || colorsClosing) return;
+    const reduce = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setColorsOpen(false);
+      return;
+    }
+    setColorsClosing(true);
+    colorsTimer.current = setTimeout(() => {
+      setColorsOpen(false);
+      setColorsClosing(false);
+    }, 180);
+  };
   useEffect(() => {
     if (!colorsOpen) return;
     const onDown = (e) => {
-      if (colorsRef.current && !colorsRef.current.contains(e.target)) setColorsOpen(false);
+      if (colorsRef.current && !colorsRef.current.contains(e.target)) closeColors();
     };
     const onKey = (e) => {
-      if (e.key === "Escape") setColorsOpen(false);
+      if (e.key === "Escape") closeColors();
     };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
@@ -312,7 +334,8 @@ export function HomeView({
       document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [colorsOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colorsOpen, colorsClosing]);
   const colorCounts = useMemo(() => countByColor(stacks), [stacks]);
   const statsRowRef = useRef(null);
   useLayoutEffect(() => {
@@ -462,6 +485,9 @@ export function HomeView({
   const goalReached = goalN > 0 && doneN >= goalN;
   return (
     <div className="dm-view dm-home-view">
+      <div className="dm-hh-toptitle dm-brand-title notranslate" translate="no" aria-hidden="true">
+        <span className="dm-brand-ww">ww</span>ordy
+      </div>
       <header className="dm-hh dm-header">
         <div className="dm-hh-brand">
           <div
@@ -543,18 +569,18 @@ export function HomeView({
         <div className="dm-ht-colors" ref={colorsRef}>
           <button
             type="button"
-            className={`dm-ht-colors-btn${colorsOpen ? " dm-ht-colors-btn-open" : ""}`}
+            className={`dm-ht-colors-btn${colorsOpen && !colorsClosing ? " dm-ht-colors-btn-open" : ""}${colorsClosing ? " dm-ht-colors-btn-closing" : ""}`}
             aria-haspopup="menu"
-            aria-expanded={colorsOpen}
+            aria-expanded={colorsOpen && !colorsClosing}
             title="Colours"
-            onClick={() => setColorsOpen((o) => !o)}
+            onClick={() => (colorsOpen && !colorsClosing ? closeColors() : openColors())}
           >
             <PaletteIcon size={16} />
             <span>Colours</span>
             <ChevronDown size={14} className="dm-ht-colors-chev" />
           </button>
           {colorsOpen && (
-            <div className="dm-ht-colors-menu" role="menu">
+            <div className={`dm-ht-colors-menu${colorsClosing ? " dm-ht-colors-menu-closing" : ""}`} role="menu">
               {WORD_COLORS.map((c) => {
                 const n = colorCounts[c.id] || 0;
                 return (
@@ -565,7 +591,7 @@ export function HomeView({
                     className="dm-ht-colors-item"
                     style={{ "--sw": c.hex }}
                     onClick={() => {
-                      setColorsOpen(false);
+                      closeColors();
                       if (onOpenColor) onOpenColor(c.id);
                     }}
                   >

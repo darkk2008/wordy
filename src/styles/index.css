@@ -21,6 +21,7 @@
 @import "../components/common/common-widgets.css";
 @import "../components/icons/icons.css";
 @import "../components/settings/settings.css";
+@import "../components/settings-view/settings-view.css";
 @import "../components/onboarding/onboarding.css";
 @import "../components/restrictions-settings/restrictions-settings.css";
 @import "../components/premium-settings/premium-settings.css";

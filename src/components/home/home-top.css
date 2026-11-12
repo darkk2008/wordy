@@ -67,27 +67,46 @@
   width: 20px;
   height: 20px;
 }
-/* Phones: logo alone next to the actions (the name does not fit), slightly tighter buttons. */
-@media (max-width: 480px) {
-  .dm-hh.dm-header {
-    padding: 12px 12px 12px 14px;
+/* The name above the card: only on small screens (on wide ones it sits inside the card). */
+.dm-hh-toptitle {
+  display: none;
+}
+@media (max-width: 640px) {
+  .dm-hh-toptitle {
+    display: table;
+    margin: 2px auto 12px;
+    font-family: "Sora", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
   }
   .dm-hh.dm-header .dm-hh-word {
     display: none;
   }
+  .dm-hh.dm-header {
+    padding: 14px 14px 14px 18px;
+  }
+}
+/* Very narrow phones: slightly tighter buttons so nothing is pushed off the screen. */
+@media (max-width: 380px) {
+  .dm-hh.dm-header {
+    padding: 12px 10px 12px 12px;
+  }
   .dm-hh.dm-header .dm-iconbtn,
   .dm-hh.dm-header .dm-hh-pro,
   .dm-hh.dm-header .dm-hh-streak {
-    height: 38px;
-    border-radius: 13px;
+    height: 36px;
+    border-radius: 12px;
   }
   .dm-hh.dm-header .dm-iconbtn,
   .dm-hh.dm-header .dm-hh-pro {
-    width: 38px;
+    width: 36px;
   }
   .dm-hh.dm-header .dm-hh-streak {
-    min-width: 54px;
-    padding: 0 10px;
+    min-width: 50px;
+    padding: 0 9px;
     font-size: 16px;
   }
 }

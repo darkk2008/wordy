@@ -1,0 +1,355 @@
+/* components/settings-view/settings-view.css
+ * Settings home: account + premium on top, a bento grid of sections, utility rows at the bottom.
+ * Sub-screens keep using settings.css; everything here is under .dm-sx.
+ */
+.dm-sx {
+  --sx-radius: 22px;
+  --sx-gap: 12px;
+  padding-bottom: 24px;
+}
+.dm-sx-title {
+  margin: 4px 2px 18px;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text);
+}
+/* One entrance for the whole screen: the blocks rise in turn */
+.dm-sx > * {
+  animation: dm-sx-rise 0.45s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes dm-sx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dm-sx > .dm-sx-bento {
+  animation: none;
+}
+.dm-sx-bento > .dm-sx-tile {
+  animation: dm-sx-rise 0.45s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* ---- Account + Premium ---- */
+.dm-sx-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sx-gap);
+  margin-bottom: var(--sx-gap);
+}
+.dm-sx-account,
+.dm-sx-premium {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--sx-radius);
+  cursor: pointer;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease,
+    background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-sx-account-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.dm-sx-account-name {
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+.dm-sx-account-desc,
+.dm-sx-row-desc,
+.dm-sx-tile-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+.dm-sx-account-desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dm-sx-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  font-family: "Sora", sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text-dim);
+  background: var(--surface-strong);
+  border: 1px dashed var(--border);
+}
+.dm-sx-avatar.is-in {
+  color: #06131a;
+  background: linear-gradient(135deg, var(--cyan), #6aa8ff);
+  border: 0;
+}
+.dm-sx-premium {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(251, 146, 60, 0.06)), var(--surface);
+}
+.dm-sx-premium-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  color: #3b2300;
+  background: linear-gradient(135deg, #fde68a, #f59e0b);
+}
+.dm-sx-premium.is-active .dm-sx-account-desc {
+  color: #f59e0b;
+}
+.dm-sx-chev {
+  flex: none;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+}
+
+/* ---- Bento tiles ---- */
+.dm-sx-bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sx-gap);
+  margin-bottom: var(--sx-gap);
+}
+.dm-sx-tile {
+  --tint: var(--cyan);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 132px;
+  padding: 14px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--tint) 10%, transparent), transparent 60%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--sx-radius);
+  cursor: pointer;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease,
+    box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-sx-tile-wide {
+  grid-column: span 2;
+  min-height: 120px;
+}
+.dm-sx-tile-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.dm-sx-chip {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: var(--tint);
+  background: color-mix(in srgb, var(--tint) 18%, transparent);
+}
+.dm-sx-chip-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.dm-sx-tile-chev {
+  color: var(--text-dim);
+  opacity: 0.5;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+.dm-sx-tile-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.dm-sx-tile-name {
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.dm-sx-langs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 4px;
+}
+.dm-sx-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.dm-sx-flag {
+  width: 26px;
+  height: 19px;
+  background-size: cover;
+  border-radius: 4px;
+}
+.dm-sx-langs-arrow {
+  color: var(--text-dim);
+}
+
+/* ---- Utility rows ---- */
+.dm-sx-list {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.dm-sx-row {
+  --tint: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 62px;
+  padding: 10px 16px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.dm-sx-row + .dm-sx-row {
+  border-top: 1px solid var(--border);
+}
+.dm-sx-row-name {
+  font-weight: 600;
+  font-size: var(--fs-base, 15px);
+}
+
+/* ---- States ---- */
+@media (hover: hover) and (pointer: fine) {
+  .dm-sx-tile:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--tint) 55%, transparent);
+    box-shadow: 0 14px 28px -18px color-mix(in srgb, var(--tint) 70%, transparent);
+  }
+  .dm-sx-tile:hover .dm-sx-tile-chev {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+  .dm-sx-account:hover,
+  .dm-sx-premium:hover {
+    transform: translateY(-2px);
+  }
+  .dm-sx-account:hover {
+    border-color: rgba(var(--cyan-rgb), 0.5);
+  }
+  .dm-sx-premium:hover {
+    border-color: rgba(251, 191, 36, 0.7);
+  }
+  .dm-sx-account:hover .dm-sx-chev,
+  .dm-sx-premium:hover .dm-sx-chev,
+  .dm-sx-row:hover .dm-sx-chev {
+    transform: translateX(3px);
+  }
+  .dm-sx-row:hover {
+    background: var(--surface-strong);
+  }
+}
+.dm-sx-tile:active,
+.dm-sx-account:active,
+.dm-sx-premium:active {
+  transform: scale(0.97);
+}
+.dm-sx-row:active {
+  background: var(--surface-strong);
+}
+.dm-sx-tile:focus-visible,
+.dm-sx-account:focus-visible,
+.dm-sx-premium:focus-visible,
+.dm-sx-row:focus-visible {
+  outline: 2px solid rgba(var(--cyan-rgb), 0.65);
+  outline-offset: 2px;
+}
+
+/* ---- Wider screens: account | premium side by side, a 12-column bento ---- */
+@media (min-width: 720px) {
+  .dm-sx-top {
+    grid-template-columns: 3fr 2fr;
+  }
+  .dm-sx-bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .dm-sx-tile {
+    grid-column: span 3;
+    min-height: 150px;
+  }
+  .dm-sx-tile-wide {
+    grid-column: span 6;
+    min-height: 150px;
+  }
+  .dm-sx-tile:nth-child(2),
+  .dm-sx-tile:nth-child(3) {
+    grid-column: span 3;
+  }
+  .dm-sx-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .dm-sx-row + .dm-sx-row {
+    border-top: 0;
+  }
+  .dm-sx-row:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+  .dm-sx-row:nth-child(even) {
+    border-left: 1px solid var(--border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm-sx > *,
+  .dm-sx-bento > .dm-sx-tile {
+    animation: none !important;
+  }
+  .dm-sx-tile,
+  .dm-sx-account,
+  .dm-sx-premium {
+    transition: none;
+  }
+}

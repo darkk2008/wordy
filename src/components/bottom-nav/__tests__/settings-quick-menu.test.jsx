@@ -83,6 +83,7 @@ describe("Settings long-press quick menu", () => {
     });
     await act(async () => {
       fireEvent.keyDown(document, { key: "Escape" });
+      vi.advanceTimersByTime(300);
     });
     expect(menu()).toBeNull();
     await act(async () => {
@@ -112,6 +113,9 @@ describe("Settings long-press quick menu", () => {
     });
     await act(async () => menu().querySelectorAll("[role=menuitem]")[0].click());
     expect(onOpenSettingsSection).toHaveBeenCalledWith("archived");
+    // it shrinks back toward the icon first, then it is removed
+    expect(menu().className).toContain("dm-nav-quickmenu-closing");
+    await act(async () => vi.advanceTimersByTime(300));
     expect(menu()).toBeNull();
     await act(async () => {
       fireEvent.contextMenu(settingsBtn());
@@ -130,6 +134,17 @@ describe("Settings long-press quick menu", () => {
     await act(async () => {
       fireEvent.pointerDown(document.body);
     });
+    expect(menu().className).toContain("dm-nav-quickmenu-closing");
+    await act(async () => vi.advanceTimersByTime(300));
     expect(menu()).toBeNull();
+  });
+
+  it("one corner next to the Settings icon is marked sharp", async () => {
+    await mount({ setTab: vi.fn() });
+    await act(async () => {
+      fireEvent.pointerDown(settingsBtn(), { button: 0 });
+      vi.advanceTimersByTime(500);
+    });
+    expect(["tl", "bl", "br"]).toContain(menu().getAttribute("data-corner"));
   });
 });

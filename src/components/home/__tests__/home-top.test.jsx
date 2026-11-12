@@ -114,7 +114,7 @@ describe("Home header", () => {
 });
 
 describe("Home toolbar", () => {
-  it("has a Colours button that opens a dropdown and picks a colour", () => {
+  it("has a Colours button that opens a dropdown and picks a colour", async () => {
     const onOpenColor = vi.fn();
     const { el } = mount({ onOpenColor });
     expect(el.querySelector(".dm-ht-counts")).toBeNull();
@@ -124,6 +124,12 @@ describe("Home toolbar", () => {
     expect(items.length).toBe(5);
     click(items[0]);
     expect(onOpenColor).toHaveBeenCalledWith("red");
+    // the menu plays a short closing animation before it is removed
+    expect(el.querySelector(".dm-ht-colors-menu-closing")).toBeTruthy();
+    expect(el.querySelector(".dm-ht-colors-btn-closing")).toBeTruthy();
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 260));
+    });
     expect(el.querySelector(".dm-ht-colors-menu")).toBeNull();
   });
 

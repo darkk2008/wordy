@@ -22,7 +22,7 @@ const SETTINGS_QUICK_ITEMS = [
 // A small menu next to the Settings icon. It is rendered in a portal inside .dm-app (the nav has
 // `contain: paint`, which would clip it, and the theme variables live on .dm-app) and positioned
 // from the icon's rectangle: to the right of it in the desktop sidebar, above it on the phone bar.
-function SettingsQuickMenu({ anchorRect, onPick, onClose, returnFocusRef }) {
+function SettingsQuickMenu({ anchorRect, closing, onPick, onClose, returnFocusRef }) {
   const menuRef = useRef(null);
   const [pos, setPos] = useState(null);
   useLayoutEffect(() => {
@@ -39,12 +39,15 @@ function SettingsQuickMenu({ anchorRect, onPick, onClose, returnFocusRef }) {
       // sidebar: open to the right, centred on the icon
       const top = clamp(anchorRect.top + anchorRect.height / 2 - h / 2, pad, vh - h - pad);
       const left = clamp(anchorRect.right + gap, pad, vw - w - pad);
-      setPos({ left, top, ox: "0%", oy: `${anchorRect.top + anchorRect.height / 2 - top}px` });
+      const iconY = anchorRect.top + anchorRect.height / 2 - top;
+      // the corner next to the icon is the sharp one, so the menu visibly "points" at Settings
+      setPos({ left, top, ox: "0%", oy: `${iconY}px`, corner: iconY <= h / 2 ? "tl" : "bl" });
     } else {
       // bottom bar: open above, right edge lined up with the icon
       const left = clamp(anchorRect.left + anchorRect.width / 2 - w + 28, pad, vw - w - pad);
       const top = clamp(anchorRect.top - h - gap, pad, vh - h - pad);
-      setPos({ left, top, ox: `${anchorRect.left + anchorRect.width / 2 - left}px`, oy: "100%" });
+      const iconX = anchorRect.left + anchorRect.width / 2 - left;
+      setPos({ left, top, ox: `${iconX}px`, oy: "100%", corner: iconX > w / 2 ? "br" : "bl" });
     }
   }, [anchorRect]);
   useEffect(() => {
@@ -83,7 +86,8 @@ function SettingsQuickMenu({ anchorRect, onPick, onClose, returnFocusRef }) {
   return createPortal(
     <div
       ref={menuRef}
-      className="dm-nav-quickmenu"
+      className={`dm-nav-quickmenu${closing ? " dm-nav-quickmenu-closing" : ""}`}
+      data-corner={pos ? pos.corner : undefined}
       role="menu"
       aria-label="Settings shortcuts"
       onKeyDown={onMenuKeyDown}
@@ -166,8 +170,16 @@ export function BottomNav({ tab, setTab, hidden, learningLanguage, onOpenSetting
   // also switch tabs.
   const settingsBtnRef = useRef(null);
   const pressRef = useRef({ timer: null, x: 0, y: 0, fired: false });
-  const [quickMenu, setQuickMenu] = useState(null); // { rect } while open
-  const closeQuickMenu = useCallback(() => setQuickMenu(null), []);
+  const [quickMenu, setQuickMenu] = useState(null); // { rect, closing } while open
+  const quickTimerRef = useRef(null);
+  // Closing plays a short shrink-back animation toward the icon before the menu is removed.
+  const closeQuickMenu = useCallback(() => {
+    setQuickMenu((q) => (q && !q.closing ? { ...q, closing: true } : q));
+    clearTimeout(quickTimerRef.current);
+    const reduce = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    quickTimerRef.current = setTimeout(() => setQuickMenu(null), reduce ? 0 : 180);
+  }, []);
+  useEffect(() => () => clearTimeout(quickTimerRef.current), []);
   const cancelPress = () => {
     const p = pressRef.current;
     if (p.timer) clearTimeout(p.timer);
@@ -176,7 +188,8 @@ export function BottomNav({ tab, setTab, hidden, learningLanguage, onOpenSetting
   const openQuickMenu = () => {
     const btn = settingsBtnRef.current;
     if (!btn) return;
-    setQuickMenu({ rect: btn.getBoundingClientRect() });
+    clearTimeout(quickTimerRef.current);
+    setQuickMenu({ rect: btn.getBoundingClientRect(), closing: false });
   };
   useEffect(() => cancelPress, []);
   useEffect(() => {
@@ -228,7 +241,7 @@ export function BottomNav({ tab, setTab, hidden, learningLanguage, onOpenSetting
             title={it.label}
             aria-label={it.label}
             {...(isSettings
-              ? { ...settingsPressHandlers, "aria-haspopup": "menu", "aria-expanded": !!quickMenu }
+              ? { ...settingsPressHandlers, "aria-haspopup": "menu", "aria-expanded": !!quickMenu && !quickMenu.closing }
               : {})}
             onClick={(e) => {
               if (isSettings && pressRef.current.fired) {
@@ -261,10 +274,11 @@ export function BottomNav({ tab, setTab, hidden, learningLanguage, onOpenSetting
       {quickMenu && (
         <SettingsQuickMenu
           anchorRect={quickMenu.rect}
+          closing={quickMenu.closing}
           returnFocusRef={settingsBtnRef}
           onClose={closeQuickMenu}
           onPick={(section) => {
-            setQuickMenu(null);
+            closeQuickMenu();
             if (onOpenSettingsSection) onOpenSettingsSection(section);
             else setTab("settings");
           }}

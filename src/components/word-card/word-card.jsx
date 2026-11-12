@@ -7,7 +7,6 @@ import { HideArticlesContext, ShowLevelBadgeContext } from "../../core/contexts"
 import { useRomanizationEnabled } from "../../core/speech-voices";
 import { LEVEL_COLOR } from "../../core/srs-and-seed-data";
 import { colorById } from "../../core/word-colors";
-import { ColorDot } from "../colors/color-swatches";
 import { FitText, IconBtn, WordMeta } from "../common/common";
 import {
   Check,
@@ -235,6 +234,7 @@ export function WordCard({
       },
     },
   ];
+  const cardColor = colorById(w.color);
   return (
     <SwipeableRow
       actions={longPressed || multiPickMode ? [] : swipeActions}
@@ -274,10 +274,28 @@ export function WordCard({
                 }
           }
         >
-          {(index !== undefined || (showLevelBadge && w.level) || colorById(w.color)) && (
+          {(index !== undefined || (showLevelBadge && w.level) || cardColor) && (
             <div className="dm-card-badges">
-              {index !== undefined && <span className="dm-card-index">{index}</span>}
-              <ColorDot id={w.color} />
+              {index !== undefined ? (
+                // the colour is shown by the line after the number (see layer-word-index-v2.css)
+                <span
+                  className={`dm-card-index${cardColor ? " dm-card-index-colored" : ""}`}
+                  style={cardColor ? { "--sw": cardColor.hex } : undefined}
+                  title={cardColor ? `Colour: ${cardColor.name}` : undefined}
+                  aria-label={cardColor ? `${index}, colour ${cardColor.name}` : undefined}
+                >
+                  {index}
+                </span>
+              ) : (
+                cardColor && (
+                  <span
+                    className="dm-card-colorline"
+                    style={{ "--sw": cardColor.hex }}
+                    title={`Colour: ${cardColor.name}`}
+                    aria-label={`Colour: ${cardColor.name}`}
+                  />
+                )
+              )}
               {showLevelBadge && w.level && (
                 <span
                   className="dm-level-badge"
