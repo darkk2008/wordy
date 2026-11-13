@@ -101,6 +101,17 @@ export const FREE_FAMILY_LIMIT = 1;
 export const FREE_THEME_LIMIT = 8;
 export const FREE_FAVORITE_LIMIT = Infinity; // favorites cost nothing, so no limit
 export const FREE_TRANSLATE_LIMIT = 10; // per day (was 4 in total, ever)
+// Daily AI limit while Premium is switched off (DM_CONFIG.premiumEnabled === false): the AI costs
+// real money, so everyone gets a generous cap instead of unlimited use. Counts chat + translator.
+export const FAIR_USE_AI_LIMIT = 30;
+// True when the Premium system is switched on (window.DM_CONFIG.premiumEnabled).
+export function premiumSystemEnabled() {
+  try {
+    return !!(window.DM_CONFIG && window.DM_CONFIG.premiumEnabled);
+  } catch (e) {
+    return false;
+  }
+}
 const FREE_TRANSLATE_COUNT_KEY = "deutschmaster-free-translate-count";
 function translateDay() {
   const d = new Date();

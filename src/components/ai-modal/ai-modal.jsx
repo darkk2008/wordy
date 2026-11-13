@@ -24,6 +24,7 @@ import {
 } from "../../core/srs-and-seed-data";
 import { dmGroqFetch, dmParseJson } from "../../services/ai-groq";
 import {
+  FAIR_USE_AI_LIMIT,
   FREE_TRANSLATE_LIMIT,
   getFreeTranslateCount,
   incFreeTranslateCount,
@@ -56,6 +57,7 @@ export function AiModal({
   messages,
   setMessages,
   isPremium,
+  premiumEnabled = true,
   onOpenPremium,
   learningLanguage,
   nativeLanguage,
@@ -82,7 +84,11 @@ export function AiModal({
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, loading]);
-  const [mode, setMode] = useState(() => (isPremium ? "chat" : "translate"));
+  // `isPremium` = real Pro (unlimited AI). With Premium switched off everyone may chat, but within a
+  // shared daily limit (chat + translator) so the AI key stays affordable; no upgrade text is shown.
+  const chatAllowed = isPremium || !premiumEnabled;
+  const dailyLimit = premiumEnabled ? FREE_TRANSLATE_LIMIT : FAIR_USE_AI_LIMIT;
+  const [mode, setMode] = useState(() => (chatAllowed ? "chat" : "translate"));
   const prevModeRef = useRef("chat");
   const MODE_ORDER = {
     chat: 0,
@@ -400,6 +406,13 @@ export function AiModal({
   const send = async (overrideText) => {
     const text = (typeof overrideText === "string" ? overrideText : input).trim();
     if (!text || loading) return;
+    if (!isPremium && !premiumEnabled) {
+      if (tFreeCount >= dailyLimit) {
+        setError(`Daily AI limit reached (${dailyLimit}/${dailyLimit}). Try again tomorrow.`);
+        return;
+      }
+      setTFreeCount(incFreeTranslateCount());
+    }
     const nextMessages = [
       ...messages,
       {
@@ -562,9 +575,11 @@ export function AiModal({
   const doTranslate = async () => {
     const text = tInput.trim();
     if (!text || tLoading) return;
-    if (!isPremium && tFreeCount >= FREE_TRANSLATE_LIMIT) {
+    if (!isPremium && tFreeCount >= dailyLimit) {
       setTError(
-        `Free translations used up for today (${FREE_TRANSLATE_LIMIT}/${FREE_TRANSLATE_LIMIT}). Try again tomorrow or upgrade to Premium for unlimited translations.`
+        premiumEnabled
+          ? `Free translations used up for today (${dailyLimit}/${dailyLimit}). Try again tomorrow or upgrade to Premium for unlimited translations.`
+          : `Daily AI limit reached (${dailyLimit}/${dailyLimit}). Try again tomorrow.`
       );
       return;
     }
@@ -857,7 +872,7 @@ export function AiModal({
           className="dm-ai-send"
           onClick={doTranslate}
           disabled={
-            tLoading || !tInput.trim() || (!isPremium && tFreeCount >= FREE_TRANSLATE_LIMIT)
+            tLoading || !tInput.trim() || (!isPremium && tFreeCount >= dailyLimit)
           }
           type="button"
         >
@@ -866,19 +881,25 @@ export function AiModal({
       </div>
       {!isPremium && (
         <div className="dm-tr-free-banner">
-          {tFreeCount >= FREE_TRANSLATE_LIMIT ? (
-            <>
-              {"You've used all " + FREE_TRANSLATE_LIMIT + " free translations for today. "}
-              <button
-                type="button"
-                className="dm-tr-free-upgrade"
-                onClick={() => onOpenPremium && onOpenPremium()}
-              >
-                Upgrade to Premium
-              </button>
-            </>
+          {tFreeCount >= dailyLimit ? (
+            premiumEnabled ? (
+              <>
+                {"You've used all " + dailyLimit + " free translations for today. "}
+                <button
+                  type="button"
+                  className="dm-tr-free-upgrade"
+                  onClick={() => onOpenPremium && onOpenPremium()}
+                >
+                  Upgrade to Premium
+                </button>
+              </>
+            ) : (
+              `You've used all ${dailyLimit} AI requests for today. Come back tomorrow.`
+            )
+          ) : premiumEnabled ? (
+            `${dailyLimit - tFreeCount} of ${dailyLimit} free translations left today`
           ) : (
-            `${FREE_TRANSLATE_LIMIT - tFreeCount} of ${FREE_TRANSLATE_LIMIT} free translations left today`
+            `${dailyLimit - tFreeCount} of ${dailyLimit} AI requests left today`
           )}
         </div>
       )}
@@ -1045,7 +1066,7 @@ export function AiModal({
         {modeTabs}
         <div className="dm-ai-panel">
           <div key={mode} className="dm-ai-panel-slide" data-dir={panelDir}>
-            {mode === "chat" ? (isPremium ? chatUI : chatLockedUI) : translatorUI}
+            {mode === "chat" ? (chatAllowed ? chatUI : chatLockedUI) : translatorUI}
           </div>
         </div>
       </div>

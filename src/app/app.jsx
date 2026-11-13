@@ -25,6 +25,7 @@ import { StackView } from "../components/stack-view/stack-view";
 import { TranslationLoadingOverlay } from "../components/translation-overlay/translation-overlay";
 import { stripArticle } from "../components/word-forms/word-forms";
 import { ROMAN_LANGS, todayStr, uid, yesterdayStr } from "../core/constants";
+import { START_LEVELS, buildLevelStacks } from "../core/level-stacks";
 import { mergeThreeWay, sameSnapshot, snapshot } from "../services/sync-merge";
 import { HideArticlesContext, ShowLevelBadgeContext } from "../core/contexts";
 import { setTranslateFormPrompts } from "../core/form-prompt-setting";
@@ -60,6 +61,7 @@ import {
   applyServerPremium,
   loadPremiumStatus,
   premiumForSync,
+  premiumSystemEnabled,
 } from "../services/premium-status";
 import {
   UI_LANG_NAMES,
@@ -207,7 +209,12 @@ export function App() {
     setAdminPage(false);
   }, []);
   const [premiumRefreshTick, setPremiumRefreshTick] = useState(0);
-  const isPremium = useMemo(() => loadPremiumStatus().active, [premiumRefreshTick]);
+  // Premium switched off (DM_CONFIG.premiumEnabled): every feature gate opens, so `isPremium` is true for
+  // everyone and no upsell is shown. `hasPro` stays the REAL subscription state and is what guards the
+  // features that cost money (AI chat/translator beyond the daily limit, background AI generation).
+  const premiumEnabled = premiumSystemEnabled();
+  const hasPro = useMemo(() => premiumEnabled && loadPremiumStatus().active, [premiumRefreshTick, premiumEnabled]);
+  const isPremium = premiumEnabled ? hasPro : true;
   useEffect(() => {
     const bump = () => setPremiumRefreshTick((n) => n + 1);
     window.addEventListener("dm-premium-updated", bump);
@@ -625,6 +632,21 @@ export function App() {
       window.localStorage.setItem("deutschmaster-starter-stack", val ? "1" : "0");
     } catch (e) {}
   };
+  // Level chosen in onboarding (A1-B2): decides which ready-made stacks the first launch creates.
+  const [startLevel, setStartLevel] = useState(() => {
+    try {
+      const v = window.localStorage.getItem("deutschmaster-start-level");
+      return START_LEVELS.includes(v) ? v : "A1";
+    } catch (e) {
+      return "A1";
+    }
+  });
+  const updateStartLevel = (val) => {
+    setStartLevel(val);
+    try {
+      window.localStorage.setItem("deutschmaster-start-level", val);
+    } catch (e) {}
+  };
   const completeOnboarding = () => {
     setShowOnboarding(false);
     try {
@@ -633,19 +655,24 @@ export function App() {
     track("onboarding_completed", {
       nativeLanguage,
       learningLanguage,
+      startLevel,
+      starterStack,
     });
   };
   useEffect(() => {
     if (!pendingFirstLaunch || showOnboarding) return;
     const seeded = seedData(learningLanguage, nativeLanguage);
-    setStacks(starterStack ? seeded.stacks.slice(0, 1) : []);
+    // Ready-made stacks for the chosen level (5 stacks x 10 words); the old single "A1 Basics" stack is
+    // only a fallback if the language/level has no curated set.
+    const levelStacks = starterStack ? buildLevelStacks(startLevel, learningLanguage, nativeLanguage) : [];
+    setStacks(levelStacks.length ? levelStacks : starterStack ? seeded.stacks.slice(0, 1) : []);
     setMiniStacks(seeded.miniStacks || {});
     setFavMiniStack(seeded.favMiniStack || null);
     setStreak(seeded.streak);
     setBestStreak(seeded.streak);
     setTodayReviews(seeded.todayReviews.count || 0);
     setPendingFirstLaunch(false);
-  }, [pendingFirstLaunch, showOnboarding, learningLanguage, nativeLanguage, starterStack]);
+  }, [pendingFirstLaunch, showOnboarding, learningLanguage, nativeLanguage, starterStack, startLevel]);
   useEffect(() => {
     if (!restrictCopy) return;
     const blockCopy = (e) => {
@@ -1041,7 +1068,7 @@ export function App() {
     // Pro can change on the server at any time (promo, admin grant, another device): re-read it on
     // resume, on a timer and on realtime events, independently of the (much bigger) user_data row.
     const refreshEntitlements = async () => {
-      if (cancelled) return;
+      if (cancelled || !premiumEnabled) return;
       try {
         const ent = await cloud.getEntitlements();
         if (!cancelled && (!ent || !ent.failed)) applyServerPremium(ent);
@@ -1719,7 +1746,7 @@ export function App() {
   // modal just reads w.paradigm (via dmHasParadigm), so anything queued up
   // here shows up instantly once they tap the table icon.
   useEffect(() => {
-    if (!loaded || !isPremium || !apiKey) return;
+    if (!loaded || !hasPro || !apiKey) return;
     const code = currentLearningLangCode;
     if (code === "de") return;
     const queue = [];
@@ -1778,7 +1805,7 @@ export function App() {
     // or premium/API-key/language state changes; already-built or
     // already-queued words are skipped via the __dmFormsDone/__dmFormsBusy
     // caches above, so this stays cheap.
-  }, [loaded, isPremium, apiKey, learningLanguage, stacks]);
+  }, [loaded, hasPro, apiKey, learningLanguage, stacks]);
   // Same idea for romanization: build it in the background for everyone
   // (free included) as soon as words exist, instead of waiting on a manual
   // button tap. Premium only gates whether it's *shown* (see WordCard),
@@ -2314,7 +2341,8 @@ export function App() {
               onAddWord={addWordToStack}
               messages={aiMessages}
               setMessages={setAiMessages}
-              isPremium={isPremium}
+              isPremium={hasPro}
+              premiumEnabled={premiumEnabled}
               onOpenPremium={() => {
                 setAiOpen(false);
                 openPremium();
@@ -2386,6 +2414,8 @@ export function App() {
               onSelectTheme={selectTheme}
               starterStack={starterStack}
               onSetStarterStack={updateStarterStack}
+              startLevel={startLevel}
+              onSetStartLevel={updateStartLevel}
               onFinish={completeOnboarding}
             />
           )}

@@ -21,6 +21,12 @@ window.DM_CONFIG = {
   blockFraming: true,
   // Pro comes only from the Supabase `entitlements` table (run supabase-entitlements.sql first).
   serverEntitlements: true,
+  // MASTER SWITCH for Premium. false = the app is completely free: nothing is locked, no Premium
+  // button/upgrade text/promo screen is shown, and the cloud is not asked about Pro. AI features
+  // stay available with a daily fair-use limit (FAIR_USE_AI_LIMIT in services/premium-status.js)
+  // so the shared AI key cannot be drained. true = the full Premium system works as before.
+  // See PREMIUM.md for what else to check when turning it back on.
+  premiumEnabled: false,
 };
 /* Clickjacking protection (a <meta> CSP cannot set frame-ancestors): optional, see blockFraming above. */
 (function () {

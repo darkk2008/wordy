@@ -22,6 +22,7 @@ import {
 import { GlobeIcon, GraduationCap, LockIcon, ShieldIcon, UsersIcon } from "../icons/settings-icons";
 
 import { activateOnKey } from "../../behaviors/keyboard-activation";
+import { premiumSystemEnabled } from "../../services/premium-status";
 function useRevealOnView() {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
@@ -454,7 +455,7 @@ export function AppAboutSettings({ onBack }) {
         A quick guide to the ideas behind the app. Tap a question to see the answer.
       </p>
       <div className="dm-faq-list">
-        {FAQS.map((f) => {
+        {FAQS.filter((f) => f.id !== "premium" || premiumSystemEnabled()).map((f) => {
           const isOpen = openId === f.id;
           return (
             <div role="button" tabIndex={0} onKeyDown={activateOnKey}

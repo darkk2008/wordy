@@ -4,6 +4,7 @@
 
 import { useMemo, useState } from "react";
 import { ONBOARDING_LOGO_SRC } from "../../assets/inline-images";
+import { START_LEVELS, levelStackPreview } from "../../core/level-stacks";
 import { speak } from "../../core/speech-voices";
 import { seedWord } from "../../core/srs-and-seed-data";
 import { FREE_THEME_LIMIT } from "../../services/premium-status";
@@ -241,6 +242,8 @@ export function OnboardingFlow({
   onSelectTheme,
   starterStack,
   onSetStarterStack,
+  startLevel,
+  onSetStartLevel,
   onFinish,
 }) {
   const [step, setStep] = useState(0);
@@ -248,7 +251,9 @@ export function OnboardingFlow({
     () => buildOnboardingSample(learningLanguage, nativeLanguage),
     [learningLanguage, nativeLanguage]
   );
-  const steps = ["welcome", "native", "learning", "theme", "stacks", "cards", "filters"];
+  const previewStacks = useMemo(() => levelStackPreview(startLevel, nativeLanguage), [startLevel, nativeLanguage]);
+  const previewWords = previewStacks.reduce((n, p) => n + p.count, 0);
+  const steps = ["welcome", "native", "learning", "level", "theme", "stacks", "cards", "filters"];
   const total = steps.length;
   const go = (delta) => setStep((s) => Math.max(0, Math.min(total - 1, s + delta)));
   const isLast = step === total - 1;
@@ -346,6 +351,42 @@ export function OnboardingFlow({
         </div>
       </div>
     );
+  } else if (steps[step] === "level") {
+    const LEVEL_INFO = {
+      A1: { title: "Beginner", sub: "I'm just starting out." },
+      A2: { title: "Elementary", sub: "I know simple everyday phrases." },
+      B1: { title: "Intermediate", sub: "I can manage most everyday situations." },
+      B2: { title: "Upper-intermediate", sub: "I can talk about many topics with ease." },
+    };
+    body = (
+      <div className="dm-onboard-step">
+        <AnimatedText tag="h2" text="What's your level?" className="dm-onboard-title" />
+        <p className="dm-onboard-sub dm-onboard-fade dm-onboard-delay-2">
+          Pick the level that fits you best in the language you're learning. We'll prepare ready-made
+          stacks with words for it.
+        </p>
+        <div className="dm-onboard-level-list" role="radiogroup" aria-label="Your level">
+          {START_LEVELS.map((lv, i) => (
+            <button
+              key={lv}
+              type="button"
+              role="radio"
+              aria-checked={startLevel === lv}
+              className={`dm-onboard-level-card ${startLevel === lv ? "dm-onboard-level-card-active" : ""} dm-onboard-fade`}
+              style={{ animationDelay: `${0.32 + i * 0.07}s` }}
+              onClick={() => onSetStartLevel(lv)}
+            >
+              <span className="dm-onboard-level-badge">{lv}</span>
+              <span className="dm-onboard-level-text">
+                <span className="dm-onboard-level-title">{LEVEL_INFO[lv].title}</span>
+                <span className="dm-onboard-level-sub">{LEVEL_INFO[lv].sub}</span>
+              </span>
+              {startLevel === lv && <Check size={16} className="dm-onboard-lang-check" />}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
   } else if (steps[step] === "theme") {
     body = (
       <div className="dm-onboard-step">
@@ -388,32 +429,45 @@ export function OnboardingFlow({
   } else if (steps[step] === "stacks") {
     body = (
       <div className="dm-onboard-step">
-        <AnimatedText tag="h2" text="Your first stack" className="dm-onboard-title" />
+        <AnimatedText tag="h2" text="Your ready-made stacks" className="dm-onboard-title" />
         <p className="dm-onboard-sub dm-onboard-fade dm-onboard-delay-2">
-          A stack is a themed set of flashcards. Start with a ready-made one, or begin with a clean
-          slate.
+          A stack is a themed set of flashcards. Start with ready-made ones for your level, or begin
+          with a clean slate.
         </p>
         <div className="dm-onboard-visual dm-onboard-fade dm-onboard-delay-3">
-          <div className={`dm-onboard-stackdemo ${starterStack ? "" : "dm-onboard-stackdemo-off"}`}>
-            <span className="dm-onboard-stackdemo-emoji">{starterStack ? "\uD83D\uDCD8" : "\u2795"}</span>
-            <div className="dm-onboard-stackdemo-text">
-              <span className="dm-onboard-stackdemo-name">
-                {starterStack ? "A1 Basics" : "No stacks yet"}
-              </span>
-              <span className="dm-onboard-stackdemo-count">
-                {starterStack ? "6 words \u00B7 ready on Home" : "Tap + on Home to create your own"}
-              </span>
+          {starterStack ? (
+            <div className="dm-onboard-stacklist">
+              <div className="dm-onboard-stacklist-head">
+                <span className="dm-onboard-level-badge">{startLevel}</span>
+                <span className="dm-onboard-stackdemo-count">
+                  {previewStacks.length} <span>stacks</span> · {previewWords} <span>words</span>
+                </span>
+              </div>
+              {previewStacks.map((p) => (
+                <div key={p.name} className="dm-onboard-stacklist-row">
+                  <span className="dm-onboard-stacklist-name">{p.name}</span>
+                  <span className="dm-onboard-stacklist-count">{p.count}</span>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="dm-onboard-stackdemo dm-onboard-stackdemo-off">
+              <span className="dm-onboard-stackdemo-emoji">{"\u2795"}</span>
+              <div className="dm-onboard-stackdemo-text">
+                <span className="dm-onboard-stackdemo-name">No stacks yet</span>
+                <span className="dm-onboard-stackdemo-count">Tap + on Home to create your own</span>
+              </div>
+            </div>
+          )}
           <div
             className={`dm-onboard-toggle-row ${starterStack ? "dm-onboard-toggle-row-on" : ""}`}
             style={{ "--guard-color": "var(--cyan)" }}
           >
             <div className="dm-onboard-toggle-text">
-              <span className="dm-onboard-toggle-title">Add a starter stack</span>
+              <span className="dm-onboard-toggle-title">Add ready-made stacks</span>
               <span className="dm-onboard-toggle-sub">
                 {starterStack
-                  ? "A1 Basics will appear on Home automatically."
+                  ? "Ready-made stacks will appear on Home automatically."
                   : "Home will start empty \u2014 no stacks added."}
               </span>
             </div>
@@ -421,7 +475,7 @@ export function OnboardingFlow({
               type="button"
               role="switch"
               aria-checked={!!starterStack}
-              aria-label="Add a starter stack"
+              aria-label="Add ready-made stacks"
               className={`dm-guard-switch ${starterStack ? "dm-guard-switch-on" : ""}`}
               onClick={() => onSetStarterStack(!starterStack)}
             >
@@ -471,6 +525,7 @@ export function OnboardingFlow({
     welcome: "Welcome",
     native: "Language",
     learning: "Learning",
+    level: "Level",
     theme: "Appearance",
     stacks: "Stacks",
     cards: "Cards",

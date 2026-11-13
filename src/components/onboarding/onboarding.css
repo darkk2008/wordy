@@ -482,3 +482,87 @@
     transform: none !important;
   }
 }
+
+/* Level step + ready-made stacks preview */
+.dm-onboard-level-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.dm-onboard-level-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.dm-onboard-level-card-active {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px var(--cyan) inset;
+}
+.dm-onboard-level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--cyan);
+}
+.dm-onboard-level-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dm-onboard-level-title {
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+.dm-onboard-level-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+.dm-onboard-stacklist {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dm-onboard-stacklist-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.dm-onboard-stacklist-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+}
+.dm-onboard-stacklist-count {
+  color: var(--text-dim);
+  font-weight: 500;
+}

@@ -26,6 +26,7 @@ import {
 import { FlagIcon, LANGUAGES, LanguagesSettings } from "../language-settings/language-settings";
 import { NotificationSettings } from "../notification-settings/notification-settings";
 import { PremiumSettings } from "../premium-settings/premium-settings";
+import { premiumSystemEnabled } from "../../services/premium-status";
 import { RestrictionsSettings } from "../restrictions-settings/restrictions-settings";
 
 export function SettingsView({
@@ -274,7 +275,7 @@ export function SettingsView({
   return (
     <div className="dm-view dm-sx">
       <h1 className="dm-sx-title">Settings</h1>
-      {GROUPS.map((rows, gi) => (
+      {GROUPS.map((rows) => rows.filter((r) => r.id !== "premium" || premiumSystemEnabled())).map((rows, gi) => (
         <div className="dm-sx-group" key={gi}>
           {rows.map((r) => (
             <button key={r.id} type="button" className="dm-sx-row" onClick={() => setSection(r.id)}>
