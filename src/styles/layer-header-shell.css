@@ -1,0 +1,68 @@
+/* styles/layer-header-shell.css
+ * One header card for every screen. This is the same shell as the Home header (.dm-hh.dm-header in
+ * home-top.css): gradient hairline border, soft cyan glow, 28px corners, same padding and the same
+ * height at every screen width. Screens that use a plain .dm-header (Games, Stats, Account, ...)
+ * now look and measure the same as Home. Imported last so it wins over the older .dm-header rules.
+ */
+.dm-header {
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-height: 80px;
+  margin: 0 0 14px;
+  padding: 14px 14px 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(var(--cyan-rgb), 0.55),
+      var(--border) 45%,
+      rgba(var(--gold-rgb), 0.5)
+    ) border-box;
+  background-color: var(--bg);
+  box-shadow:
+    0 18px 36px -22px rgba(var(--cyan-rgb), 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+.dm-header::after {
+  top: -90%;
+  left: -8%;
+  right: auto;
+  width: 260px;
+  height: 220px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--cyan-rgb), 0.16),
+    transparent 70%
+  );
+}
+@media (max-width: 640px) {
+  .dm-header {
+    min-height: 76px;
+    padding: 12px 12px 12px 14px;
+  }
+}
+@media (max-width: 380px) {
+  .dm-header {
+    min-height: 72px;
+    padding: 12px 10px 12px 12px;
+  }
+}
+
+/* Games: the title is as big as the Home wordmark, with the eyebrow above it */
+.dm-gh .dm-gh-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.dm-gh .dm-eyebrow {
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+.dm-gh .dm-h1 {
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}

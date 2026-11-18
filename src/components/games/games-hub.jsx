@@ -137,8 +137,8 @@ export function GamesHub({
   ];
   return (
     <div className="dm-view">
-      <div className="dm-header">
-        <div>
+      <div className="dm-header dm-gh">
+        <div className="dm-gh-text">
           <div className="dm-eyebrow">Train your recall</div>
           <h1 className="dm-h1">Games</h1>
         </div>

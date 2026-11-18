@@ -1,0 +1,125 @@
+/* styles/layer-nav-new.css
+ * Sidebar (desktop) and bottom bar (phone), restyled to match the new Home header:
+ * same gradient hairline border, same soft cyan glow, same rounded corners, pill-shaped items.
+ * Imported LAST in index.css so it wins over the older nav layers. Colours only come from tokens.
+ */
+
+/* ---------- Shared card look (the same recipe as .dm-hh.dm-header) ---------- */
+.dm-bottomnav,
+.dm-app.dm-light .dm-bottomnav {
+  border: 1px solid transparent;
+  border-radius: 28px;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(var(--cyan-rgb), 0.55),
+      var(--border) 45%,
+      rgba(var(--gold-rgb), 0.5)
+    ) border-box;
+  background-color: var(--bg);
+  box-shadow:
+    0 18px 36px -22px rgba(var(--cyan-rgb), 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+/* the old thin top line is gone; a calm cyan bloom takes its place */
+.dm-bottomnav::before {
+  display: none;
+}
+.dm-bottomnav::after {
+  content: "";
+  position: absolute;
+  top: -90px;
+  left: -60px;
+  bottom: auto;
+  width: 260px;
+  height: 220px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--cyan-rgb), 0.16),
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ---------- Items ---------- */
+/* Phone bar: round pills with a soft cyan tint when active */
+@media (max-width: 899px) {
+  .dm-navbtn {
+    border-radius: 999px;
+  }
+  .dm-navbtn-active,
+  .dm-navbtn[aria-haspopup="menu"][aria-expanded="true"] {
+    background: rgba(var(--cyan-rgb), 0.14);
+    color: var(--cyan) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.3);
+    transform: none;
+  }
+  .dm-navbtn-active::before {
+    border-radius: 999px;
+  }
+}
+/* Desktop sidebar: the items keep their original look (soft rounded rectangle, gradient tint when
+   active). Only the card around them follows the new header. */
+@media (min-width: 900px) {
+  .dm-navbtn {
+    border-radius: 11px;
+  }
+  .dm-navbtn-active {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--cyan-rgb), 0.16),
+      rgba(var(--cyan-rgb), 0.05)
+    );
+    color: var(--cyan) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.22);
+    transform: none;
+  }
+  .dm-navbtn-active::before {
+    border-radius: 14px;
+  }
+}
+
+/* ---------- Phone: a floating bar, detached from the screen edge ---------- */
+@media (max-width: 899px) {
+  .dm-bottomnav {
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+    max-width: 456px;
+    padding: 8px;
+  }
+  .dm-navbtn {
+    padding: 6px 14px;
+  }
+  .dm-content {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 899px) and (max-height: 480px) {
+  .dm-bottomnav {
+    padding: 5px 8px;
+  }
+  .dm-content {
+    padding-bottom: 80px;
+  }
+}
+
+/* ---------- Desktop: the sidebar is the same card as the header ---------- */
+@media (min-width: 900px) {
+  .dm-bottomnav {
+    padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
+    gap: 4px;
+  }
+  .dm-navbtn {
+    padding: 10px 13px;
+  }
+  .dm-nav-collapsed .dm-navbtn {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .dm-nav-collapsed .dm-bottomnav {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}

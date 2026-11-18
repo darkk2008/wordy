@@ -16,56 +16,80 @@ export function MistakesModal({ words, onSetColor, onToggleFav, onClose }) {
   const [pickId, setPickId] = useState(null); // the word whose colour picker is open
   const pickWord = pickId ? words.find((w) => w.id === pickId) : null;
   return (
-    <div className="dm-modal-backdrop" onClick={onClose}>
-      <div className="dm-modal dm-mistakes-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="dm-modal-head">
-          <h3>{`Mistakes (${words.length})`}</h3>
-          <IconBtn title="Close" onClick={onClose}>
-            <X size={18} />
-          </IconBtn>
-        </div>
-        <div className="dm-mistakes-list">
-          {words.map((w) => {
-            const c = colorById(w.color);
-            return (
-              <div key={w.id} className="dm-mcard" style={c ? { "--sw": c.hex } : undefined}>
-                <div className="dm-mcard-text">
-                  <span className="dm-mcard-de">{w.de}</span>
-                  <span className="dm-mcard-en">{w.en}</span>
+    <>
+      <div className="dm-modal-backdrop" onClick={onClose}>
+        <div
+          className="dm-modal dm-mistakes-modal"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="dm-modal-head">
+            <h3>{`Mistakes (${words.length})`}</h3>
+            <IconBtn title="Close" onClick={onClose}>
+              <X size={18} />
+            </IconBtn>
+          </div>
+          <div className="dm-mistakes-list">
+            {words.map((w) => {
+              const c = colorById(w.color);
+              return (
+                <div
+                  key={w.id}
+                  className="dm-mcard"
+                  style={c ? { "--sw": c.hex } : undefined}
+                >
+                  <div className="dm-mcard-text">
+                    <span className="dm-mcard-de">{w.de}</span>
+                    <span className="dm-mcard-en">{w.en}</span>
+                  </div>
+                  <div className="dm-mcard-actions">
+                    <button
+                      type="button"
+                      className={`dm-mcard-btn${w.favorite ? " dm-mcard-btn-fav" : ""}`}
+                      title={
+                        w.favorite
+                          ? "Remove from favorites"
+                          : "Add to favorites"
+                      }
+                      aria-label={
+                        w.favorite
+                          ? "Remove from favorites"
+                          : "Add to favorites"
+                      }
+                      aria-pressed={!!w.favorite}
+                      onClick={() =>
+                        onToggleFav && onToggleFav(w._stackId, w.id)
+                      }
+                    >
+                      <Star size={18} fill={w.favorite ? "#FFB020" : "none"} />
+                    </button>
+                    <button
+                      type="button"
+                      className={`dm-mcard-btn${c ? " dm-mcard-btn-colored" : ""}`}
+                      title={c ? `Colour: ${c.name}` : "Add to a colour"}
+                      aria-label={
+                        c
+                          ? `Colour: ${c.name}. Change colour`
+                          : "Add to a colour"
+                      }
+                      aria-haspopup="dialog"
+                      onClick={() => setPickId(w.id)}
+                    >
+                      <PaletteIcon size={18} />
+                      {c && <span className="dm-mcard-btn-dot" />}
+                    </button>
+                  </div>
                 </div>
-                <div className="dm-mcard-actions">
-                  <button
-                    type="button"
-                    className={`dm-mcard-btn${w.favorite ? " dm-mcard-btn-fav" : ""}`}
-                    title={w.favorite ? "Remove from favorites" : "Add to favorites"}
-                    aria-label={w.favorite ? "Remove from favorites" : "Add to favorites"}
-                    aria-pressed={!!w.favorite}
-                    onClick={() => onToggleFav && onToggleFav(w._stackId, w.id)}
-                  >
-                    <Star size={18} fill={w.favorite ? "#FFB020" : "none"} />
-                  </button>
-                  <button
-                    type="button"
-                    className={`dm-mcard-btn${c ? " dm-mcard-btn-colored" : ""}`}
-                    title={c ? `Colour: ${c.name}` : "Add to a colour"}
-                    aria-label={c ? `Colour: ${c.name}. Change colour` : "Add to a colour"}
-                    aria-haspopup="dialog"
-                    onClick={() => setPickId(w.id)}
-                  >
-                    <PaletteIcon size={18} />
-                    {c && <span className="dm-mcard-btn-dot" />}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="dm-modal-actions">
-          <button type="button" className="dm-btn-primary" onClick={onClose}>
-            Done
-          </button>
+              );
+            })}
+          </div>
+          <div className="dm-modal-actions">
+            <button type="button" className="dm-btn-primary" onClick={onClose}>
+              Done
+            </button>
+          </div>
         </div>
       </div>
+      {/* A separate modal next to the Mistakes one (not inside its backdrop), so it always stacks on top */}
       {pickWord && (
         <div
           className="dm-modal-backdrop dm-colorpick-backdrop"
@@ -128,6 +152,6 @@ export function MistakesModal({ words, onSetColor, onToggleFav, onClose }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

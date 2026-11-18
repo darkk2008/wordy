@@ -251,8 +251,12 @@
 }
 
 /* The colour picker modal, on top of the Mistakes modal */
-.dm-colorpick-backdrop {
+.dm-modal-backdrop.dm-colorpick-backdrop {
   z-index: 1100;
+}
+/* its sheet must sit above the Mistakes sheet (z-index 1001) even if that one is painted later */
+.dm-colorpick-backdrop .dm-colorpick {
+  z-index: 1101;
 }
 .dm-colorpick {
   max-width: 420px;
