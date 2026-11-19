@@ -190,58 +190,60 @@ export function GameDone({
           ))}
         </div>
       )}
-      <div className="dm-done-ring-wrap">
-        <div className="dm-done-glow" />
-        <div className="dm-done-sparkles">
-          {sparkles.map((s, i) => (
-            <span
-              key={i}
-              className="dm-done-spark"
+      <div className="dm-done-card">
+        <div className="dm-done-ring-wrap">
+          <div className="dm-done-glow" />
+          <div className="dm-done-sparkles">
+            {sparkles.map((s, i) => (
+              <span
+                key={i}
+                className="dm-done-spark"
+                style={{
+                  left: `calc(50% + ${s.x}px)`,
+                  top: `calc(50% + ${s.y}px)`,
+                  width: `${s.size}px`,
+                  height: `${s.size}px`,
+                  animationDelay: `${s.delay}s`,
+                  animationDuration: `${s.duration}s`,
+                }}
+              />
+            ))}
+          </div>
+          <svg viewBox="0 0 120 120" className="dm-done-ring-svg">
+            <circle cx={60} cy={60} r={54} className="dm-done-ring-track" />
+            <circle
+              cx={60}
+              cy={60}
+              r={54}
+              className="dm-done-ring-fill"
               style={{
-                left: `calc(50% + ${s.x}px)`,
-                top: `calc(50% + ${s.y}px)`,
-                width: `${s.size}px`,
-                height: `${s.size}px`,
-                animationDelay: `${s.delay}s`,
-                animationDuration: `${s.duration}s`,
+                stroke: ringColor,
+                strokeDasharray: circumference,
+                strokeDashoffset: offset,
               }}
             />
-          ))}
+          </svg>
+          <div className="dm-done-ring-label">{animatedPercent}%</div>
         </div>
-        <svg viewBox="0 0 120 120" className="dm-done-ring-svg">
-          <circle cx={60} cy={60} r={54} className="dm-done-ring-track" />
-          <circle
-            cx={60}
-            cy={60}
-            r={54}
-            className="dm-done-ring-fill"
-            style={{
-              stroke: ringColor,
-              strokeDasharray: circumference,
-              strokeDashoffset: offset,
-            }}
-          />
-        </svg>
-        <div className="dm-done-ring-label">{animatedPercent}%</div>
+        <h2 className="dm-h1 dm-done-heading">{heading}</h2>
+        <p className="dm-done-sub">
+          {subtitle ? (
+            subtitle
+          ) : rounds && rounds.total > 1 ? (
+            <>
+              {label}
+              {` round ${rounds.round} of ${rounds.total} complete`}
+              {percent !== null ? ` — ${score} correct` : ""}.
+            </>
+          ) : (
+            <>
+              {label}
+              {" round complete"}
+              {percent !== null ? ` — ${score} correct` : ""}.
+            </>
+          )}
+        </p>
       </div>
-      <h2 className="dm-h1 dm-done-heading">{heading}</h2>
-      <p className="dm-done-sub">
-        {subtitle ? (
-          subtitle
-        ) : rounds && rounds.total > 1 ? (
-          <>
-            {label}
-            {` round ${rounds.round} of ${rounds.total} complete`}
-            {percent !== null ? ` — ${score} correct` : ""}.
-          </>
-        ) : (
-          <>
-            {label}
-            {" round complete"}
-            {percent !== null ? ` — ${score} correct` : ""}.
-          </>
-        )}
-      </p>
       {showMistakes && mistakes && (
         <MistakesModal
           words={mistakes.words}

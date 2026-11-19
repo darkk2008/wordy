@@ -1,74 +1,49 @@
 /* styles/layer-nav-new.css
- * Sidebar (desktop) and bottom bar (phone), restyled to match the new Home header:
- * same gradient hairline border, same soft cyan glow, same rounded corners, pill-shaped items.
- * Imported LAST in index.css so it wins over the older nav layers. Colours only come from tokens.
+ * DESKTOP SIDEBAR ONLY. Restyled to match the new Home header: same gradient hairline border,
+ * same soft cyan glow, same rounded corners.
+ * The phone bottom bar (below 900px) is deliberately NOT touched here: it keeps its original look
+ * and animations from bottom-nav.css and the older layers.
+ * Imported last in index.css so it wins over the older sidebar layers.
  */
-
-/* ---------- Shared card look (the same recipe as .dm-hh.dm-header) ---------- */
-.dm-bottomnav,
-.dm-app.dm-light .dm-bottomnav {
-  border: 1px solid transparent;
-  border-radius: 28px;
-  background:
-    linear-gradient(var(--bg), var(--bg)) padding-box,
-    linear-gradient(
-      135deg,
-      rgba(var(--cyan-rgb), 0.55),
-      var(--border) 45%,
-      rgba(var(--gold-rgb), 0.5)
-    ) border-box;
-  background-color: var(--bg);
-  box-shadow:
-    0 18px 36px -22px rgba(var(--cyan-rgb), 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
-}
-/* the old thin top line is gone; a calm cyan bloom takes its place */
-.dm-bottomnav::before {
-  display: none;
-}
-.dm-bottomnav::after {
-  content: "";
-  position: absolute;
-  top: -90px;
-  left: -60px;
-  bottom: auto;
-  width: 260px;
-  height: 220px;
-  background: radial-gradient(
-    circle,
-    rgba(var(--cyan-rgb), 0.16),
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* ---------- Phone: the bar stays attached to the bottom edge (no gap) ---------- */
-@media (max-width: 899px) {
+@media (min-width: 900px) {
   .dm-bottomnav,
   .dm-app.dm-light .dm-bottomnav {
-    bottom: 0;
-    width: 100%;
-    max-width: 480px;
-    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-    border-bottom-width: 0;
-    border-radius: 28px 28px 0 0;
+    border: 1px solid transparent;
+    border-radius: 28px;
+    background:
+      linear-gradient(var(--bg), var(--bg)) padding-box,
+      linear-gradient(
+        135deg,
+        rgba(var(--cyan-rgb), 0.55),
+        var(--border) 45%,
+        rgba(var(--gold-rgb), 0.5)
+      ) border-box;
+    background-color: var(--bg);
     box-shadow:
-      0 -18px 36px -22px rgba(var(--cyan-rgb), 0.35),
+      0 18px 36px -22px rgba(var(--cyan-rgb), 0.35),
       0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  }
-}
-@media (max-width: 899px) and (max-height: 480px) {
-  .dm-bottomnav {
-    padding: 5px 8px calc(5px + env(safe-area-inset-bottom));
-  }
-}
-
-/* ---------- Desktop: the sidebar is the same card as the header ---------- */
-@media (min-width: 900px) {
-  .dm-bottomnav {
     padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
     gap: 4px;
+  }
+  /* the old thin top line is gone; a calm cyan bloom takes its place */
+  .dm-bottomnav::before {
+    display: none;
+  }
+  .dm-bottomnav::after {
+    content: "";
+    position: absolute;
+    top: -90px;
+    left: -60px;
+    bottom: auto;
+    width: 260px;
+    height: 220px;
+    background: radial-gradient(
+      circle,
+      rgba(var(--cyan-rgb), 0.16),
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: -1;
   }
   .dm-nav-collapsed .dm-bottomnav {
     padding-left: 8px;
